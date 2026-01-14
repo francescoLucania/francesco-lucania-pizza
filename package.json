@@ -4,6 +4,7 @@
   "license": "MIT",
   "scripts": {
     "serve pizza-store": "nx start pizza-store",
+    "serve admin": "nx serve pizza-admin",
     "serve backend": "nx serve pizza-api",
     "prepare": "git config core.hooksPath .git-hooks || echo 'Not in a git repo'",
     "lint-staged": "lint-staged"
