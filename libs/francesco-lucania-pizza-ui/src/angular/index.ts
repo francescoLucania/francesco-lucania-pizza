@@ -1,1 +1,4 @@
-export * from './lib/francesco-lucania-pizza-ui/francesco-lucania-pizza-ui';
+export * from './a11y/';
+export * from './constants/';
+export * from './services/';
+export * from './components/';

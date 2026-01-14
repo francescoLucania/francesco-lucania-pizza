@@ -8,6 +8,6 @@ import { DatePipe } from '@angular/common';
   standalone: true,
   imports: [DatePipe],
 })
-export class FooterStandaloneComponent {
+export class FooterComponent {
   public date = Date.now();
 }

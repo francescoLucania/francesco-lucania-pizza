@@ -22,7 +22,7 @@ import { ElementFocusDirective, TrapFocusDirective } from '../../a11y';
   imports: [NgClass, ElementFocusDirective, TrapFocusDirective],
   standalone: true,
 })
-export class ModalStandaloneComponent implements OnInit {
+export class ModalComponent implements OnInit {
   @ViewChild('modalContent', { read: ViewContainerRef })
   public modal: ViewContainerRef;
   @ViewChild('modalContainer', { read: ElementRef })

@@ -18,7 +18,7 @@ import { NgTemplateOutlet } from '@angular/common';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, NgTemplateOutlet],
 })
-export class ButtonStandaloneComponent {
+export class ButtonComponent {
   public label = input<string | undefined>(undefined);
   @Input() public theme: 'base' | 'secondary' | 'brand' = 'base';
   @Input() public size: 'base' | 'small' | 'large' = 'base';

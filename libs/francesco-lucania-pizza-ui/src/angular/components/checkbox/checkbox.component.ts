@@ -20,12 +20,12 @@ import { EMPTY_FUNCTION } from '../../constants';
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => CheckboxStandaloneComponent),
+      useExisting: forwardRef(() => CheckboxComponent),
       multi: true,
     },
   ],
 })
-export class CheckboxStandaloneComponent implements OnInit {
+export class CheckboxComponent implements OnInit {
   public static idCounter = 1;
 
   @Input() public radioId: string; // input ID: если не указан, генерируется уникальный ID

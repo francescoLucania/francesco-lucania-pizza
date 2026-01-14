@@ -43,13 +43,13 @@ import { MaskitoOptions } from '@maskito/core';
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => InputStandaloneComponent),
+      useExisting: forwardRef(() => InputComponent),
       multi: true,
     },
   ],
   imports: [NgClass, FormsModule, MaskitoDirective, NgTemplateOutlet],
 })
-export class InputStandaloneComponent
+export class InputComponent
   implements
     OnInit,
     OnChanges,

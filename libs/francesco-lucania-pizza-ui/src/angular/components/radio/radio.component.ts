@@ -19,13 +19,13 @@ import { EMPTY_FUNCTION } from '../../constants';
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => RadioStandaloneComponent),
+      useExisting: forwardRef(() => RadioComponent),
       multi: true,
     },
   ],
   standalone: true,
 })
-export class RadioStandaloneComponent implements ControlValueAccessor, OnInit {
+export class RadioComponent implements ControlValueAccessor, OnInit {
   public static idCounter = 1;
 
   @Input() public radioId: string; // input ID: если не указан, генерируется уникальный ID

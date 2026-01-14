@@ -29,7 +29,7 @@ import { NavigateListComponent } from '../navigate-list/navigate-list.component'
     NavigateListComponent,
   ],
 })
-export class HeaderStandaloneComponent implements OnInit {
+export class HeaderComponent implements OnInit {
   @Input() public navigate: INavigateList[] = [];
   @Input() public logoPath = '../../assets/img/logo.jpg';
 
