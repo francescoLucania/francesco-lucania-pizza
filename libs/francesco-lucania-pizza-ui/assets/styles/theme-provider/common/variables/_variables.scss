@@ -1,0 +1,308 @@
+@use 'sass:color';
+
+// common variables
+$borderRadiusSmall: 0;
+$borderRadiusBase: 2px;
+$borderRadiusLarge: 4px;
+
+$transitionSmall: 0.2s;
+$transitionBase: 0.4s;
+$transitionLarge: 0.8s;
+
+:root {
+  --borderRadiusSmall: #{$borderRadiusSmall};
+  --borderRadiusBase: #{$borderRadiusBase};
+  --borderRadiusLarge: #{$borderRadiusLarge};
+
+  --transitionSmall: #{$transitionSmall};
+  --transitionBase: #{$transitionBase};
+  --transitionLarge: #{$transitionLarge};
+}
+
+// font & headings variables
+
+$baseFont: 'Roboto Mono', Arial, Helvetica, sans-serif !default;
+
+$fontSizeSmall: 14px !default;
+$lineHeightSmall: 20px !default;
+
+$fontSizeBase: 16px !default;
+$lineHeightBase: 24px !default;
+
+$fontSizeLarge: 18px !default;
+$lineHeightLarge: 32px !default;
+
+:root {
+  --baseFont: #{$baseFont};
+
+  --fontSizeSmall: #{$fontSizeSmall};
+  --lineHeightSmall: #{$lineHeightSmall};
+
+  --fontSizeBase: #{$fontSizeBase};
+  --lineHeightBase: #{$lineHeightBase};
+
+  --fontSizeLarge: #{$fontSizeLarge};
+  --lineHeightLarge: #{$lineHeightLarge};
+}
+
+// palette variables
+$colorBase: #121314 !default;
+$colorLight: rgba(#121314, 0.8) !default;
+$colorLighter: rgba(#121314, 0.6) !default;
+$colorLightest: rgba(#121314, 0.4) !default;
+
+$colorBrand: #5409ff !default;
+$colorSound: #9280bc !default;
+$colorSoundLight: rgba(#9280bc, 0.6) !default;
+$colorSound: #9280bc !default;
+$bgColor: #fff !default;
+$bgColorMode: #e7e7e7;
+
+$colorError: red !default;
+
+$accessibilityBorder: #9b3be5 !default;
+$accessibilityBackground: #fef0cc !default;
+$accessibilityColor: $accessibilityBorder !default;
+
+// Dark
+$colorBaseDark: #fff !default;
+$colorLightDark: rgba($colorBaseDark, 0.7) !default;
+$colorLighterDark: rgba($colorBaseDark, 0.6) !default;
+$colorLightestDark: rgba($colorBaseDark, 0.4) !default;
+
+$colorBrandDark: #5409ff !default;
+$colorSoundDark: #9280bc !default;
+$colorSoundLightDark: rgba(#9280bc, 0.6) !default;
+$colorSoundDark: #9280bc !default;
+$bgColorDark: $colorBase !default;
+$bgColorModeDark: rgba($colorBase, 0.8);
+
+$colorErrorDark: red !default;
+
+$accessibilityBorderDark: #9b3be5 !default;
+$accessibilityBackgroundDark: #fef0cc !default;
+$accessibilityColorDark: $accessibilityBorder !default;
+
+:root {
+  --colorBase: #{$colorBase};
+  --colorLight: #{$colorLight};
+  --colorLighter: #{$colorLighter};
+  --colorLightest: #{$colorLightest};
+
+  --colorBrand: #{$colorBrand};
+  --colorSound: #{$colorSound};
+  --colorSoundLight: #{$colorSoundLight};
+  --bgColor: #{$bgColor};
+  --bgColorMode: #{$bgColorMode};
+
+  --accessibilityBorder: #{$accessibilityBorder};
+  --accessibilityBackground: #{$accessibilityBackground};
+  --accessibilityColor: #{$accessibilityColor};
+
+  --colorError: #{$colorError};
+}
+
+html[data-theme='dark'] {
+  --colorBase: #{$colorBaseDark};
+  --colorLight: #{$colorLightDark};
+  --colorLighter: #{$colorLighterDark};
+  --colorLightest: #{$colorLightestDark};
+
+  --colorBrand: #{$colorBrandDark};
+  --colorSound: #{$colorSoundDark};
+  --colorSoundLight: #{$colorSoundLightDark};
+  --bgColor: #{$bgColorDark};
+  --bgColorMode: #{$bgColorModeDark};
+
+  --accessibilityBorder: #{$accessibilityBorderDark};
+  --accessibilityBackground: #{$accessibilityBackgroundDark};
+  --accessibilityColor: #{$accessibilityColorDark};
+
+  --colorError: #{$colorErrorDark};
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --colorBase: #{$colorBaseDark};
+    --colorLight: #{$colorLightDark};
+    --colorLighter: #{$colorLighterDark};
+    --colorLightest: #{$colorLightestDark};
+
+    --colorBrand: #{$colorBrandDark};
+    --colorSound: #{$colorSoundDark};
+    --colorSoundLight: #{$colorSoundLightDark};
+    --bgColor: #{$bgColorDark};
+    --bgColorMode: #{$bgColorModeDark};
+
+    --accessibilityBorder: #{$accessibilityBorderDark};
+    --accessibilityBackground: #{$accessibilityBackgroundDark};
+    --accessibilityColor: #{$accessibilityColorDark};
+
+    --colorError: #{$colorErrorDark};
+  }
+}
+
+// neo-ui-input
+$inputBorderWidth: 1px;
+$inputBorderRadius: 0;
+$inputBackgroundBase: #fff;
+$inputColorBase: #fff;
+
+$inputPaddingTopSmall: 8px;
+$inputPaddingBottomSmall: 8px;
+$inputPaddingLeftSmall: 8px;
+$inputPaddingRightSmall: 8px;
+
+$inputPaddingTopBase: 8px;
+$inputPaddingBottomBase: 8px;
+$inputPaddingLeftBase: 8px;
+$inputPaddingRightBase: 8px;
+
+$inputPaddingTopLarge: 8px;
+$inputPaddingBottomLarge: 8px;
+$inputPaddingLeftLarge: 8px;
+$inputPaddingRightLarge: 8px;
+
+$inputHeightSmall: auto;
+$inputHeightBase: auto;
+$inputHeightLarge: auto;
+
+:root {
+  // neo-ui-input
+  --inputBorderWidth: #{$inputBorderWidth};
+  --inputBorderRadius: #{$inputBorderRadius};
+  --inputBackgroundBase: #{$inputBackgroundBase};
+  --inputColorBase: #{$inputColorBase};
+  --inputTransition: #{$transitionSmall};
+
+  --inputPaddingTopSmall: #{$inputPaddingTopSmall};
+  --inputPaddingBottomSmall: #{$inputPaddingBottomSmall};
+  --inputPaddingLeftSmall: #{$inputPaddingLeftSmall};
+  --inputPaddingRightSmall: #{$inputPaddingRightSmall};
+
+  --inputPaddingTopBase: #{$inputPaddingTopBase};
+  --inputPaddingBottomBase: #{$inputPaddingBottomBase};
+  --inputPaddingLeftBase: #{$inputPaddingLeftBase};
+  --inputPaddingRightBase: #{$inputPaddingRightBase};
+
+  --inputPaddingTopLarge: #{$inputPaddingTopLarge};
+  --inputPaddingBottomLarge: #{$inputPaddingBottomLarge};
+  --inputPaddingLeftLarge: #{$inputPaddingLeftLarge};
+  --inputPaddingRightLarge: #{$inputPaddingRightLarge};
+
+  --inputHeightSmall: #{$inputHeightSmall};
+  --inputHeightBase: #{$inputHeightBase};
+  --inputHeightLarge: #{$inputHeightLarge};
+}
+
+// neo-ui-button
+$buttonBorderWidth: 3px;
+$buttonBorderRadius: 0;
+$buttonBackgroundBase: $colorBase;
+$buttonFontWeight: $colorBase;
+$buttonColorBase: #fff;
+
+$buttonPaddingTopSmall: 10px;
+$buttonPaddingBottomSmall: 10px;
+$buttonPaddingLeftSmall: 24px;
+$buttonPaddingRightSmall: 24px;
+
+$buttonPaddingTopBase: 14px;
+$buttonPaddingBottomBase: 14px;
+$buttonPaddingLeftBase: 30px;
+$buttonPaddingRightBase: 30px;
+
+$buttonPaddingTopLarge: 14px;
+$buttonPaddingBottomLarge: 14px;
+$buttonPaddingLeftLarge: 30px;
+$buttonPaddingRightLarge: 30px;
+
+:root {
+  --borderRadiusSmall: #{$borderRadiusSmall};
+  --borderRadiusBase: #{$borderRadiusBase};
+  --borderRadiusLarge: #{$borderRadiusLarge};
+
+  --transitionSmall: #{$transitionSmall};
+  --transitionBase: #{$transitionBase};
+  --transitionLarge: #{$transitionLarge};
+
+  // neo-ui-button
+  --buttonBorderWidth: #{$buttonBorderWidth};
+  --buttonBorderRadius: #{$buttonBorderRadius};
+  --buttonColotBase: #{$buttonColorBase};
+  --buttonFontWeight: #{$buttonFontWeight};
+  --buttonBackgroundBase: #{$buttonBackgroundBase};
+  --buttonTransition: #{$transitionSmall};
+
+  --buttonPaddingTopSmall: #{$buttonPaddingTopSmall};
+  --buttonPaddingBottomSmall: #{$buttonPaddingBottomSmall};
+  --buttonPaddingLeftSmall: #{$buttonPaddingLeftSmall};
+  --buttonPaddingRightSmall: #{$buttonPaddingRightSmall};
+
+  --buttonPaddingTopBase: #{$buttonPaddingTopBase};
+  --buttonPaddingBottomBase: #{$buttonPaddingBottomBase};
+  --buttonPaddingLeftBase: #{$buttonPaddingLeftBase};
+  --buttonPaddingRightBase: #{$buttonPaddingRightBase};
+
+  --buttonPaddingTopLarge: #{$buttonPaddingTopLarge};
+  --buttonPaddingBottomLarge: #{$buttonPaddingBottomLarge};
+  --buttonPaddingLeftLarge: #{$buttonPaddingLeftLarge};
+  --buttonPaddingRightLarge: #{$buttonPaddingRightLarge};
+}
+
+// neo-ui-navigate-list
+$navigateListColorBase: $colorBase;
+$navigateListColorHover: $colorBase;
+$navigateListFontWeight: 400;
+$navigateListTransition: $transitionSmall;
+
+:root {
+  --navigateListColorBase: #{$navigateListColorBase};
+  --navigateListColorHover: #{$navigateListColorHover};
+  --navigateListFontWeight: #{$navigateListFontWeight};
+  --navigateListTransition: #{$navigateListTransition};
+}
+
+// neo-ui-modal
+$modalPaddingSm: 16px;
+$modalBorderSm: none;
+$modalBoxShadowSm: none;
+$modalBorderRadiusSm: 0;
+
+$modalPadding: 24px 32px;
+$modalBorder: 4px solid var(--colorBrand);
+$modalBoxShadow: 0 12px 32px rgba(11, 31, 51, 0.18);
+$modalBorderRadius: none;
+$modalBgColor: #fff;
+
+:root {
+  --modalPaddingSm: #{$modalPaddingSm};
+  --modalBoxShadowSm: #{$modalBoxShadowSm};
+  --modalBorderSm: #{$modalBorderSm};
+  --modalBorderRadiusSm: #{$modalBorderRadiusSm};
+
+  --modalPadding: #{$modalPadding};
+  --modalBoxShadow: #{$modalBoxShadow};
+  --modalBorder: #{$modalBorder};
+  --modalBorderRadius: #{$modalBorderRadius};
+  --modalBgColor: #{$modalBgColor};
+}
+
+// neo-ui-popover
+// neo-ui-modal
+$popoverPaddingSm: 10px 8px;
+$popoverPadding: 10px 8px;
+$popoverBorder: 1px solid rgba(0, 0, 0, 0.07);
+$popoverBoxShadow: 0 12px 12px #0000001f;
+$popoverBorderRadius: 6px;
+$popoverBgColor: #fff;
+
+:root {
+  --popoverPaddingSm: #{$popoverPaddingSm};
+
+  --popoverPadding: #{$popoverPadding};
+  --popoverBoxShadow: #{$popoverBoxShadow};
+  --popoverBorder: #{$popoverBorder};
+  --popoverBorderRadius: #{$popoverBorderRadius};
+  --popoverBgColor: #{$popoverBgColor};
+}

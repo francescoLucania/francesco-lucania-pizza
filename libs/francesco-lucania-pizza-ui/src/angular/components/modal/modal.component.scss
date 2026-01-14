@@ -1,0 +1,119 @@
+@use '../../../../assets/styles/theme-provider/theme_provider' as theme;
+
+.modal {
+  z-index: 9999999999;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  overflow: auto;
+
+  &_open {
+    display: flex;
+
+    @include theme.mq(sm) {
+      display: block;
+    }
+
+    &.modal_scroll {
+      display: block;
+    }
+  }
+
+  &__fade {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    pointer-events: none;
+    background: var(--colorSoundLight);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: background 0.25s;
+
+    &_close {
+      pointer-events: auto;
+    }
+  }
+
+  &__modal__container {
+  }
+}
+
+.modal-body {
+  position: relative;
+  padding: var(--modalPaddingSm);
+  border: var(--modalBorderSm);
+  border-radius: var(--modalBorderRadiusSm);
+  background: var(--modalBgColor);
+  margin-left: auto;
+  margin-right: auto;
+  box-shadow: var(--modalBoxShadowSm);
+
+  @include theme.mq(sm) {
+    min-height: 100vh;
+  }
+
+  @include theme.mq(md) {
+    padding: var(--modalPadding);
+    border: var(--modalBorder);
+    border-radius: var(--modalBorderRadius);
+    background: var(--modalBgColor);
+    box-shadow: var(--modalBoxShadow);
+    min-width: 634px;
+    max-width: 634px;
+    margin: 48px auto;
+    height: auto;
+  }
+
+  &__close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 30px;
+    height: 30px;
+    border: 3px solid transparent;
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: none;
+      border-radius: 8px;
+      border: 3px solid var(--accessibilityBorder);
+      background: var(--accessibilityBackground);
+    }
+
+    .modal-opened_hide-close-button & {
+      display: none;
+    }
+
+    &:before,
+    &:after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 11px;
+      width: 2px;
+      height: 20px;
+      background: var(--colorBrand);
+      transform: rotate(45deg);
+    }
+
+    &:before {
+      transform: rotate(45deg);
+    }
+
+    &:after {
+      transform: rotate(-45deg);
+    }
+  }
+
+  &__title {
+    padding: 0 40px 26px 0;
+    border-bottom: 1px solid var(--colorBase);
+  }
+}

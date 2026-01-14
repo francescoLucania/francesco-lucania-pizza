@@ -1,0 +1,45 @@
+// Responsive (for example: sm, md, lg, xl)
+$mq-breakpoints: (
+  'sm': 767px,
+  'md': 768px,
+  'lg': 1140px,
+  'xl': 1440px,
+  'xxl': 1920px,
+  'xxxl': 2220px,
+) !default;
+
+$mq-indents: (
+  'sm': 24px,
+  'md': 32px,
+  'lg': 32px,
+  'xl': 32px,
+  'xxl': 48px,
+  'xxxl': 48px,
+) !default;
+
+$mq-container-widths: (
+  'sm': 100%,
+  'md': 100%,
+  'lg': 1420px,
+  'xl': 1420px,
+  'xxl': 1420px,
+  'xxxl': 1420px,
+) !default;
+
+$mq-container-indents: (
+  'sm': 16px,
+  'md': 32px,
+  'lg': 64px,
+  'xl': 64px,
+  'xxl': 64px,
+  'xxxl': 64px,
+) !default;
+
+$mq-grid-gutters: (
+  'sm': map-get($mq-indents, 'sm'),
+  'md': map-get($mq-indents, 'md'),
+  'lg': map-get($mq-indents, 'lg'),
+  'xl': map-get($mq-indents, 'xl'),
+  'xxl': map-get($mq-indents, 'xxl'),
+  'xxxl': map-get($mq-indents, 'xxxl'),
+) !default;

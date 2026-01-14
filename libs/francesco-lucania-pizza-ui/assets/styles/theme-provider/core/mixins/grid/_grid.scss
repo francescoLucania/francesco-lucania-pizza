@@ -1,0 +1,47 @@
+@use '../../../config' as config;
+@use '../media/media' as media;
+
+@mixin grid(
+  $main-axis: x,
+  $justify-content: flex-start,
+  $align-items: flex-start,
+  $multiplier: 1
+) {
+  display: flex;
+  justify-content: $justify-content;
+  align-items: $align-items;
+
+  @if $main-axis == x {
+    flex-flow: row wrap;
+  }
+
+  @if $main-axis == y {
+    flex-flow: column nowrap;
+  }
+
+  @each $mq-grid-gutter in config.$mq-grid-gutters {
+    $mq: nth($mq-grid-gutter, 1);
+    $gutter: -#{nth($mq-grid-gutter, 2) / 2 * $multiplier};
+
+    @include media.mq($mq) {
+      margin-right: $gutter;
+      margin-left: $gutter;
+    }
+  }
+}
+
+// Grid col
+@mixin grid-col-mx($size, $multiplier: 1) {
+  flex: 0 0 $size * 100%;
+  max-width: $size * 100%;
+
+  @each $mq-grid-gutter in config.$mq-grid-gutters {
+    $mq: nth($mq-grid-gutter, 1);
+    $gutter: nth($mq-grid-gutter, 2) / 2 * $multiplier;
+
+    @include media.mq($mq) {
+      padding-right: $gutter;
+      padding-left: $gutter;
+    }
+  }
+}

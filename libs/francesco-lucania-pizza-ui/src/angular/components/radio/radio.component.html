@@ -1,0 +1,21 @@
+<label class="neo-ui-radio" [for]="radioId">
+  <input
+    class="neo-ui-radio__input"
+    type="radio"
+    role="radio"
+    [attr.aria-checked]="checked"
+    [checked]="checked"
+    [disabled]="disabled"
+    (change)="onChange($event)"
+    (blur)="notifyFocusEvent($event)"
+    [id]="radioId"
+    [name]="name"
+    [attr.value]="value"
+    [required]="required"
+  />
+  <span class="neo-ui-radio__view"> </span>
+  <span class="neo-ui-radio__label">
+    {{ label }}
+  </span>
+  <span class="neo-ui-radio__focus-visible"> </span>
+</label>

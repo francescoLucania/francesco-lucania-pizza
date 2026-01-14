@@ -1,0 +1,8 @@
+<div class="popup__body">
+  @if (title) {
+  <h4 class="popup__title title-h3 mb-24">
+    {{ title }}
+  </h4>
+  }
+  <div [ngTemplateOutlet]="content"></div>
+</div>

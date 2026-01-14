@@ -1,0 +1,15 @@
+@mixin reset-buttons-styles {
+  padding: 0;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  border: 0;
+  text-align: left;
+  box-shadow: none;
+  color: inherit;
+}

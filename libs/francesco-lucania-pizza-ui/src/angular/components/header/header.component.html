@@ -1,0 +1,53 @@
+<header class="site-header" [class.site-header--scroll-mod]="scrolled">
+  <div class="container">
+    <div class="site-header__grid">
+      <a [routerLink]="['/']" class="site-header__logo">
+        <img
+          [src]="logoPath"
+          alt="NGX-NEO-UI UI библиотека доступных компонентов для Angular"
+        />
+      </a>
+
+      <nav
+        tabindex="0"
+        role="navigation"
+        class="site-header__navigate outline-base"
+      >
+        <ng-container [ngTemplateOutlet]="menu"></ng-container>
+      </nav>
+
+      <button
+        (click)="changeMenu()"
+        type="button"
+        aria-label="Меню"
+        class="menu-button"
+        [class.menu-button--is-active]="mobileMenuState"
+      >
+        <span></span>
+      </button>
+    </div>
+  </div>
+
+  <div
+    class="mobile-menu-fade"
+    [class.is-active]="mobileMenuState"
+    [class.is-close]="mobileMenuStateClose"
+    (click)="changeMenu()"
+  ></div>
+
+  <div
+    class="mobile-menu"
+    [class.is-active]="mobileMenuState"
+    [class.is-close]="mobileMenuStateClose"
+    [neoElementFocus]="mobileMenuState"
+    [neoTrapFocus]="mobileMenuState"
+  >
+    <div class="mobile-menu__box">
+      <ng-container [ngTemplateOutlet]="menu"></ng-container>
+    </div>
+  </div>
+</header>
+
+<ng-template #menu>
+  <neo-ui-navigate-list [navigate]="navigate"></neo-ui-navigate-list>
+</ng-template>

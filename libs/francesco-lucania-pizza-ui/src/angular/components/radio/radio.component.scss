@@ -1,0 +1,91 @@
+//@use '../../../ui/assets/styles/theme-provider/common/accessibility/mixins/link' as link;
+
+.neo-ui-radio {
+  position: relative;
+  display: flex;
+
+  &:hover {
+    .neo-ui-radio__view {
+      background: var(--colorSoundLight);
+    }
+  }
+
+  &__label {
+    position: relative;
+    display: block;
+    margin-left: 8px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  &__view {
+    position: relative;
+    display: block;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid var(--colorBrand);
+    background-color: transparent;
+
+    &::before {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--colorBrand);
+    }
+  }
+
+  &__input {
+    position: absolute;
+    z-index: -1;
+    opacity: 0;
+    width: 0;
+    height: 0;
+
+    &:checked + .neo-ui-radio__view:before {
+      content: '';
+    }
+
+    &:disabled + .neo-ui-radio__view,
+    &:disabled + .neo-ui-radio__view + .neo-ui-radio__label {
+      opacity: 0.6;
+    }
+
+    &:disabled + .neo-ui-radio__view + .neo-ui-radio__label {
+      pointer-events: none;
+    }
+
+    &:focus-visible {
+      + .neo-ui-radio__view
+        + .neo-ui-radio__label
+        + .neo-ui-radio__focus-visible {
+        &::before {
+          content: '';
+          z-index: -1;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          height: calc(100% + 5px);
+          width: calc(100% + 5px);
+          transform: translate(-50%, -50%);
+          padding: 0 8px;
+          border: 3px dashed var(--accessibilityBorder);
+          border-radius: var(--baseBorderRadius);
+          background: var(--accessibilityBackground);
+        }
+
+        &::before {
+          width: calc(100% + 10px);
+          height: calc(100% + 10px);
+        }
+      }
+    }
+  }
+
+  &__focus-visible {
+  }
+}

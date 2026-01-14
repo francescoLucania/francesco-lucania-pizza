@@ -1,0 +1,35 @@
+@use '../../theme_provider' as theme;
+
+@mixin offsets($prefix) {
+  @for $i from 0 through 20 {
+    .mt#{$prefix}-#{$i * 4} {
+      margin-top: #{$i * 4}px;
+    }
+
+    .mb#{$prefix}-#{$i * 4} {
+      margin-bottom: #{$i * 4}px;
+    }
+
+    .ml#{$prefix}-#{$i * 4} {
+      margin-left: #{$i * 4}px;
+    }
+
+    .mr#{$prefix}-#{$i * 4} {
+      margin-right: #{$i * 4}px;
+    }
+  }
+}
+
+@include offsets('');
+
+@include theme.mq(sm) {
+  @include offsets('-sm');
+}
+
+@include theme.mq(md) {
+  @include offsets('-md');
+}
+
+@include theme.mq(lg) {
+  @include offsets('-lg');
+}

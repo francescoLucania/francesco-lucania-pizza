@@ -1,0 +1,9 @@
+@use '../../config' as config;
+
+.container {
+  position: relative;
+  margin: 0 auto;
+  padding: 0 16px;
+  min-width: 320px;
+  max-width: map_get(config.$mq-container-widths, 'lg');
+}

@@ -1,0 +1,90 @@
+@use '../../common/accessibility/mixins/actions' as link;
+
+.neo-ui-input {
+  position: relative;
+
+  &[type='tel'] {
+    padding: 0;
+  }
+
+  &--invalid {
+    .neo-ui-input__tag {
+      border-color: var(--colorError);
+    }
+  }
+
+  &--disable {
+    .neo-ui-input__tag {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+
+  &__tag {
+    padding: var(--inputPaddingTopBase) var(--inputPaddingRightBase)
+      var(--inputPaddingBottomBase) var(--inputPaddingLeftBase);
+    width: 100%;
+    height: var(--inputHeightBase);
+    border-radius: var(--inputBorderRadius);
+    border-style: solid;
+    border-width: var(--inputBorderWidth);
+    border-color: var(--colorBase);
+    font-size: var(--fontSizeBase);
+    line-height: 1;
+
+    &:focus {
+      border-color: var(--colorBrand);
+      outline-style: solid;
+      outline-color: var(--colorBrand);
+    }
+
+    &--size-small {
+      padding: var(--inputPaddingTopSmall) var(--inputPaddingRightSmall)
+        var(--inputPaddingBottomSmall) var(--inputPaddingLeftSmall);
+      height: var(--inputHeightSmall);
+      font-size: var(--fontSizeSmall);
+    }
+
+    &--size-large {
+      padding: var(--inputPaddingTopLarge) var(--inputPaddingRightLarge)
+        var(--inputPaddingBottomLarge) var(--inputPaddingLeftLarge);
+      height: var(--inputHeightLarge);
+      font-size: var(--fontSizeLarge);
+    }
+  }
+
+  &__show-hide {
+    @include link.accessibilityLinkStyles;
+    position: absolute;
+    top: 10px;
+    right: 16px;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    background: url(img/password-hidden.svg) no-repeat center;
+    font-size: 0;
+
+    &:focus-visible {
+      position: absolute;
+      display: block;
+      background: url(img/password-hidden.svg) no-repeat center
+        var(--accessibilityBackground);
+
+      &::before {
+        background: none;
+      }
+    }
+
+    &.invalid {
+      background: url(img/password-hidden-error.svg) no-repeat center;
+    }
+
+    &.show {
+      background: url(img/password-shown.svg) no-repeat center;
+
+      &.invalid {
+        background: url(img/password-shown-error.svg) no-repeat center;
+      }
+    }
+  }
+}

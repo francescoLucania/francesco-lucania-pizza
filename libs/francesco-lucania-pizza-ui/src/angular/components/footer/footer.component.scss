@@ -1,0 +1,39 @@
+@use '../../../../assets/styles/theme-provider/theme_provider' as theme;
+
+.site-footer {
+  padding: 16px;
+  background: var();
+
+  @include theme.mq(md) {
+    padding: 24px;
+  }
+
+  @include theme.mq(lg) {
+    padding: 32px;
+  }
+
+  &__grid {
+    @include theme.mq(lg) {
+      @include theme.grid();
+    }
+  }
+
+  &__col-navigate {
+    @include theme.mq(lg) {
+      @include theme.grid-col-mx(5/8);
+    }
+  }
+
+  &__col-copyright {
+    @include theme.mq(sm) {
+      text-align: center;
+    }
+    @include theme.mq(md) {
+      @include theme.grid-col-mx(3/8);
+
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+  }
+}

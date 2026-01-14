@@ -1,0 +1,31 @@
+@mixin accessibilityLinkStyles() {
+  &:focus-visible {
+    position: relative;
+    display: inline-block;
+    outline: none;
+    z-index: 2;
+
+    &::before {
+      content: '';
+      z-index: -1;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      height: calc(100% + 10px);
+      width: calc(100% + 10px);
+      transform: translate(-50%, -50%);
+      padding: 0 8px;
+      border: 3px dashed var(--accessibilityBorder);
+      border-radius: var(--baseBorderRadius);
+      background: var(--accessibilityBackground);
+      color: var(--accessibilityColor);
+    }
+
+    html[data-theme='dark'] {
+      color: var(--accessibilityColor) !important;
+    }
+    @media (prefers-color-scheme: dark) {
+      color: var(--accessibilityColor) !important;
+    }
+  }
+}

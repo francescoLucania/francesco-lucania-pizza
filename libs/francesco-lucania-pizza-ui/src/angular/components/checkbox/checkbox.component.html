@@ -1,0 +1,20 @@
+<label class="neo-ui-checkbox" [for]="radioId">
+  <input
+    class="neo-ui-checkbox__input"
+    type="checkbox"
+    role="checkbox"
+    [attr.aria-checked]="checked"
+    [checked]="checked"
+    [disabled]="disabled"
+    (change)="onSelected($event)"
+    (blur)="notifyFocusEvent($event)"
+    [id]="radioId"
+    [attr.value]="value"
+    [required]="required"
+  />
+  <span class="neo-ui-checkbox__view"> </span>
+  <span class="neo-ui-checkbox__label">
+    {{ label }}
+  </span>
+  <span class="neo-ui-checkbox__focus-visible"> </span>
+</label>

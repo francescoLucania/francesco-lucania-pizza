@@ -1,0 +1,112 @@
+@use '../../config' as config;
+@use '../../theme_provider' as theme;
+
+@mixin font($font-size, $line-height: $font-size) {
+  font-size: $font-size;
+  line-height: $line-height;
+}
+
+@mixin heading {
+  font-weight: 700;
+}
+
+@mixin text {
+  a,
+  button {
+    font-weight: inherit;
+    text-decoration: none;
+  }
+}
+
+@mixin text-base-small($font-weight: 400) {
+  @include text;
+  font-size: var(--fontSizeSmall);
+  line-height: var(--lineHeightSmall);
+  font-weight: $font-weight;
+}
+
+@mixin text-base($font-weight: 400) {
+  @include text;
+  font-size: var(--fontSizeBase);
+  line-height: var(--lineHeightBase);
+  font-weight: $font-weight;
+}
+
+@mixin text-base-large($font-weight: 400) {
+  @include text;
+  font-size: var(--fontSizeLarge);
+  line-height: var(--lineHeightLarge);
+  font-weight: $font-weight;
+}
+
+.heading-h1,
+.heading-h2,
+.heading-h3,
+.heading-h4,
+.heading-h5,
+.heading-h6 {
+  @include heading;
+}
+
+@mixin heading-h1() {
+  @include font(42px, 48px);
+}
+@mixin heading-h2() {
+  @include font(28px, 32px);
+}
+@mixin heading-h3() {
+  @include font(24px, 32px);
+}
+@mixin heading-h4() {
+  @include font(20px, 28px);
+}
+@mixin heading-h5() {
+  @include font(18px, 26px);
+}
+@mixin heading-h6() {
+  @include font(16px, 24px);
+}
+
+.heading-h1 {
+  @include heading-h1();
+}
+
+.heading-h2 {
+  @include heading-h2();
+}
+
+.heading-h3 {
+  @include heading-h3();
+}
+
+.heading-h4 {
+  @include heading-h4();
+}
+
+.heading-h5 {
+  @include heading-h5();
+}
+
+.heading-h6 {
+  @include heading-h6();
+}
+
+.text-base {
+  @include text-base;
+}
+
+.text-base-small {
+  @include text-base-small;
+}
+
+.text-helper {
+  color: var(--colorLighte);
+}
+
+.red {
+  color: var(--colorError);
+}
+
+.uppercase {
+  text-transform: uppercase;
+}

@@ -1,0 +1,58 @@
+<div
+  class="neo-ui-input"
+  [ngClass]="{
+    'neo-ui-input--multiline': multiline,
+    'neo-ui-input--invalid': invalid,
+    'neo-ui-input--disable': disabled
+  }"
+>
+  <ng-container *ngTemplateOutlet="passwordButton"></ng-container>
+  @if (!multiline) {
+  <input
+    class="neo-ui-input__tag"
+    #input
+    [attr.name]="name"
+    [attr.type]="showPassword ? 'text' : type || 'text'"
+    [attr.tabIndex]="tabIndex"
+    [attr.id]="id ? id : null"
+    [attr.aria-label]="ariaLabel"
+    [attr.minlength]="minlength"
+    [attr.maxlength]="maxlength"
+    [attr.placeholder]="placeholder"
+    [attr.autocomplete]="autocomplete === undefined ? null : autocomplete"
+    [disabled]="disabled"
+    [(ngModel)]="value"
+    [readOnly]="readOnly"
+    [class.invalid]="invalidDisplayed"
+    [class.focused]="focused"
+    [class.neo-ui-input__tag--size-small]="size === 'small'"
+    [class.neo-ui-input__tag--size-large]="size === 'large'"
+    [maskito]="maskitoOptions"
+    (change)="handleChange()"
+    (input)="handleInput($event)"
+    (blur)="notifyBlurEvent($event)"
+    (focus)="notifyFocusEvent($event)"
+    (keyup.enter)="forceChange()"
+  />
+  }
+  <ng-container *ngTemplateOutlet="passwordButton"></ng-container>
+  <ng-template #passwordButton>
+    @if (type === 'password' && value.length > 0) {
+    <button
+      type="button"
+      class="neo-ui-input__show-hide"
+      [attr.tabIndex]="tabIndex"
+      [class.show]="showPassword"
+      [class.invalid]="invalid"
+      (keydown.enter)="showButtonKeypress($event)"
+      (click)="switchPasswordMode()"
+    >
+      {{
+        showPassword
+          ? 'Введен пароль' + ' ' + value + ' ' + 'Скрыть пароль'
+          : 'Поле пароль заполнено. Нажмите, чтобы посмотреть пароль'
+      }}
+    </button>
+    }
+  </ng-template>
+</div>

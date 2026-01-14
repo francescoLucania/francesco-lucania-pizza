@@ -1,0 +1,30 @@
+@use 'sass:map';
+@use '../../functions/functions' as funcs;
+@use '../../../config' as config;
+@use '../media/media' as media;
+
+@mixin eachMedia($cssProperty, $values) {
+  @if (funcs.isMap($values)) {
+    @each $property, $value in $values {
+      @if $property == nth(map.keys(config.$mq-breakpoints), 1) {
+        #{$cssProperty}: $value;
+      } @else {
+        @include media.mq($property) {
+          #{$cssProperty}: $value;
+        }
+      }
+    }
+  } @else {
+    @error 'Unknown map';
+  }
+}
+
+@mixin eachStyle($styles) {
+  @each $property, $value in $styles {
+    @if (funcs.isMap($value)) {
+      @include eachMedia($property, $value);
+    } @else {
+      #{$property}: #{$value};
+    }
+  }
+}

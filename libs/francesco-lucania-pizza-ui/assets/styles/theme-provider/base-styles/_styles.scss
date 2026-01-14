@@ -1,0 +1,83 @@
+@use 'sass:list';
+@use 'sass:map';
+@use 'sass:meta';
+@use '../theme_provider' as theme;
+@use 'typography/typography' as typography;
+@use 'resets/button' as button;
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--baseFont);
+  font-size: var(--fontSizeBase);
+  line-height: var(--lineHeightBase);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
+
+button,
+a {
+  cursor: pointer;
+}
+
+a {
+  text-decoration: none;
+  color: var(--colorBrand);
+
+  //&:visited {
+  //  color: var(--accessibilityColor);
+  //}
+}
+
+button {
+  @include button.reset-buttons-styles;
+
+  text-decoration: none;
+  color: var(--colorBrand);
+}
+
+strong,
+b {
+  font-weight: bold;
+  vertical-align: top;
+}
+
+@include theme.mq(lg) {
+  body {
+    position: relative;
+  }
+}
+
+ul,
+ol {
+  display: block;
+  list-style-type: none;
+  margin-block-start: 0;
+  margin-block-end: 0;
+  margin-inline-start: 0;
+  margin-inline-end: 0;
+  padding-inline-start: 0;
+}

@@ -1,0 +1,22 @@
+@use 'sass:list';
+@use 'sass:map';
+@use 'sass:math';
+@use 'sass:meta';
+@use '../../functions/functions' as funcs;
+@use '../../../config' as config;
+
+@mixin mq($breakpoint) {
+  @if map.has-key(config.$mq-breakpoints, $breakpoint) {
+    $range: 'min';
+
+    @if $breakpoint == list.nth(map.keys(config.$mq-breakpoints), 1) {
+      $range: 'max';
+    }
+
+    @media (#{$range}-width: map.get(config.$mq-breakpoints, $breakpoint)) {
+      @content;
+    }
+  } @else {
+    @error 'Unknown breakpoint';
+  }
+}

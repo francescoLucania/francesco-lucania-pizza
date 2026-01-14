@@ -1,0 +1,17 @@
+<ol
+  class="navigate-list"
+  [ngClass]="{ 'navigate-list--vertical': type === 'vertical' }"
+>
+  @for (item of navigate; track item) {
+  <li class="navigate-list__item">
+    <a
+      class="focus-visible"
+      [routerLink]="item.uri"
+      [routerLinkActive]="'is-active'"
+      [neoUiNavigateListActiveRouteDisable]="'is-active'"
+      [routerLinkActiveOptions]="{ exact: true }"
+      ><span>{{ item.name }}</span></a
+    >
+  </li>
+  }
+</ol>

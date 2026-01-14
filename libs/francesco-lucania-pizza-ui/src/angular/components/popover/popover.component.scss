@@ -1,0 +1,93 @@
+@use '../../../../assets/styles/theme-provider/theme_provider' as theme;
+@use '../../../../assets/styles/theme-provider/base-styles/typography/typography'
+  as typography;
+
+.neo-ui-popover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 999999999;
+
+  &__body {
+    padding: var(--popoverPaddingSm);
+    background: #fff;
+
+    @include theme.mq(md) {
+      position: absolute;
+      top: 0;
+      left: 0;
+      padding: var(--popoverPadding);
+      border-radius: var(--popoverBorderRadius);
+      border: var(--popoverBorder);
+      box-shadow: var(--popoverBoxShadow);
+      will-change: transform;
+    }
+
+    .is-open & {
+      @include theme.mq(sm) {
+        position: fixed;
+        top: 0;
+        right: 0;
+        left: 0;
+        bottom: 0;
+        width: 100% !important;
+        transform: translate(0, 0) !important;
+      }
+    }
+  }
+
+  &__title {
+    @include typography.heading-h6;
+
+    padding-right: 52px;
+
+    @include theme.mq(md) {
+      padding-right: 32px;
+    }
+  }
+
+  &__close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 30px;
+    height: 30px;
+    border: 3px solid transparent;
+    cursor: pointer;
+
+    @include theme.mq(md) {
+      top: 0;
+      right: 0;
+    }
+
+    &:focus-visible {
+      outline: none;
+      border: 3px solid var(--accessibilityBorder);
+      background: var(--accessibilityBackground);
+    }
+
+    .modal-opened_hide-close-button & {
+      display: none;
+    }
+
+    &:before,
+    &:after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 11px;
+      width: 2px;
+      height: 20px;
+      background: var(--colorBrand);
+      transform: rotate(45deg);
+    }
+
+    &:before {
+      transform: rotate(45deg);
+    }
+
+    &:after {
+      transform: rotate(-45deg);
+    }
+  }
+}
