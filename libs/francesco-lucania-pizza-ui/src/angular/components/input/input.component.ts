@@ -15,7 +15,6 @@ import {
   OnInit,
   Optional,
   Output,
-  SimpleChanges,
   SkipSelf,
   ViewChild,
 } from '@angular/core';
@@ -34,7 +33,7 @@ import { MaskitoOptions } from '@maskito/core';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'neo-ui-input',
+  selector: 'pizza-lib-input',
   templateUrl: './input.component.html',
   styleUrls: [
     '../../../../assets/styles/theme-provider/lib-components/input/input.component.scss',
@@ -106,10 +105,10 @@ export class InputComponent
   public focused = false;
   public touched = false;
   public invalidDisplayed = false;
-  public control: AbstractControl | null;
+  public control: AbstractControl | null = null;
 
   private _ID = '';
-  private onTouchedCallback: () => void;
+  private onTouchedCallback!: () => void;
   public showToggle = false;
   public showPassword = false;
 
@@ -226,7 +225,7 @@ export class InputComponent
     this.check();
   }
 
-  public registerOnTouched(fn: any) {
+  public registerOnTouched(fn: () => void) {
     this.onTouchedCallback = fn;
   }
 

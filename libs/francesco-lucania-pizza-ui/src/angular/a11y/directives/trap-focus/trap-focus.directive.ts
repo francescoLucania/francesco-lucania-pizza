@@ -9,22 +9,22 @@ import { fromEvent, Observable } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
 @Directive({
-  selector: '[neoTrapFocus]',
+  selector: '[pizzaLibTrapFocus]',
   standalone: true,
 })
 export class TrapFocusDirective implements AfterViewInit {
   // необязательно передавать значение в state
   // оно нужно только для динамических компонетов (например модальные окна, поповеры и тд)
-  @Input('neoTrapFocus') public set setState(value: unknown) {
+  @Input('pizzaLibTrapFocus') public set setState(value: unknown) {
     if (this.state !== undefined) {
       this.state = Boolean(value);
     }
     this.trapFocus(this.elementRef.nativeElement);
   }
 
-  private focusElements: Observable<any>;
-  private firstFocusableElement: HTMLElement;
-  private lastFocusableElement: HTMLElement;
+  private focusElements!: Observable<Event>;
+  private firstFocusableElement!: HTMLElement;
+  private lastFocusableElement!: HTMLElement;
   private state = true;
 
   constructor(private elementRef: ElementRef, private cdr: ChangeDetectorRef) {}
@@ -40,7 +40,7 @@ export class TrapFocusDirective implements AfterViewInit {
         'input[type="radio"], input[type="checkbox"], select'
     );
     const focusableEls = Array.from(focusableEls1).filter(
-      (el: any) => !el.disabled
+      (el: HTMLElement) => !el.disabled
     );
 
     this.firstFocusableElement = element;

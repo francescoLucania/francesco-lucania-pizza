@@ -1,15 +1,20 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Type } from '@angular/core';
 import { Subject } from 'rxjs';
 
+export interface PopoverContext {
+  content?: unknown;
+  [key: string]: unknown;
+}
+
 export interface PopoverData {
-  event?: Event;
+  event?: Event | HTMLElement;
   title?: string | null;
   gutter?: string | null;
   width?: string | null;
   positionType?: 'top' | 'bottom' | null;
   type?: string | null;
-  component?: any;
-  context?: any;
+  component?: Type<unknown>;
+  context?: PopoverContext;
   isHide?: boolean;
   closeButton: boolean;
 }
@@ -19,9 +24,9 @@ export interface PopoverData {
 })
 export class PopoverService {
   public popoverSequence$: Subject<PopoverData | null> = new Subject();
-  private popoverEvent$$: Subject<any> = new Subject();
+  private popoverEvent$$: Subject<Event | HTMLElement> = new Subject();
 
-  public open(event: any, popoverData: PopoverData) {
+  public open(event: Event | HTMLElement, popoverData: PopoverData) {
     this.popoverSequence$.next(popoverData);
     this.popoverEvent$$.next(event);
   }

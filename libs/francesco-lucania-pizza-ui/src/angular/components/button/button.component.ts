@@ -9,7 +9,7 @@ import { RouterLink } from '@angular/router';
 import { NgTemplateOutlet } from '@angular/common';
 
 @Component({
-  selector: 'neo-ui-button',
+  selector: 'pizza-lib-button',
   templateUrl: './button.component.html',
   styleUrls: [
     '../../../../assets/styles/theme-provider/lib-components/button/button.component.scss',

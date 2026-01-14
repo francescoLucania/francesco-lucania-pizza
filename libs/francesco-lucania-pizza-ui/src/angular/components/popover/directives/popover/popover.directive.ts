@@ -3,7 +3,6 @@ import {
   ElementRef,
   HostListener,
   Input,
-  NgModuleRef,
   TemplateRef,
 } from '@angular/core';
 import { PopoverData, PopoverService } from '../../services';
@@ -11,19 +10,19 @@ import { PopoverBaseComponentComponent } from '../../components';
 import { EMPTY_FUNCTION } from '../../../../constants';
 
 @Directive({
-  selector: '[openNeoPopoverFromTemplate]',
+  selector: '[openPizzaLibPopoverFromTemplate]',
   standalone: true,
 })
 export class PopoverDirective {
-  @Input() public openNeoPopoverFromTemplate: TemplateRef<any>;
-  @Input() public openNeoPopoverTitle: string | null;
-  @Input() public openNeoPopoverGutter: string | null;
-  @Input() public openNeoPopoverWidth: string | null;
-  @Input() public openNeoPopoverPositionType: 'top' | 'bottom' | null;
-  @Input() public openNeoPopoverCloseButton: boolean;
-  @Input() public openNeoPopoverType: string;
-  @Input() public openNeoPopoverIsHide: boolean;
-  @Input() public openNeoPopoverContext: any;
+  @Input() public openPizzaLibPopoverFromTemplate: TemplateRef<unknown>;
+  @Input() public openPizzaLibPopoverTitle: string | null;
+  @Input() public openPizzaLibPopoverGutter: string | null;
+  @Input() public openPizzaLibPopoverWidth: string | null;
+  @Input() public openPizzaLibPopoverPositionType: 'top' | 'bottom' | null;
+  @Input() public openPizzaLibPopoverCloseButton: boolean;
+  @Input() public openPizzaLibPopoverType: string;
+  @Input() public openPizzaLibPopoverIsHide: boolean;
+  @Input() public openPizzaLibPopoverContext: Record<string, unknown> | null = null;
 
   @Input() public closeHandler = EMPTY_FUNCTION;
 
@@ -32,7 +31,7 @@ export class PopoverDirective {
     private element: ElementRef
   ) {}
 
-  @HostListener('click', ['$event']) private onClick(event: Event): void {
+  @HostListener('click', ['$event']) private onClick(): void {
     const element =
       this.element?.nativeElement.tagName === 'BUTTON'
         ? this.element?.nativeElement
@@ -44,19 +43,19 @@ export class PopoverDirective {
     const popoverData = {
       event: element,
       closeHandler: () => this?.closeHandler?.(),
-      title: this.openNeoPopoverTitle,
-      gutter: this.openNeoPopoverGutter,
-      width: this.openNeoPopoverWidth,
-      positionType: this.openNeoPopoverPositionType,
-      type: this.openNeoPopoverType,
-      isHide: this.openNeoPopoverIsHide,
-      closeButton: this.openNeoPopoverCloseButton,
+      title: this.openPizzaLibPopoverTitle,
+      gutter: this.openPizzaLibPopoverGutter,
+      width: this.openPizzaLibPopoverWidth,
+      positionType: this.openPizzaLibPopoverPositionType,
+      type: this.openPizzaLibPopoverType,
+      isHide: this.openPizzaLibPopoverIsHide,
+      closeButton: this.openPizzaLibPopoverCloseButton,
       component: PopoverBaseComponentComponent,
       context: {
-        content: this.openNeoPopoverFromTemplate,
-        ...this.openNeoPopoverContext,
+        content: this.openPizzaLibPopoverFromTemplate,
+        ...this.openPizzaLibPopoverContext,
       },
-    } as unknown as PopoverData;
+    } as PopoverData;
 
     this.popoverService.open(element, popoverData);
   }

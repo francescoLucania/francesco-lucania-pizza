@@ -16,7 +16,7 @@ import { ElementFocusDirective, TrapFocusDirective } from '../../a11y';
 import { NavigateListComponent } from '../navigate-list/navigate-list.component';
 
 @Component({
-  selector: 'neo-ui-header',
+  selector: 'pizza-lib-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -47,16 +47,16 @@ export class HeaderComponent implements OnInit {
   @HostListener('window:scroll', ['$event'])
   public onWindowScroll() {
     if (this.browser.isBrowser) {
-      this.scrolled = (window as any)?.scrollY > 0;
+      this.scrolled = window.scrollY > 0;
 
       if (this.scrolled) {
         this.renderer.addClass(
-          (document as any)?.querySelector('body'),
+          document.querySelector('body'),
           'scrolled'
         );
       } else {
         this.renderer.removeClass(
-          (document as any)?.querySelector('body'),
+          document.querySelector('body'),
           'scrolled'
         );
       }

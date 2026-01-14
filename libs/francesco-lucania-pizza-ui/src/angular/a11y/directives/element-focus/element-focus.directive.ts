@@ -7,11 +7,11 @@ import {
 } from '@angular/core';
 
 @Directive({
-  selector: '[neoElementFocus]',
+  selector: '[pizzaLibElementFocus]',
   standalone: true,
 })
 export class ElementFocusDirective implements OnDestroy {
-  @Input('neoElementFocusContextClass') public contextClass = 'outline-base';
+  @Input('pizzaLibElementFocusContextClass') public contextClass = 'outline-base';
 
   @HostBinding('class') private cssClass = this.contextClass;
   @HostBinding('tabindex') private tabIndex =
@@ -20,7 +20,7 @@ export class ElementFocusDirective implements OnDestroy {
       : '0';
 
   // Если в @Input() не передано значение, то эелемент получит фокус только при ициализации
-  @Input('neoElementFocus') public set onFocus(value: unknown) {
+  @Input('pizzaLibElementFocus') public set onFocus(value: unknown) {
     if (value === false) {
       // Если передан false – возвращаем фокус на prevElement(тоже самое на ngOnDestroy())
       this.toPrevElement();
@@ -35,7 +35,7 @@ export class ElementFocusDirective implements OnDestroy {
   }
 
   // В prevElement записываем предыдущий элемент, на него возвращается focus при esiaElementFocus = false и ngOnDestroy()
-  private prevElement: HTMLElement;
+  private prevElement!: HTMLElement;
 
   constructor(private elementRef: ElementRef) {}
 

@@ -10,12 +10,12 @@ import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
 
 @Directive({
-  selector: '[neoUiNavigateListActiveRouteDisable]',
+  selector: '[pizzaLibNavigateListActiveRouteDisable]',
   standalone: true,
 })
 export class NavigateListActiveRouteDisableDirective implements OnInit {
   @HostBinding('tabindex') public tabindex: string;
-  @Input() public set neoUiNavigateListActiveRouteDisable(className: string) {
+  @Input() public set pizzaLibNavigateListActiveRouteDisable(className: string) {
     this.className = className;
     if (this.elementRef.nativeElement.classList.contains(this.className)) {
       this.tabindex = '-1';

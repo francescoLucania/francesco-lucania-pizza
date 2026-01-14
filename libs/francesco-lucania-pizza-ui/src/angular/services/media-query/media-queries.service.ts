@@ -1,4 +1,4 @@
-import { Inject, Injectable, InjectionToken, Optional } from '@angular/core';
+import { Inject, Injectable, Optional } from '@angular/core';
 import { BehaviorSubject, fromEvent, Observable } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import {
@@ -7,8 +7,8 @@ import {
   IMediaQueriesParams,
   MEDIA_QUERY_CONFIG,
   TMediaQueriesBreakpoint,
-} from './models/media-queries.interface';
-import { BrowserService } from '../browser/browser.service';
+} from './models';
+import { BrowserService } from '../browser';
 
 export const MEDIA_QUERY_CONFIG_BASE: IMediaQueriesParams = {
   enable: {
@@ -31,12 +31,12 @@ export class MediaQueriesService {
   );
   public deviceType$ = this._deviceType$.asObservable();
 
-  private _deviceTypeParams: any;
+  private _deviceTypeParams: IMediaQueriesDeviceInfo | null = null;
 
-  private _windowResize$: Observable<Event>;
+  private _windowResize$!: Observable<Event>;
 
   private _mq: { [key: string]: IMediaQueriesBreakpoint } = {};
-  private _mqParams = {};
+  private _mqParams: Record<string, boolean> = {};
 
   constructor(
     @Optional() @Inject(MEDIA_QUERY_CONFIG) private config: IMediaQueriesParams,
@@ -89,16 +89,14 @@ export class MediaQueriesService {
     return displayWidthType;
   }
 
-  public getDeviceSizeData(): { size: string; mq: any; width: number } {
+  public getDeviceSizeData(): { size: string; mq: Record<string, boolean>; width: number | null } {
     this.createMq(this.config.mqBreakpoints);
 
     let resultSize = '';
 
     if (this.browserService.isBrowser) {
       Object.keys(this._mq).forEach((key) => {
-        // @ts-ignore
         this._mqParams[key] = window.matchMedia(this._mq[key].str).matches;
-        // @ts-ignore
         if (this._mqParams[key]) {
           resultSize = key;
         }
@@ -108,11 +106,11 @@ export class MediaQueriesService {
     return {
       size: resultSize,
       mq: this._mqParams,
-      width: this.browserService.isBrowser ? (window as any).innerWidth : null,
+      width: this.browserService.isBrowser ? window.innerWidth : null,
     };
   }
 
-  public getDeviceParams(): string {
+  public getDeviceParams(): IMediaQueriesDeviceInfo | null {
     return this._deviceTypeParams;
   }
 }

@@ -12,7 +12,7 @@ export default [
         'error',
         {
           type: 'attribute',
-          prefix: 'lib',
+          prefix: 'pizzaLib',
           style: 'camelCase',
         },
       ],
@@ -20,11 +20,25 @@ export default [
         'error',
         {
           type: 'element',
-          prefix: 'lib',
+          prefix: 'pizza-lib',
           style: 'kebab-case',
         },
       ],
+
+      "@angular-eslint/no-output-native": "off",
+      "@angular-eslint/component-class-suffix": "error",
+      "@angular-eslint/directive-class-suffix": "error",
+      "@angular-eslint/no-host-metadata-property": "error",
+      "@angular-eslint/no-input-rename": "error",
+      "@angular-eslint/no-inputs-metadata-property": "error",
+      "@angular-eslint/no-output-on-prefix": "error",
+      "@angular-eslint/no-output-rename": "error",
+      "@angular-eslint/no-outputs-metadata-property": "error",
+      "@angular-eslint/use-lifecycle-interface": "error",
+      "@angular-eslint/use-pipe-transform-interface": "error",
+
     },
+
   },
   {
     files: ['**/*.html'],

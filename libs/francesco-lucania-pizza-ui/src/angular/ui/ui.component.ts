@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'nx-neo-ui',
+  selector: 'pizza-lib-ui',
   standalone: true,
   imports: [],
   templateUrl: './ui.component.html',

@@ -1,13 +1,12 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  OnInit,
   TemplateRef,
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 
 @Component({
-  selector: 'neo-ui-popover-base-component',
+  selector: 'pizza-lib-popover-base-component',
   standalone: true,
   imports: [NgTemplateOutlet],
   templateUrl: './popover-base-component.component.html',
@@ -15,5 +14,5 @@ import { NgTemplateOutlet } from '@angular/common';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PopoverBaseComponentComponent {
-  public content: TemplateRef<any>;
+  public content!: TemplateRef<unknown>;
 }

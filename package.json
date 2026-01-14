@@ -4,7 +4,9 @@
   "license": "MIT",
   "scripts": {
     "serve pizza-store": "nx start pizza-store",
-    "serve backend": "nx serve pizza-api"
+    "serve backend": "nx serve pizza-api",
+    "prepare": "git config core.hooksPath .git-hooks || echo 'Not in a git repo'",
+    "lint-staged": "lint-staged"
   },
   "private": true,
   "devDependencies": {
@@ -62,7 +64,8 @@
     "tslib": "^2.3.0",
     "typescript": "~5.9.2",
     "typescript-eslint": "^8.40.0",
-    "webpack-cli": "^5.1.4"
+    "webpack-cli": "^5.1.4",
+    "lint-staged": "^15.2.0"
   },
   "dependencies": {
     "@angular/common": "~21.0.0",
@@ -85,5 +88,14 @@
     "react-dom": "^19.0.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,scss,css,html,md}": [
+      "prettier --write"
+    ]
   }
 }

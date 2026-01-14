@@ -16,9 +16,9 @@ const rect = {
  *
  * NOTE: Be careful subscribing to 'changes'
  */
-export const EMPTY_QUERY = new QueryList<any>();
+export const EMPTY_QUERY = new QueryList<unknown>();
 export const EMPTY_ARRAY: [] = [];
-export const EMPTY_FUNCTION: (...args: any[]) => void = () => {};
+export const EMPTY_FUNCTION: (...args: unknown[]) => void = () => {};
 export const EMPTY_CLIENT_RECT: DOMRect = {
   ...rect,
   toJSON() {

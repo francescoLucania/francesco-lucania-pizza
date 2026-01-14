@@ -21,26 +21,26 @@ export class HelperService {
     return new Event(eventType, { bubbles, cancelable });
   }
 
-  public static isString(something: any) {
+  public static isString(something: unknown): something is string {
     return typeof something === 'string' || something instanceof String;
   }
 
-  public static isObject(something: any) {
+  public static isObject(something: unknown): something is Record<string, unknown> {
     if (something === null || something === undefined) {
       return false;
     }
     return typeof something === 'function' || typeof something === 'object';
   }
 
-  public static isArray(something: any) {
+  public static isArray(something: unknown): something is unknown[] {
     return Array.isArray(something);
   }
 
-  public static isFunction(something: any) {
+  public static isFunction(something: unknown): something is (...args: unknown[]) => unknown {
     return typeof something === 'function' || something instanceof Function;
   }
 
-  public static isIterable(something: any, strict?: boolean) {
+  public static isIterable(something: unknown, strict?: boolean): boolean {
     if (something === null || something === undefined) {
       return false;
     }
@@ -54,7 +54,7 @@ export class HelperService {
     }
   }
 
-  public static isEmpty(something: any) {
+  public static isEmpty(something: unknown): boolean {
     if (!HelperService.isIterable(something)) {
       return false;
     }
@@ -66,7 +66,7 @@ export class HelperService {
     return true;
   }
 
-  public static keys(something: any) {
+  public static keys(something: unknown): string[] {
     if (!HelperService.isObject(something)) {
       return [];
     }
@@ -74,7 +74,7 @@ export class HelperService {
   }
 
   // простое глубокое копирование, подходит для json-образных структур где конструкторы/типы объектов не имеют значения
-  public static deepCopy(obj: any) {
+  public static deepCopy<T>(obj: T): T {
     let newObj = obj; // все простые типы копируются как есть
     if (obj && typeof obj === 'object') {
       if (obj instanceof Date) {
@@ -89,13 +89,13 @@ export class HelperService {
     return newObj;
   }
 
-  public static copyArrayToArray(source: any[], dest: any[]): void {
+  public static copyArrayToArray<T>(source: T[], dest: T[]): void {
     if (!dest) {
       return;
     }
     const sourceX = source || [];
     const originalLength = dest.length;
-    sourceX.forEach((item: any, index: number) => {
+    sourceX.forEach((item: T, index: number) => {
       dest[index] = source[index];
     });
     if (originalLength > sourceX.length) {
@@ -174,7 +174,7 @@ export class HelperService {
   // ставит курсор ввода на конец текста в текстовом элементе, при этом убирает выделение
   public static resetSelection(
     inputElement: HTMLInputElement,
-    mask: any = null,
+    mask: string | null = null,
     startPosition?: number
   ) {
     if (
@@ -202,7 +202,7 @@ export class HelperService {
   }
 
   // Проверка на идентичность объектов.
-  public static deepEqual(object1: any, object2: any): boolean {
+  public static deepEqual(object1: unknown, object2: unknown): boolean {
     if (object1 == null || object2 == null) {
       return object2 === object1;
     }

@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  ComponentRef,
   ElementRef,
   HostListener,
   OnInit,
@@ -15,7 +16,7 @@ import { NgClass } from '@angular/common';
 import { ElementFocusDirective, TrapFocusDirective } from '../../a11y';
 
 @Component({
-  selector: 'neo-ui-modal',
+  selector: 'pizza-lib-modal',
   templateUrl: './modal.component.html',
   styleUrls: ['./modal.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -24,20 +25,20 @@ import { ElementFocusDirective, TrapFocusDirective } from '../../a11y';
 })
 export class ModalComponent implements OnInit {
   @ViewChild('modalContent', { read: ViewContainerRef })
-  public modal: ViewContainerRef;
+  public modal!: ViewContainerRef;
   @ViewChild('modalContainer', { read: ElementRef })
-  public modalContainer: ElementRef;
+  public modalContainer!: ElementRef;
   @ViewChild('modalBody', { read: ElementRef })
-  public modalBody: ElementRef;
+  public modalBody!: ElementRef;
 
   public modalState = this.modalService.modalState$;
-  public modalContext: any;
+  public modalContext: ComponentRef<unknown> | null = null;
 
   public isOpen = false;
   public closeButton = true;
   public backgroundClick = true;
-  public html: HTMLHtmlElement | null;
-  public body: HTMLBodyElement | null;
+  public html: HTMLHtmlElement | null = null;
+  public body: HTMLBodyElement | null = null;
   public scrollState = false;
 
   constructor(
@@ -83,9 +84,9 @@ export class ModalComponent implements OnInit {
     });
   }
 
-  private checkHeightModalBody(deviceType: any): void {
+  private checkHeightModalBody(deviceType: string): void {
     if (deviceType !== 'sm') {
-      const windowHeight = (window as any).innerHeight;
+      const windowHeight = window.innerHeight;
       const modalBodyHeight = this.modalBody.nativeElement.offsetHeight + 96;
       this.scrollState = modalBodyHeight > windowHeight;
     } else {

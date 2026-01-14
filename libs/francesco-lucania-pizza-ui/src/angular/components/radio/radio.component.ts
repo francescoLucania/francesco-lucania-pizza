@@ -13,7 +13,7 @@ import { EMPTY_FUNCTION } from '../../constants';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'neo-ui-radio',
+  selector: 'pizza-lib-radio',
   templateUrl: './radio.component.html',
   styleUrls: ['./radio.component.scss'],
   providers: [

@@ -5,7 +5,7 @@ import { NavigateListActiveRouteDisableDirective } from './directives/navigate-l
 import { NgClass } from '@angular/common';
 
 @Component({
-  selector: 'neo-ui-navigate-list',
+  selector: 'pizza-lib-navigate-list',
   templateUrl: './navigate-list.component.html',
   styleUrls: ['./navigate-list.component.scss'],
   standalone: true,

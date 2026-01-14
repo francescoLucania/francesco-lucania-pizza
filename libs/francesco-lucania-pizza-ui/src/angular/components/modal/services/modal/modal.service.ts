@@ -1,6 +1,6 @@
 import { Injectable, NgModuleRef, Type } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
-import { IModalDataInterface } from '../../models/modal/modal';
+import { IModalDataInterface, IModalContext } from '../../models/modal/modal';
 
 @Injectable({
   providedIn: 'root',
@@ -10,12 +10,11 @@ export class ModalService {
     return this._modalState$.asObservable();
   }
   private _modalState$ = new Subject<IModalDataInterface | null>();
-  constructor() {}
 
   public open(
-    component: Type<any>,
-    moduleRef?: NgModuleRef<any>,
-    context?: any
+    component: Type<unknown>,
+    moduleRef?: NgModuleRef<unknown>,
+    context?: IModalContext
   ): void {
     const baseContext = {
       closable: true,

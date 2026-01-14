@@ -2,7 +2,7 @@
   "name": "francesco-lucania-pizza-ui",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/francesco-lucania-pizza-ui/src",
-  "prefix": "lib",
+  "prefix": "pizza-lib",
   "projectType": "library",
   "tags": [],
   "targets": {
@@ -15,7 +15,10 @@
       }
     },
     "lint": {
-      "executor": "@nx/eslint:lint"
+      "executor": "@nx/eslint:lint",
+      "options": {
+        "eslintConfig": "libs/francesco-lucania-pizza-ui/eslint.config.mjs"
+      }
     }
   }
 }

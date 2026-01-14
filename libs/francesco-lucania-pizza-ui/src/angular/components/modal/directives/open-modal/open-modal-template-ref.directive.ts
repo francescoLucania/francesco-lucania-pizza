@@ -9,10 +9,10 @@ import { ModalService } from '../../services';
 import { BaseModalStandaloneComponent } from '../../components/base-modal/base-modal.component';
 import { EMPTY_FUNCTION } from '../../../../constants';
 
-//  Пример использования openModalFromTemplate
+//  Пример использования openPizzaLibModalFromTemplate
 //  <button
 //    type="button"
-//    [openModalFromTemplate]="ipErrorModal"
+//    [openPizzaLibModalFromTemplate]="ipErrorModal"
 //    [modalTitle]="'Заголовок'"
 //    [closeHandler]="test"
 //    class="plain-button-inline"
@@ -25,11 +25,11 @@ import { EMPTY_FUNCTION } from '../../../../constants';
 //  </ng-template>
 
 @Directive({
-  selector: '[openModalFromTemplate]',
+  selector: '[openPizzaLibModalFromTemplate]',
   standalone: true,
 })
 export class OpenModalTemplateRefDirective {
-  @Input() public openModalFromTemplate: TemplateRef<any>;
+  @Input() public openPizzaLibModalFromTemplate: TemplateRef<unknown>;
   @Input() public modalTitle: string;
   @Input() public closeHandler = EMPTY_FUNCTION;
 
@@ -41,7 +41,7 @@ export class OpenModalTemplateRefDirective {
   @HostListener('click', ['$event']) private onClick(): void {
     const context = {
       title: this.modalTitle,
-      content: this.openModalFromTemplate,
+      content: this.openPizzaLibModalFromTemplate,
       closeHandler: () => this?.closeHandler?.(),
     };
 

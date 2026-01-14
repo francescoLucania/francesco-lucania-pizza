@@ -39,8 +39,8 @@
     class="mobile-menu"
     [class.is-active]="mobileMenuState"
     [class.is-close]="mobileMenuStateClose"
-    [neoElementFocus]="mobileMenuState"
-    [neoTrapFocus]="mobileMenuState"
+    [pizzaLibElementFocus]="mobileMenuState"
+    [pizzaLibTrapFocus]="mobileMenuState"
   >
     <div class="mobile-menu__box">
       <ng-container [ngTemplateOutlet]="menu"></ng-container>
@@ -49,5 +49,5 @@
 </header>
 
 <ng-template #menu>
-  <neo-ui-navigate-list [navigate]="navigate"></neo-ui-navigate-list>
+  <pizza-lib-navigate-list [navigate]="navigate"></pizza-lib-navigate-list>
 </ng-template>

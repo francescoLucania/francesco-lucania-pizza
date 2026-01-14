@@ -13,7 +13,7 @@ import { BrowserService, DestroyService } from '../../services';
 import { filter, fromEvent, takeUntil } from 'rxjs';
 
 @Component({
-  selector: 'neo-ui-popover',
+  selector: 'pizza-lib-popover',
   standalone: true,
   imports: [NgClass, NgStyle],
   providers: [DestroyService],
@@ -34,10 +34,10 @@ export class PopoverComponent {
 
   public isOpen = false;
   public isHide: boolean | undefined;
-  public popoverComponent!: ComponentRef<any>;
-  public popoverData!: any;
-  public eventRef!: any;
-  public positionType!: any;
+  public popoverComponent!: ComponentRef<unknown>;
+  public popoverData!: PopoverData;
+  public eventRef!: Event | HTMLElement;
+  public positionType!: 'top' | 'bottom' | null;
 
   public horizontalScrollOffset = 0;
 
@@ -52,8 +52,8 @@ export class PopoverComponent {
     paddingTop?: string;
   } = { opacity: 0 };
 
-  private html: any | null = null;
-  private body: any | null = null;
+  private html: HTMLHtmlElement | null = null;
+  private body: HTMLBodyElement | null = null;
 
   public constructor(
     private browser: BrowserService,
@@ -85,7 +85,7 @@ export class PopoverComponent {
 
       this.isOpen = true;
 
-      (document as any)
+      document
         ?.querySelector('.neo-popover__body-scroll-container > div')
         ?.scrollIntoView(); // scroll to top popover
 
@@ -151,7 +151,7 @@ export class PopoverComponent {
     }
   }
 
-  private buildContext(context: any): void {
+  private buildContext(context: PopoverData['context']): void {
     if (context) {
       Object.keys(context).forEach((key) => {
         this.popoverComponent.instance[key] = context[key];
@@ -252,7 +252,7 @@ export class PopoverComponent {
                 horizontalOffsetTotal + 'px'
               }, ${
                 this.eventRef.getBoundingClientRect().top +
-                (window as any).scrollY +
+                window.scrollY +
                 this.eventRef.offsetHeight +
                 this.popoverData.gutter +
                 'px'
@@ -353,7 +353,7 @@ export class PopoverComponent {
 
       this.style.transform = `translate(${horizontalOffsetTotal + 'px'}, ${
         this.eventRef.getBoundingClientRect().top +
-        (window as any).scrollY +
+        window.scrollY +
         this.eventRef.offsetHeight +
         this.popoverData.gutter +
         'px'
@@ -372,7 +372,7 @@ export class PopoverComponent {
               : 16;
           this.style.transform = `translate(${horizontalOffsetTotal + 'px'}, ${
             this.eventRef.getBoundingClientRect().top +
-            (window as any).scrollY +
+            window.scrollY +
             this.eventRef.offsetHeight +
             this.popoverData.gutter +
             'px'
@@ -423,7 +423,7 @@ export class PopoverComponent {
 
   private offsetService(
     positionType: 'bottom' | 'top' = 'bottom',
-    ref: any,
+    ref: HTMLElement,
     gutter = 8
   ) {
     this.style.opacity = 0;
@@ -504,7 +504,7 @@ export class PopoverComponent {
               horizontalOffsetTotal + 29 + 'px'
             }, ${
               ref.getBoundingClientRect().top +
-              (window as any).scrollY +
+              window.scrollY +
               this.eventRef.offsetHeight +
               gutter +
               'px'
@@ -537,8 +537,6 @@ export class PopoverComponent {
                     .left +
                     parseInt(<string>this.style.width));
 
-              console.log('3', this.style.width);
-
               if (offset < 0) {
                 offset = offset - 16;
                 this.horizontalScrollOffset =
@@ -552,15 +550,17 @@ export class PopoverComponent {
                     ? this.horizontalScrollOffset +
                       referencePointElement.offsetWidth / 2
                     : 16;
-                this.style.transform = `translate(${
-                  horizontalOffsetTotal + 'px'
-                }, ${
-                  ref.getBoundingClientRect().top +
-                  (window as any).scrollY +
-                  this.eventRef.offsetHeight +
-                  gutter +
-                  'px'
-                })`;
+                if ("offsetHeight" in this.eventRef) {
+                  this.style.transform = `translate(${
+                    horizontalOffsetTotal + 'px'
+                  }, ${
+                    ref.getBoundingClientRect().top +
+                    window.scrollY +
+                    this.eventRef.offsetHeight +
+                    gutter +
+                    'px'
+                  })`;
+                }
               }
             }, 10);
           }
@@ -722,7 +722,7 @@ export class PopoverComponent {
     }
   }
 
-  private sizeService(type = '', ref: any, w = '320') {
+  private sizeService(type = '', ref: HTMLElement, w = '320') {
     const width = parseInt(w);
     if (type !== 'select' && width === null) {
       if (ref.closest('button')) {

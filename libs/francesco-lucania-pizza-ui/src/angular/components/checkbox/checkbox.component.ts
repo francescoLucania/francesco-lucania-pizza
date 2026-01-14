@@ -13,7 +13,7 @@ import { EMPTY_FUNCTION } from '../../constants';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'neo-ui-checkbox',
+  selector: 'pizza-lib-checkbox',
   templateUrl: './checkbox.component.html',
   styleUrls: ['./checkbox.component.scss'],
   standalone: true,
@@ -51,7 +51,7 @@ export class CheckboxComponent implements OnInit {
   public ngOnInit(): void {
     // генеририрует уникальный ID, если не указан radioId
     if (!this.radioId) {
-      this.radioId = 'app-radio-' + CheckboxStandaloneComponent.idCounter++;
+      this.radioId = 'app-radio-' + CheckboxComponent.idCounter++;
     }
   }
 
@@ -62,7 +62,7 @@ export class CheckboxComponent implements OnInit {
       this.checked = target.checked;
     }
     // для остальных из данной группы синхронизация произойдет через модель
-    console.log('this.value', this.value);
+
     this.controlValueAccessorChangeFn(this.value);
     this.changed.emit(this.value);
   }
