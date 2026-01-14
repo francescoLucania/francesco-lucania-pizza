@@ -46,3 +46,9 @@ Thumbs.db
 .env.local
 .env.*.local
 apps/pizza-api/.env
+
+.angular
+
+# Next.js
+.next
+out
