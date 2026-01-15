@@ -57,7 +57,7 @@ export class InputComponent
     OnDestroy,
     ControlValueAccessor
 {
-  @ViewChild('input') protected inputElement: ElementRef<HTMLInputElement>;
+  @ViewChild('input') protected inputElement!: ElementRef<HTMLInputElement>;
 
   @HostBinding('attr.id')
   public externalId: string | null = '';
@@ -77,7 +77,7 @@ export class InputComponent
   @Input() public type?: string; // password, email, number итд
   @Input() public minlength?: string | number;
   @Input() public maxlength?: string | number;
-  @Input() public autocomplete: boolean;
+  @Input() public autocomplete = false;
   @Input() public placeholder?: string;
   @Input() public tabIndex?: string | number;
   @Input() public ariaLabel?: string;
@@ -87,7 +87,7 @@ export class InputComponent
   @Input() public commitOnInput = true; // коммитить по input или по change
   @Input() public invalid = false;
   @Input() public size: 'small' | 'base' | 'large' = 'base';
-  @Input() public maskitoOptions: MaskitoOptions;
+  @Input() public maskitoOptions: MaskitoOptions | null = null;
 
   @Input()
   public set id(value: string) {

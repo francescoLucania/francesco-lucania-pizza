@@ -14,14 +14,14 @@ import { EMPTY_FUNCTION } from '../../../../constants';
   standalone: true,
 })
 export class PopoverDirective {
-  @Input() public openPizzaLibPopoverFromTemplate: TemplateRef<unknown>;
-  @Input() public openPizzaLibPopoverTitle: string | null;
-  @Input() public openPizzaLibPopoverGutter: string | null;
-  @Input() public openPizzaLibPopoverWidth: string | null;
-  @Input() public openPizzaLibPopoverPositionType: 'top' | 'bottom' | null;
-  @Input() public openPizzaLibPopoverCloseButton: boolean;
-  @Input() public openPizzaLibPopoverType: string;
-  @Input() public openPizzaLibPopoverIsHide: boolean;
+  @Input() public openPizzaLibPopoverFromTemplate!: TemplateRef<unknown>;
+  @Input() public openPizzaLibPopoverTitle: string | null = null;
+  @Input() public openPizzaLibPopoverGutter: string | null = null;
+  @Input() public openPizzaLibPopoverWidth: string | null = null;
+  @Input() public openPizzaLibPopoverPositionType: 'top' | 'bottom' | null = null;
+  @Input() public openPizzaLibPopoverCloseButton = true;
+  @Input() public openPizzaLibPopoverType = '';
+  @Input() public openPizzaLibPopoverIsHide = false;
   @Input() public openPizzaLibPopoverContext: Record<string, unknown> | null = null;
 
   @Input() public closeHandler = EMPTY_FUNCTION;
@@ -31,7 +31,7 @@ export class PopoverDirective {
     private element: ElementRef
   ) {}
 
-  @HostListener('click', ['$event']) private onClick(): void {
+  @HostListener('click', ['$event']) public onClick(event?: Event): void {
     const element =
       this.element?.nativeElement.tagName === 'BUTTON'
         ? this.element?.nativeElement

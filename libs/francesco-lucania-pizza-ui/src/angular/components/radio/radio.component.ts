@@ -28,15 +28,15 @@ import { EMPTY_FUNCTION } from '../../constants';
 export class RadioComponent implements ControlValueAccessor, OnInit {
   public static idCounter = 1;
 
-  @Input() public radioId: string; // input ID: если не указан, генерируется уникальный ID
+  @Input() public radioId = ''; // input ID: если не указан, генерируется уникальный ID
   @Input() public disabled = false; // состояние: по умолчанию - активное
-  @Input() public label: string;
-  @Input() public description: string;
-  @Input() public errorMessage: string;
+  @Input() public label = '';
+  @Input() public description = '';
+  @Input() public errorMessage = '';
   @Input() public required = false;
-  @Input() public name: string;
-  @Input() public value: string;
-  @Input() public checked: boolean;
+  @Input() public name = '';
+  @Input() public value = '';
+  @Input() public checked = false;
 
   @Output() private changedEvent = new EventEmitter<string>();
   @Output() private focusEvent = new EventEmitter<FocusEvent>();
@@ -52,7 +52,7 @@ export class RadioComponent implements ControlValueAccessor, OnInit {
   public ngOnInit(): void {
     // генеририрует уникальный ID, если не указан radioId
     if (!this.radioId) {
-      this.radioId = 'app-radio-' + RadioStandaloneComponent.idCounter++;
+      this.radioId = 'app-radio-' + RadioComponent.idCounter++;
     }
   }
 

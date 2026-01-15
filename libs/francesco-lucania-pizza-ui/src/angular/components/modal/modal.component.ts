@@ -48,8 +48,8 @@ export class ModalComponent implements OnInit {
   ) {}
 
   @HostListener('window:keyup', ['$event.keyCode'])
-  private keyClose(code: number) {
-    if (code === 27 && this.closeButton) {
+  public keyClose(code?: number): void {
+    if (code !== undefined && code === 27 && this.closeButton) {
       this.close();
     }
   }
@@ -66,14 +66,16 @@ export class ModalComponent implements OnInit {
       }
 
       this.modalContext = this.modal.createComponent(modalData.component);
-      if (modalData.context) {
+      if (modalData.context && this.modalContext) {
+        const instance = this.modalContext.instance as Record<string, unknown>;
         Object.keys(modalData.context).forEach((key) => {
-          this.modalContext.instance[key] = modalData.context[key];
+          instance[key] = modalData.context![key];
         });
       }
 
-      this.closeButton = this.modalContext.instance.closable;
-      this.backgroundClick = this.modalContext.instance.backgroundClick;
+      const instance = this.modalContext.instance as { closable?: boolean; backgroundClick?: boolean };
+      this.closeButton = instance.closable ?? true;
+      this.backgroundClick = instance.backgroundClick ?? true;
 
       this.isOpen = true;
       setTimeout(() => {
@@ -107,7 +109,9 @@ export class ModalComponent implements OnInit {
 
     this.checkHeightModalBody(this.mediaQueriesService.getType());
     this.mediaQueriesService.deviceType$.subscribe((data) => {
-      this.checkHeightModalBody(data?.deviceType);
+      if (data?.deviceType) {
+        this.checkHeightModalBody(data.deviceType);
+      }
       this.changeDetector.markForCheck();
     });
   }
@@ -117,7 +121,8 @@ export class ModalComponent implements OnInit {
       return;
     }
     this.modalContext?.destroy();
-    this.modalContext?.instance?.closeHandler?.();
+    const instance = this.modalContext?.instance as { closeHandler?: () => void } | undefined;
+    instance?.closeHandler?.();
     this.modalContext = null;
     this.isOpen = false;
     if (this.html && this.body) {

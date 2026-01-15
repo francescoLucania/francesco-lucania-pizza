@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Title, Meta } from '@angular/platform-browser';
-import { UntypedFormGroup } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 
 @Injectable({
@@ -17,7 +17,7 @@ export class HelperService {
     eventType: string,
     bubbles: boolean,
     cancelable: boolean
-  ) {
+  ): Event {
     return new Event(eventType, { bubbles, cancelable });
   }
 
@@ -29,7 +29,8 @@ export class HelperService {
     if (something === null || something === undefined) {
       return false;
     }
-    return typeof something === 'function' || typeof something === 'object';
+    // Exclude functions and arrays from object check
+    return typeof something === 'object' && !Array.isArray(something);
   }
 
   public static isArray(something: unknown): something is unknown[] {
@@ -37,7 +38,7 @@ export class HelperService {
   }
 
   public static isFunction(something: unknown): something is (...args: unknown[]) => unknown {
-    return typeof something === 'function' || something instanceof Function;
+    return typeof something === 'function';
   }
 
   public static isIterable(something: unknown, strict?: boolean): boolean {
@@ -45,10 +46,10 @@ export class HelperService {
       return false;
     }
     if (strict) {
-      return typeof something[Symbol.iterator] === 'function';
+      return typeof (something as { [Symbol.iterator]?: unknown })[Symbol.iterator] === 'function';
     } else {
       return (
-        typeof something[Symbol.iterator] === 'function' ||
+        typeof (something as { [Symbol.iterator]?: unknown })[Symbol.iterator] === 'function' ||
         HelperService.isObject(something)
       );
     }
@@ -59,9 +60,16 @@ export class HelperService {
       return false;
     }
     if (HelperService.isIterable(something, true)) {
-      for (const i of Object.keys(something)) {
-        return false;
+      const iterable = something as Iterable<unknown> | Record<string, unknown>;
+      if (Array.isArray(iterable)) {
+        return iterable.length === 0;
       }
+      if (HelperService.isObject(iterable)) {
+        return Object.keys(iterable).length === 0;
+      }
+      // For other iterables, check if they have any items
+      const iterator = (iterable as Iterable<unknown>)[Symbol.iterator]();
+      return iterator.next().done === true;
     }
     return true;
   }
@@ -75,18 +83,33 @@ export class HelperService {
 
   // простое глубокое копирование, подходит для json-образных структур где конструкторы/типы объектов не имеют значения
   public static deepCopy<T>(obj: T): T {
-    let newObj = obj; // все простые типы копируются как есть
-    if (obj && typeof obj === 'object') {
-      if (obj instanceof Date) {
-        return new Date(obj.getTime()); // даты клонируем, т.к. они mutable
-      }
-      newObj =
-        Object.prototype.toString.call(obj) === '[object Array]' ? [] : {};
-      for (const i of Object.keys(obj)) {
-        newObj[i] = this.deepCopy(obj[i]);
+    if (obj === null || obj === undefined) {
+      return obj;
+    }
+
+    // Handle primitive types
+    if (typeof obj !== 'object') {
+      return obj;
+    }
+
+    // Handle Date objects
+    if (obj instanceof Date) {
+      return new Date(obj.getTime()) as T;
+    }
+
+    // Handle arrays
+    if (Array.isArray(obj)) {
+      return obj.map((item) => HelperService.deepCopy(item)) as T;
+    }
+
+    // Handle plain objects
+    const newObj = {} as Record<string, unknown>;
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        newObj[key] = HelperService.deepCopy((obj as Record<string, unknown>)[key]);
       }
     }
-    return newObj;
+    return newObj as T;
   }
 
   public static copyArrayToArray<T>(source: T[], dest: T[]): void {
@@ -96,7 +119,7 @@ export class HelperService {
     const sourceX = source || [];
     const originalLength = dest.length;
     sourceX.forEach((item: T, index: number) => {
-      dest[index] = source[index];
+      dest[index] = item;
     });
     if (originalLength > sourceX.length) {
       dest.splice(sourceX.length, originalLength - sourceX.length);
@@ -116,10 +139,10 @@ export class HelperService {
   }
 
   // конвертирует хтмл в его текстовое представление, убирает все теги
-  public static htmlToText(html: string) {
+  public static htmlToText(html: string): string {
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
-    return doc.body ? doc.body.textContent : '';
+    return doc.body?.textContent ?? '';
   }
 
   // выбирает склонение существительного в зависимости от количества, массив pluralizeNouns всегда длины 3!
@@ -137,7 +160,7 @@ export class HelperService {
     html: string,
     positionFrom: number,
     positionTo: number
-  ) {
+  ): boolean {
     let isText = true;
     for (let i = 0; i < positionTo; i++) {
       if (html[i] === '<') {
@@ -155,9 +178,9 @@ export class HelperService {
 
   public static findMatchEnd(text: string, mask: string): number {
     const value = text || '';
-    let matchEnd = (value || '').length;
+    let matchEnd = value.length;
     if (mask && value) {
-      for (let i = mask.length; i--; i >= 0) {
+      for (let i = mask.length - 1; i >= 0; i--) {
         if (i >= value.length) {
           continue;
         }
@@ -176,7 +199,7 @@ export class HelperService {
     inputElement: HTMLInputElement,
     mask: string | null = null,
     startPosition?: number
-  ) {
+  ): void {
     if (
       !inputElement ||
       !(inputElement.type === 'text' || inputElement.type === 'password')
@@ -185,7 +208,7 @@ export class HelperService {
     }
     const lastCharacterPosition = HelperService.findMatchEnd(
       inputElement.value,
-      mask
+      mask ?? ''
     );
     const indexOfCaret =
       startPosition && startPosition > lastCharacterPosition
@@ -194,7 +217,7 @@ export class HelperService {
     inputElement.setSelectionRange(indexOfCaret, indexOfCaret);
   }
 
-  public static markFormTouched(form: UntypedFormGroup) {
+  public static markFormTouched(form: FormGroup): void {
     const controls = form.controls;
     for (const controlName of Object.keys(controls)) {
       controls[controlName].markAsTouched({ onlySelf: false });
@@ -206,11 +229,17 @@ export class HelperService {
     if (object1 == null || object2 == null) {
       return object2 === object1;
     }
+
+    if (!HelperService.isObject(object1) || !HelperService.isObject(object2)) {
+      return object1 === object2;
+    }
+
     const keys1 = Object.keys(object1);
     const keys2 = Object.keys(object2);
     if (keys1.length !== keys2.length) {
       return false;
     }
+
     for (const key of keys1) {
       const val1 = object1[key];
       const val2 = object2[key];

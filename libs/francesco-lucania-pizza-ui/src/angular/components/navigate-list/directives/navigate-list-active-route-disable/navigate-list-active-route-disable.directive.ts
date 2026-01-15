@@ -14,7 +14,7 @@ import { filter } from 'rxjs';
   standalone: true,
 })
 export class NavigateListActiveRouteDisableDirective implements OnInit {
-  @HostBinding('tabindex') public tabindex: string;
+  @HostBinding('tabindex') public tabindex = '';
   @Input() public set pizzaLibNavigateListActiveRouteDisable(className: string) {
     this.className = className;
     if (this.elementRef.nativeElement.classList.contains(this.className)) {
@@ -24,7 +24,7 @@ export class NavigateListActiveRouteDisableDirective implements OnInit {
     }
   }
 
-  private className: string;
+  private className = '';
 
   constructor(
     private elementRef: ElementRef,

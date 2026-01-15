@@ -13,8 +13,8 @@ import {
 export class ElementFocusDirective implements OnDestroy {
   @Input('pizzaLibElementFocusContextClass') public contextClass = 'outline-base';
 
-  @HostBinding('class') private cssClass = this.contextClass;
-  @HostBinding('tabindex') private tabIndex =
+  @HostBinding('class') public cssClass = this.contextClass;
+  @HostBinding('tabindex') public tabIndex =
     this.elementRef.nativeElement.tabIndex !== -1
       ? `${this.elementRef.nativeElement.tabIndex}`
       : '0';

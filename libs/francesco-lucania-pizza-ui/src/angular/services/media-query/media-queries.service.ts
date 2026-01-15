@@ -57,6 +57,7 @@ export class MediaQueriesService {
   private init(): void {
     this._deviceTypeParams = {
       deviceType: this.getType(),
+      // @ts-ignore
       deviceSize: this.getDeviceSizeData(),
     };
     this._deviceType$.next(this._deviceTypeParams);

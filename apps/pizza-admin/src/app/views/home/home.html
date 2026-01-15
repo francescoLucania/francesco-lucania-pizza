@@ -1,0 +1,35 @@
+<section class="home">
+  <div class="home__content-box">
+    <h1 class="home__heading heading-h1">Francesco Lucania Pizza</h1>
+
+    <p class="mt-16">Уаправление заказами</p>
+    <div class="mt-32">
+      <pizza-lib-button
+        [theme]="'brand'"
+        [size]="'large'"
+        [openPizzaLibModalFromTemplate]="ipErrorModal"
+      >
+        <span>Продолжить</span>
+      </pizza-lib-button>
+
+      <ng-template #ipErrorModal>
+        <h3 class="heading-h3 mb-32">Get started</h3>
+
+        <div class="mb-24">
+          <h4 class="heading-h4 mb-16">Installation:</h4>
+<!--          <neo-code>npm i ngx-neo-ui</neo-code>-->
+        </div>
+
+        <div class="mb-24">
+          <h4 class="heading-h4 mb-16">Customize styles:</h4>
+          <div class="mb-24">
+            <a (click)="modalService.close()" [routerLink]="'styles/global'"
+            >Styles</a
+            >
+          </div>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</section>
+

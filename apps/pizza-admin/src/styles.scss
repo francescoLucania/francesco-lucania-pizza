@@ -1,0 +1,185 @@
+// Для кастомизации инструментов шаблона
+
+//@use 'libs/francesco-lucania-pizza-ui/assets/styles/theme-provider/config' as config with (
+//
+//  $mq-breakpoints: (
+//    'sm': 500px,
+//    'md': 501px,
+//    'lg': 1140px,
+//    'xl': 1440px,
+//    'xxl': 1920px,
+//    'xxxl': 2220px,
+//  ),
+//
+//  $mq-indents: (
+//    'sm': 24px,
+//    'md': 32px,
+//    'lg': 32px,
+//    'xl': 32px,
+//    'xxl': 48px,
+//    'xxxl': 48px,
+//  ),
+//
+//  $mq-container-widths: (
+//    'sm': 100%,
+//    'md': 100%,
+//    'lg': 1420px,
+//    'xl': 1420px,
+//    'xxl': 1420px,
+//    'xxxl': 1420px,
+//  ),
+//
+//  $mq-container-indents: (
+//    'sm': 16px,
+//    'md': 32px,
+//    'lg': 64px,
+//    'xl': 64px,
+//    'xxl': 64px,
+//    'xxxl': 64px,
+//  ),
+//
+//  $mq-grid-gutters: (
+//    'sm': 24px,
+//    'md': 32px,
+//    'lg': 32px,
+//    'xl': 32px,
+//    'xxl': 48px,
+//    'xxxl': 48px,
+//  )
+//);
+
+@forward 'node_modules/normalize.css/normalize';
+@forward 'libs/francesco-lucania-pizza-ui/assets/styles/theme-provider/common/variables/variables';
+@forward 'libs/francesco-lucania-pizza-ui/assets/styles/theme-provider/common/fonts/fonts';
+@forward 'libs/francesco-lucania-pizza-ui/assets/styles/theme-provider/base-styles/styles';
+@forward 'libs/francesco-lucania-pizza-ui/assets/styles/theme-provider/common/accessibility/accessibility';
+@forward 'libs/francesco-lucania-pizza-ui/assets/styles/theme-provider/common/offsets/offsets';
+@forward 'libs/francesco-lucania-pizza-ui/assets/styles/theme-provider/base-styles/typography/typography';
+@forward 'libs/francesco-lucania-pizza-ui/assets/styles/theme-provider/base-styles/container/container';
+@forward '../public/styles/view/view';
+
+@use 'libs/francesco-lucania-pizza-ui/assets/styles/theme-provider/theme_provider' as theme;
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  padding-top: 80px;
+  background-color: var(--bgColor);
+  color: var(--colorBase);
+  font-family: var(--baseFont);
+  transition: background-color 0.6s, padding-top 0.6s;
+  will-change: padding-top;
+
+  @include theme.mq(md) {
+    padding-top: 128px;
+  }
+
+  .app {
+    min-height: calc(100vh - 80px);
+
+    @include theme.mq(md) {
+      min-height: calc(100vh - 128px);
+    }
+  }
+
+  &.scrolled {
+    background-color: var(--bgColorMode);
+
+    @include theme.mq(md) {
+      padding-top: 88px;
+    }
+
+    .app {
+      @include theme.mq(md) {
+        min-height: calc(100vh - 88px);
+      }
+    }
+  }
+}
+
+base-root {
+  display: block;
+}
+
+.app {
+  display: grid;
+  grid-template-areas:
+    'header'
+    'main'
+    'footer';
+  grid-template-rows: auto 1fr auto;
+}
+
+pizza-lib-header {
+  grid-area: header;
+  height: content-box;
+}
+
+main {
+  grid-area: main;
+  display: flex;
+  width: 100%;
+
+  > *:not(router-outlet) {
+    flex-grow: 1;
+  }
+}
+
+pizza-lib-footer {
+  grid-area: footer;
+  height: content-box;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.outline-base {
+  &:focus {
+    outline: 3px dotted var(--accessibilityBorder, #9b3be5) !important;
+    outline-offset: 2px;
+  }
+}
+
+.components {
+  &__grid {
+    @include theme.mq(md) {
+      display: flex;
+    }
+  }
+
+  &__navigate-col {
+    @include theme.mq(md) {
+      width: 260px;
+    }
+  }
+
+  &__content-col {
+    @include theme.mq(md) {
+      padding-left: 64px;
+      width: calc(100% - 260px);
+    }
+  }
+
+  &__navigate {
+    list-style-type: none;
+  }
+
+  &__navigate-item {
+    display: block;
+
+    &:not(:last-child) {
+      margin-bottom: 8px;
+    }
+
+    > a,
+    button {
+      display: block;
+      color: var(--colorBase);
+    }
+  }
+}

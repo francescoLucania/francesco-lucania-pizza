@@ -1,0 +1,30 @@
+@use 'libs/francesco-lucania-pizza-ui/assets/styles/theme-provider/theme_provider' as theme;
+
+:host {
+  display: flex;
+}
+
+.home {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &__content-box {
+    text-align: center;
+  }
+
+  &__heading {
+    font-size: 48px;
+    line-height: 48px;
+    text-transform: uppercase;
+
+    @include theme.mq(md) {
+      font-size: 56px;
+      line-height: 56px;
+    }
+  }
+
+  &__description {
+  }
+}

@@ -1,6 +1,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "useDefineForClassFields": false,
     "rootDir": ".",
     "sourceMap": true,
     "declaration": false,
@@ -15,8 +16,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@francesco-lucania-pizza/francesco-lucania-pizza-ui": [
-        "libs/francesco-lucania-pizza-ui/src/index.ts"
+      "@francesco-lucania-pizza/angular-ui": [
+        "libs/francesco-lucania-pizza-ui/src/angular/index.ts"
       ]
     }
   },

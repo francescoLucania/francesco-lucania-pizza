@@ -29,8 +29,8 @@ import { EMPTY_FUNCTION } from '../../../../constants';
   standalone: true,
 })
 export class OpenModalTemplateRefDirective {
-  @Input() public openPizzaLibModalFromTemplate: TemplateRef<unknown>;
-  @Input() public modalTitle: string;
+  @Input() public openPizzaLibModalFromTemplate!: TemplateRef<unknown>;
+  @Input() public modalTitle = '';
   @Input() public closeHandler = EMPTY_FUNCTION;
 
   constructor(
@@ -38,7 +38,7 @@ export class OpenModalTemplateRefDirective {
     private moduleRef: NgModuleRef<any>
   ) {}
 
-  @HostListener('click', ['$event']) private onClick(): void {
+  @HostListener('click', ['$event']) public onClick(event?: Event): void {
     const context = {
       title: this.modalTitle,
       content: this.openPizzaLibModalFromTemplate,

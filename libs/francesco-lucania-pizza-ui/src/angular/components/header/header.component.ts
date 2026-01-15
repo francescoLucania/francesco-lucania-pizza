@@ -45,7 +45,7 @@ export class HeaderComponent implements OnInit {
   ) {}
 
   @HostListener('window:scroll', ['$event'])
-  public onWindowScroll() {
+  public onWindowScroll(event?: Event): void {
     if (this.browser.isBrowser) {
       this.scrolled = window.scrollY > 0;
 

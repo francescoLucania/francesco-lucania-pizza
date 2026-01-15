@@ -22,7 +22,7 @@ export class TrapFocusDirective implements AfterViewInit {
     this.trapFocus(this.elementRef.nativeElement);
   }
 
-  private focusElements!: Observable<Event>;
+  private focusElements!: Observable<KeyboardEvent>;
   private firstFocusableElement!: HTMLElement;
   private lastFocusableElement!: HTMLElement;
   private state = true;
@@ -40,7 +40,7 @@ export class TrapFocusDirective implements AfterViewInit {
         'input[type="radio"], input[type="checkbox"], select'
     );
     const focusableEls = Array.from(focusableEls1).filter(
-      (el: HTMLElement) => !el.disabled
+      (el): el is HTMLElement => el instanceof HTMLElement && !(el as HTMLElement & { disabled?: boolean }).disabled
     );
 
     this.firstFocusableElement = element;
@@ -48,7 +48,7 @@ export class TrapFocusDirective implements AfterViewInit {
       focusableEls.length - 1
     ] as HTMLElement;
     if (!this.focusElements) {
-      this.focusElements = fromEvent(element, 'keydown');
+      this.focusElements = fromEvent<KeyboardEvent>(element, 'keydown');
       this.focusElements
         .pipe(filter((e: KeyboardEvent) => e.code === 'Tab'))
         .subscribe({
