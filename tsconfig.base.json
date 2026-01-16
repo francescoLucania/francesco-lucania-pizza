@@ -16,6 +16,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@francesco-lucania-pizza-models": ["models/index.ts"],
       "@francesco-lucania-pizza/angular-ui": [
         "libs/francesco-lucania-pizza-ui/src/angular/index.ts"
       ]
