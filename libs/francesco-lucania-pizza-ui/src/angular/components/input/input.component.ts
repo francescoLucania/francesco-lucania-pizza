@@ -5,16 +5,15 @@ import {
   Component,
   DoCheck,
   ElementRef,
-  EventEmitter,
   forwardRef,
   Host,
   HostBinding,
-  Input,
+  input,
   OnChanges,
   OnDestroy,
   OnInit,
   Optional,
-  Output,
+  output,
   SkipSelf,
   ViewChild,
 } from '@angular/core';
@@ -60,44 +59,37 @@ export class InputComponent
   @ViewChild('input') protected inputElement!: ElementRef<HTMLInputElement>;
 
   @HostBinding('attr.id')
-  public externalId: string | null = '';
+  public get externalId(): string | null {
+    return this.id() || null;
+  }
 
   // focus и blur искусственные, одноименные с естественными, остальные события просто всплывают
-  @Output() public cleared = new EventEmitter<void>();
-  @Output() public focusEvent = new EventEmitter<FocusEvent>();
-  @Output() public blurEvent = new EventEmitter<FocusEvent>();
-  @Output() public selectSuggest = new EventEmitter<Suggest | SuggestItem>();
+  public cleared = output<void>();
+  public focusEvent = output<FocusEvent>();
+  public blurEvent = output<FocusEvent>();
+  public selectSuggest = output<Suggest | SuggestItem>();
   // эти события не перехватываются и всплывают:
   // input, change, keydown, keyup, keypress, click, dblclick, touchstart, touchend,
   // touchmove, mousedown, mouseup, mouseenter, mouseleave, mouseover, mouseout, mousemove
 
   // name используется для назначения аттрибуту, но чтобы связать контрол с формой - используйте formControlName
-  @Input() public name?: string;
-  @Input() public formControlName?: string;
-  @Input() public type?: string; // password, email, number итд
-  @Input() public minlength?: string | number;
-  @Input() public maxlength?: string | number;
-  @Input() public autocomplete = false;
-  @Input() public placeholder?: string;
-  @Input() public tabIndex?: string | number;
-  @Input() public ariaLabel?: string;
-  @Input() public readOnly?: boolean;
-  @Input() public disabled = false;
-  @Input() public multiline?: boolean;
-  @Input() public commitOnInput = true; // коммитить по input или по change
-  @Input() public invalid = false;
-  @Input() public size: 'small' | 'base' | 'large' = 'base';
-  @Input() public maskitoOptions: MaskitoOptions | null = null;
-
-  @Input()
-  public set id(value: string) {
-    this._ID = value;
-    this.externalId = null;
-  }
-
-  public get id() {
-    return this._ID;
-  }
+  public name = input<string | undefined>(undefined);
+  public formControlName = input<string | undefined>(undefined);
+  public type = input<string | undefined>(undefined); // password, email, number итд
+  public minlength = input<string | number | undefined>(undefined);
+  public maxlength = input<string | number | undefined>(undefined);
+  public autocomplete = input<boolean>(false);
+  public placeholder = input<string | undefined>(undefined);
+  public tabIndex = input<string | number | undefined>(undefined);
+  public ariaLabel = input<string | undefined>(undefined);
+  public readOnly = input<boolean | undefined>(undefined);
+  public disabled = input<boolean>(false);
+  public multiline = input<boolean | undefined>(undefined);
+  public commitOnInput = input<boolean>(true); // коммитить по input или по change
+  public invalid = input<boolean>(false);
+  public size = input<'small' | 'base' | 'large'>('base');
+  public maskitoOptions = input<MaskitoOptions | null>(null);
+  public id = input<string>('');
 
   public value = '';
 
@@ -106,8 +98,6 @@ export class InputComponent
   public touched = false;
   public invalidDisplayed = false;
   public control: AbstractControl | null = null;
-
-  private _ID = '';
   private onTouchedCallback!: () => void;
   public showToggle = false;
   public showPassword = false;
@@ -118,9 +108,9 @@ export class InputComponent
   ) {}
 
   public ngOnInit(): void {
-    if (this.controlContainer && this.formControlName) {
-      this.control = this.controlContainer?.control?.get(this.formControlName)
-        ? this.controlContainer?.control?.get(this.formControlName)
+    if (this.controlContainer && this.formControlName()) {
+      this.control = this.controlContainer?.control?.get(this.formControlName()!)
+        ? this.controlContainer?.control?.get(this.formControlName()!)
         : null;
     } else {
       this.control = null;
@@ -161,7 +151,7 @@ export class InputComponent
 
   public writeValue(value: string | number) {
     this.value = value === null || value === undefined ? '' : '' + value;
-    if (this.multiline && this.inputElement) {
+    if (this.multiline() && this.inputElement) {
       this.inputElement.nativeElement.value = this.value;
     }
     this.check();
@@ -176,8 +166,6 @@ export class InputComponent
       this.onTouchedCallback();
     }
     this.check();
-
-    this.blurEvent.emit();
     this.changeDetection.detectChanges();
   }
 
@@ -187,7 +175,6 @@ export class InputComponent
       this.onTouchedCallback();
     }
     this.check();
-    this.focusEvent.emit();
   }
 
   public returnFocus(e?: Event) {
@@ -207,7 +194,7 @@ export class InputComponent
 
   public handleInput(e: Event) {
     this.value = this.inputElement.nativeElement.value;
-    if (this.commitOnInput) {
+    if (this.commitOnInput()) {
       this.commit(this.value);
     }
     this.check();
@@ -215,7 +202,7 @@ export class InputComponent
 
   public handleChange(): void {
     this.value = this.inputElement.nativeElement.value;
-    if (!this.commitOnInput) {
+    if (!this.commitOnInput()) {
       this.commit(this.value);
     }
     this.check();

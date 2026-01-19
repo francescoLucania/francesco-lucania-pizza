@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { NxWelcome } from './nx-welcome';
 import {
   FooterComponent,
   HeaderComponent,
@@ -10,7 +9,7 @@ import {
 } from "@francesco-lucania-pizza/angular-ui";
 
 @Component({
-  imports: [NxWelcome, RouterModule, HeaderComponent, FooterComponent, ModalComponent, PopoverComponent],
+  imports: [RouterModule, HeaderComponent, FooterComponent, ModalComponent, PopoverComponent],
   selector: 'app-root',
   templateUrl: './app.html',
   styleUrl: './app.scss',
