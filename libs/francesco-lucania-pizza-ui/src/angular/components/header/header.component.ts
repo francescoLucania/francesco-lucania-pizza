@@ -3,7 +3,7 @@ import {
   ChangeDetectorRef,
   Component,
   HostListener,
-  Input,
+  input,
   OnInit,
   Renderer2,
 } from '@angular/core';
@@ -30,8 +30,8 @@ import { NavigateListComponent } from '../navigate-list/navigate-list.component'
   ],
 })
 export class HeaderComponent implements OnInit {
-  @Input() public navigate: INavigateList[] = [];
-  @Input() public logoPath = '../../assets/img/logo.jpg';
+  public navigate = input<INavigateList[]>([]);
+  public logoPath = input<string>('../../assets/img/logo.jpg');
 
   public scrolled = false;
   public mobileMenuState = false;

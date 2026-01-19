@@ -3,7 +3,7 @@
     <div class="site-header__grid">
       <a [routerLink]="['/']" class="site-header__logo">
         <img
-          [src]="logoPath"
+          [src]="logoPath()"
           alt="NGX-NEO-UI UI библиотека доступных компонентов для Angular"
         />
       </a>
@@ -49,5 +49,5 @@
 </header>
 
 <ng-template #menu>
-  <pizza-lib-navigate-list [navigate]="navigate"></pizza-lib-navigate-list>
+  <pizza-lib-navigate-list [navigate]="navigate()"></pizza-lib-navigate-list>
 </ng-template>

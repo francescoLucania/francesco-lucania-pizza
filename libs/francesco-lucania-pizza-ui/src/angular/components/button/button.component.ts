@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   input,
-  Input,
 } from '@angular/core';
 
 import { RouterLink } from '@angular/router';
@@ -20,16 +19,16 @@ import { NgTemplateOutlet } from '@angular/common';
 })
 export class ButtonComponent {
   public label = input<string | undefined>(undefined);
-  @Input() public theme: 'base' | 'secondary' | 'brand' = 'base';
-  @Input() public size: 'base' | 'small' | 'large' = 'base';
-  @Input() public fullWidth = false;
-  @Input() public showLoader = false;
+  public theme = input<'base' | 'secondary' | 'brand'>('base');
+  public size = input<'base' | 'small' | 'large'>('base');
+  public fullWidth = input<boolean>(false);
+  public showLoader = input<boolean>(false);
 
-  @Input() public disabled = false;
-  @Input() public buttonType: 'submit' | 'reset' | 'button' = 'button';
+  public disabled = input<boolean>(false);
+  public buttonType = input<'submit' | 'reset' | 'button'>('button');
 
-  @Input() public link = '';
-  @Input() public target: '_blank' | '_self' | '_parent' | '_top' = '_self';
+  public link = input<string>('');
+  public target = input<'_blank' | '_self' | '_parent' | '_top'>('_self');
 
   public title = input<string | undefined>(undefined);
   public ariaLabel = input<string | undefined>(undefined);

@@ -1,15 +1,15 @@
-@if (!link) {
+@if (!link()) {
 <button
   class="neo-ui-button"
-  [class.neo-ui-button--theme-secondary]="theme === 'secondary'"
-  [class.neo-ui-button--theme-brand]="theme === 'brand'"
-  [class.neo-ui-button--size-small]="size === 'small'"
-  [class.neo-ui-button--size-large]="size === 'large'"
-  [class.neo-ui-button--full-width]="fullWidth"
-  [type]="buttonType"
-  [disabled]="disabled"
-  [attr.aria-label]="ariaLabel"
-  [attr.tabindex]="tabIndex"
+  [class.neo-ui-button--theme-secondary]="theme() === 'secondary'"
+  [class.neo-ui-button--theme-brand]="theme() === 'brand'"
+  [class.neo-ui-button--size-small]="size() === 'small'"
+  [class.neo-ui-button--size-large]="size() === 'large'"
+  [class.neo-ui-button--full-width]="fullWidth()"
+  [type]="buttonType()"
+  [disabled]="disabled()"
+  [attr.aria-label]="ariaLabel()"
+  [attr.tabindex]="tabIndex()"
 >
   @if (label()) {
   {{ label() }}
@@ -20,16 +20,16 @@
 } @else {
 <a
   class="neo-ui-button"
-  [routerLink]="link"
-  [target]="target"
-  [class.neo-ui-button--theme-secondary]="theme === 'secondary'"
-  [class.neo-ui-button--theme-brand]="theme === 'brand'"
-  [class.neo-ui-button--size-small]="size === 'small'"
-  [class.neo-ui-button--size-large]="size === 'large'"
-  [class.neo-ui-button--full-width]="fullWidth"
-  [type]="buttonType"
-  [attr.aria-label]="ariaLabel"
-  [attr.tabindex]="tabIndex"
+  [routerLink]="link()"
+  [target]="target()"
+  [class.neo-ui-button--theme-secondary]="theme() === 'secondary'"
+  [class.neo-ui-button--theme-brand]="theme() === 'brand'"
+  [class.neo-ui-button--size-small]="size() === 'small'"
+  [class.neo-ui-button--size-large]="size() === 'large'"
+  [class.neo-ui-button--full-width]="fullWidth()"
+  [type]="buttonType()"
+  [attr.aria-label]="ariaLabel()"
+  [attr.tabindex]="tabIndex()"
 >
   @if (label()) {
   {{ label() }}
