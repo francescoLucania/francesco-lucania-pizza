@@ -2,13 +2,18 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  EventEmitter,
+  effect,
   forwardRef,
-  Input,
+  input,
+  model,
   OnInit,
-  Output,
+  output,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import {
+  FormValueControl,
+  ValidationError,
+} from '@angular/forms/signals';
 import { EMPTY_FUNCTION } from '../../constants';
 
 @Component({
@@ -25,61 +30,104 @@ import { EMPTY_FUNCTION } from '../../constants';
   ],
   standalone: true,
 })
-export class RadioComponent implements ControlValueAccessor, OnInit {
+export class RadioComponent implements ControlValueAccessor, OnInit, FormValueControl<string> {
   public static idCounter = 1;
 
-  @Input() public radioId = ''; // input ID: если не указан, генерируется уникальный ID
-  @Input() public disabled = false; // состояние: по умолчанию - активное
-  @Input() public label = '';
-  @Input() public description = '';
-  @Input() public errorMessage = '';
-  @Input() public required = false;
-  @Input() public name = '';
-  @Input() public value = '';
-  @Input() public checked = false;
+  // Signal-based inputs
+  public radioId = input<string>(''); // input ID: если не указан, генерируется уникальный ID
+  public disabled = input<boolean>(false); // состояние: по умолчанию - активное
+  public label = input<string>('');
+  public description = input<string>('');
+  public errorMessage = input<string>('');
+  public required = input<boolean>(false);
+  public name = input<string>('');
+  public radioValue = input<string>(''); // Значение этого конкретного radio button
 
-  @Output() private changedEvent = new EventEmitter<string>();
-  @Output() private focusEvent = new EventEmitter<FocusEvent>();
-  @Output() private blurEvent = new EventEmitter<FocusEvent>();
+  // Signal-based outputs
+  public changedEvent = output<string>();
+  public focusEvent = output<FocusEvent>();
+  public blurEvent = output<FocusEvent>();
+
+  // FormValueControl required signal - текущее выбранное значение группы
+  readonly value = model<string>('');
+
+  // FormValueControl optional signals
+  readonly errors = input<readonly ValidationError[]>([]);
+  readonly touched = model<boolean>(false);
+  readonly dirty = model<boolean>(false);
+  readonly readonly = input<boolean>(false);
+  readonly minLength = input<number | undefined>(undefined);
+  readonly maxLength = input<number | undefined>(undefined);
+  readonly pattern = input<readonly RegExp[]>([]);
 
   /** The method to be called in order to update ngModel */
   private controlValueAccessorChangeFn = EMPTY_FUNCTION;
   private onTouched = EMPTY_FUNCTION;
   private _controlValueAccessorChangeFn = EMPTY_FUNCTION;
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  // Internal state for backward compatibility
+  private _radioId = '';
+  public _checked = false; // Public for template access
+
+  constructor(private cdr: ChangeDetectorRef) {
+    // Sync value signal with checked state
+    effect(() => {
+      const currentValue = this.value();
+      const radioVal = this.radioValue();
+      const shouldBeChecked = currentValue === radioVal && radioVal !== '';
+      if (shouldBeChecked !== this._checked) {
+        this._checked = shouldBeChecked;
+        this.cdr.detectChanges();
+      }
+    });
+  }
 
   public ngOnInit(): void {
     // генеририрует уникальный ID, если не указан radioId
-    if (!this.radioId) {
-      this.radioId = 'app-radio-' + RadioComponent.idCounter++;
+    const id = this.radioId();
+    if (!id) {
+      this._radioId = 'app-radio-' + RadioComponent.idCounter++;
+    } else {
+      this._radioId = id;
     }
+  }
+
+  public get computedRadioId(): string {
+    return this._radioId || this.radioId();
   }
 
   public onChange(event: Event): void {
     // всегда true, но вызывается только для активного
     const { target } = event;
-    if (target instanceof HTMLInputElement) {
-      this.checked = target.checked;
-    }
+    if (target instanceof HTMLInputElement && target.checked) {
+      const radioVal = this.radioValue();
+      this._checked = true;
+      this.value.set(radioVal);
+      this.dirty.set(true);
+      this.touched.set(true);
 
-    // для остальных из данной группы синхронизация произойдет через модель
-    this.controlValueAccessorChangeFn(this.value);
-    this.changedEvent.emit(this.value);
+      // для остальных из данной группы синхронизация произойдет через модель
+      this.controlValueAccessorChangeFn(radioVal);
+      this.changedEvent.emit(radioVal);
+    }
   }
 
   public notifyFocusEvent(event: FocusEvent): void {
+    this.touched.set(true);
     this.focusEvent.emit(event);
   }
 
   public notifyBlurEvent(event: FocusEvent): void {
+    this.touched.set(true);
     this.blurEvent.emit(event);
   }
 
   // Обязательные методы ControlValueAccessor:
 
   public writeValue(value: string): void {
-    this.checked = value === this.value;
+    const stringValue = value === null || value === undefined ? '' : String(value);
+    this.value.set(stringValue);
+    this._checked = stringValue === this.radioValue();
     this.cdr.detectChanges();
   }
 
@@ -94,7 +142,9 @@ export class RadioComponent implements ControlValueAccessor, OnInit {
   }
 
   public setDisabledState(isDisabled: boolean): void {
-    this.disabled = isDisabled;
+    // Note: disabled is now a signal, so we can't directly set it
+    // This method is called by ControlValueAccessor, but the actual disabled state
+    // should be controlled through the input signal or form state
     this.cdr.detectChanges();
   }
 }

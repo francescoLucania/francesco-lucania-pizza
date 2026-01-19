@@ -4,11 +4,13 @@ import {
   ChangeDetectorRef,
   Component,
   DoCheck,
+  effect,
   ElementRef,
   forwardRef,
   Host,
   HostBinding,
   input,
+  model,
   OnChanges,
   OnDestroy,
   OnInit,
@@ -24,6 +26,10 @@ import {
   FormsModule,
   NG_VALUE_ACCESSOR,
 } from '@angular/forms';
+import {
+  FormValueControl,
+  ValidationError,
+} from '@angular/forms/signals';
 import { Suggest, SuggestItem } from './models/suggest';
 import { HelperService } from '../../services';
 import { NgClass, NgTemplateOutlet } from '@angular/common';
@@ -54,7 +60,8 @@ export class InputComponent
     AfterViewInit,
     DoCheck,
     OnDestroy,
-    ControlValueAccessor
+    ControlValueAccessor,
+    FormValueControl<string>
 {
   @ViewChild('input') protected inputElement!: ElementRef<HTMLInputElement>;
 
@@ -73,7 +80,8 @@ export class InputComponent
   // touchmove, mousedown, mouseup, mouseenter, mouseleave, mouseover, mouseout, mousemove
 
   // name используется для назначения аттрибуту, но чтобы связать контрол с формой - используйте formControlName
-  public name = input<string | undefined>(undefined);
+  // For FormValueControl compatibility, name must be InputSignal<string>
+  public name = input<string>('');
   public formControlName = input<string | undefined>(undefined);
   public type = input<string | undefined>(undefined); // password, email, number итд
   public minlength = input<string | number | undefined>(undefined);
@@ -82,6 +90,7 @@ export class InputComponent
   public placeholder = input<string | undefined>(undefined);
   public tabIndex = input<string | number | undefined>(undefined);
   public ariaLabel = input<string | undefined>(undefined);
+  // readOnly kept for backward compatibility, readonly is for FormValueControl
   public readOnly = input<boolean | undefined>(undefined);
   public disabled = input<boolean>(false);
   public multiline = input<boolean | undefined>(undefined);
@@ -91,11 +100,25 @@ export class InputComponent
   public maskitoOptions = input<MaskitoOptions | null>(null);
   public id = input<string>('');
 
-  public value = '';
+  // FormValueControl required signal
+  readonly value = model<string>('');
+
+  // FormValueControl optional signals
+  readonly errors = input<readonly ValidationError[]>([]);
+  readonly touched = model<boolean>(false);
+  readonly dirty = model<boolean>(false);
+  readonly readonly = input<boolean>(false);
+  readonly required = input<boolean>(false);
+  readonly minLength = input<number | undefined>(undefined);
+  readonly maxLength = input<number | undefined>(undefined);
+  readonly pattern = input<readonly RegExp[]>([]);
+
+  // Internal value for backward compatibility with ControlValueAccessor
+  private _internalValue = '';
 
   private destroyed = false;
   public focused = false;
-  public touched = false;
+  private _touched = false; // For backward compatibility
   public invalidDisplayed = false;
   public control: AbstractControl | null = null;
   private onTouchedCallback!: () => void;
@@ -123,6 +146,17 @@ export class InputComponent
 
   public ngAfterViewInit(): void {
     this.check();
+    
+    // Sync value signal with input element when changed externally (e.g., via formField)
+    effect(() => {
+      const signalValue = this.value();
+      if (signalValue !== this._internalValue && this.inputElement) {
+        this._internalValue = signalValue;
+        if (this.inputElement.nativeElement.value !== signalValue) {
+          this.inputElement.nativeElement.value = signalValue;
+        }
+      }
+    });
   }
 
   public ngOnChanges() {
@@ -131,7 +165,11 @@ export class InputComponent
 
   public ngDoCheck() {
     if (this.control) {
-      this.touched = this.control.touched;
+      const controlTouched = this.control.touched;
+      this._touched = controlTouched;
+      if (controlTouched !== this.touched()) {
+        this.touched.set(controlTouched);
+      }
     }
     this.check();
   }
@@ -150,9 +188,11 @@ export class InputComponent
   }
 
   public writeValue(value: string | number) {
-    this.value = value === null || value === undefined ? '' : '' + value;
+    const stringValue = value === null || value === undefined ? '' : '' + value;
+    this._internalValue = stringValue;
+    this.value.set(stringValue);
     if (this.multiline() && this.inputElement) {
-      this.inputElement.nativeElement.value = this.value;
+      this.inputElement.nativeElement.value = stringValue;
     }
     this.check();
     if (!this.destroyed) {
@@ -162,6 +202,8 @@ export class InputComponent
 
   public handleBlur() {
     this.focused = false;
+    this.touched.set(true);
+    this._touched = true;
     if (this.onTouchedCallback) {
       this.onTouchedCallback();
     }
@@ -170,7 +212,9 @@ export class InputComponent
   }
 
   public handleFocus() {
-    this.focused = this.touched = true;
+    this.focused = true;
+    this.touched.set(true);
+    this._touched = true;
     if (this.onTouchedCallback) {
       this.onTouchedCallback();
     }
@@ -193,17 +237,23 @@ export class InputComponent
   }
 
   public handleInput(e: Event) {
-    this.value = this.inputElement.nativeElement.value;
+    const newValue = this.inputElement.nativeElement.value;
+    this._internalValue = newValue;
+    this.value.set(newValue);
+    this.dirty.set(true);
     if (this.commitOnInput()) {
-      this.commit(this.value);
+      this.commit(newValue);
     }
     this.check();
   }
 
   public handleChange(): void {
-    this.value = this.inputElement.nativeElement.value;
+    const newValue = this.inputElement.nativeElement.value;
+    this._internalValue = newValue;
+    this.value.set(newValue);
+    this.dirty.set(true);
     if (!this.commitOnInput()) {
-      this.commit(this.value);
+      this.commit(newValue);
     }
     this.check();
   }
@@ -224,6 +274,11 @@ export class InputComponent
     this.focusEvent.emit(event);
   }
 
-  public check() {}
+  public check() {
+    // Sync invalidDisplayed with invalid() signal or errors()
+    const hasErrors = this.errors().length > 0;
+    const isInvalid = this.invalid() || hasErrors;
+    this.invalidDisplayed = isInvalid;
+  }
   protected commit(value: string): void {}
 }

@@ -11,7 +11,7 @@
   <input
     class="neo-ui-input__tag"
     #input
-    [attr.name]="name()"
+    [attr.name]="name() ? name() : undefined"
     [attr.type]="showPassword ? 'text' : type() || 'text'"
     [attr.tabIndex]="tabIndex()"
     [attr.id]="id() || null"
@@ -21,9 +21,9 @@
     [attr.placeholder]="placeholder()"
     [attr.autocomplete]="autocomplete() ? 'on' : null"
     [disabled]="disabled()"
-    [(ngModel)]="value"
-    [readOnly]="readOnly()"
-    [class.invalid]="invalidDisplayed"
+    [value]="value()"
+    [readOnly]="readonly() || readOnly() || false"
+    [class.invalid]="invalidDisplayed || invalid() || errors().length > 0"
     [class.focused]="focused"
     [class.neo-ui-input__tag--size-small]="size() === 'small'"
     [class.neo-ui-input__tag--size-large]="size() === 'large'"
@@ -37,7 +37,7 @@
   }
   <ng-container *ngTemplateOutlet="passwordButton"></ng-container>
   <ng-template #passwordButton>
-    @if (type() === 'password' && value.length > 0) {
+    @if (type() === 'password' && value().length > 0) {
     <button
       type="button"
       class="neo-ui-input__show-hide"
@@ -49,7 +49,7 @@
     >
       {{
         showPassword
-          ? 'Введен пароль' + ' ' + value + ' ' + 'Скрыть пароль'
+          ? 'Введен пароль' + ' ' + value() + ' ' + 'Скрыть пароль'
           : 'Поле пароль заполнено. Нажмите, чтобы посмотреть пароль'
       }}
     </button>
