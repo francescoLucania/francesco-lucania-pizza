@@ -73,17 +73,17 @@ export const NeoReactInput: React.FC<InputProps> = ({
   const [showPassword, setShowPassword] = React.useState(false);
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const wrapperClassName = [
-    styles['neo-ui-input'],
-    invalid ? styles['neo-ui-input--invalid'] : '',
-    disabled ? styles['neo-ui-input--disable'] : '',
+    styles['pizza-ui-input'],
+    invalid ? styles['pizza-ui-input--invalid'] : '',
+    disabled ? styles['pizza-ui-input--disable'] : '',
   ]
     .filter(Boolean)
     .join(' ');
 
   const inputClassName = [
-    styles['neo-ui-input__tag'],
-    size === 'small' ? styles['neo-ui-input__tag--size-small'] : '',
-    size === 'large' ? styles['neo-ui-input__tag--size-large'] : '',
+    styles['pizza-ui-input__tag'],
+    size === 'small' ? styles['pizza-ui-input__tag--size-small'] : '',
+    size === 'large' ? styles['pizza-ui-input__tag--size-large'] : '',
   ]
     .filter(Boolean)
     .join(' ');
@@ -155,7 +155,7 @@ export const NeoReactInput: React.FC<InputProps> = ({
         <button
           type="button"
           className={[
-            styles['neo-ui-input__show-hide'],
+            styles['pizza-ui-input__show-hide'],
             showPassword ? styles['show'] : '',
             invalid ? styles['invalid'] : '',
           ]

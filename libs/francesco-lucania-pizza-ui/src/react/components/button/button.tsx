@@ -27,12 +27,12 @@ export const NeoReactButton: React.FC<ButtonProps> = ({
   target = '_self',
 }) => {
   const classNames = [
-    styles['neo-ui-button'],
-    theme === 'brand' ? styles['neo-ui-button--theme-brand'] : '',
-    theme === 'secondary' ? styles['neo-ui-button--theme-secondary'] : '',
-    size === 'small' ? styles['neo-ui-button--size-small'] : '',
-    size === 'large' ? styles['neo-ui-button--size-large'] : '',
-    fullWidth ? styles['neo-ui-button--full-width'] : '',
+    styles['pizza-ui-button'],
+    theme === 'brand' ? styles['pizza-ui-button--theme-brand'] : '',
+    theme === 'secondary' ? styles['pizza-ui-button--theme-secondary'] : '',
+    size === 'small' ? styles['pizza-ui-button--size-small'] : '',
+    size === 'large' ? styles['pizza-ui-button--size-large'] : '',
+    fullWidth ? styles['pizza-ui-button--full-width'] : '',
   ]
     .filter(Boolean)
     .join(' ');

@@ -5,16 +5,34 @@ import {
   email,
   minLength,
   maxLength,
+  ValidationError,
+  FieldState,
 } from '@angular/forms/signals';
-import {Gender, RegistrationBody} from "@francesco-lucania-pizza-models";
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
+import { Gender, RegistrationBody } from '@francesco-lucania-pizza-models';
+import { InputComponent } from '@francesco-lucania-pizza/angular-ui';
+import { ButtonComponent } from '@francesco-lucania-pizza/angular-ui';
+import { RadioComponent } from '@francesco-lucania-pizza/angular-ui';
 
 @Component({
   selector: 'pizza-admin-registration-form',
-  imports: [],
+  imports: [
+    FormsModule,
+    FormField,
+    InputComponent,
+    ButtonComponent,
+    RadioComponent,
+  ],
   templateUrl: './registration-form.html',
-  styleUrl: './registration-form.css',
+  styleUrl: './registration-form.scss',
 })
 export class RegistrationForm {
+  protected readonly submitted = signal(false);
+
+  // Отслеживаем, какие поля были отредактированы
+  protected readonly touchedFields = signal<Set<string>>(new Set());
+
   protected readonly registrationModel = signal<RegistrationBody>({
     email: '',
     phone: '',
@@ -41,7 +59,47 @@ export class RegistrationForm {
     }
   );
 
+  protected markFieldTouched(fieldName: string): void {
+    this.touchedFields.update(fields => {
+      const newFields = new Set(fields);
+      newFields.add(fieldName);
+      return newFields;
+    });
+  }
+
+  protected shouldShowError(fieldName: string, fieldFn: () => FieldState<unknown>): boolean {
+    const fieldState = fieldFn();
+    return (
+      this.submitted() ||
+      this.touchedFields().has(fieldName)
+    ) && fieldState.invalid();
+  }
+
+  protected getErrorMessage(errors: readonly ValidationError[]): string {
+    if (!errors || errors.length === 0) {
+      return '';
+    }
+
+    const firstError = errors[0];
+    const errorKind = firstError.kind || '';
+
+    // Если есть сообщение, используем его, иначе используем маппинг по kind
+    if (firstError.message) {
+      return firstError.message;
+    }
+
+    const errorMessages: Record<string, string> = {
+      required: 'Это поле обязательно для заполнения',
+      email: 'Введите корректный email адрес',
+      minLength: 'Минимальная длина 8 символов',
+      maxLength: 'Максимальная длина 16 символов',
+    };
+
+    return errorMessages[errorKind] || 'Ошибка валидации';
+  }
+
   protected send(): void {
+    this.submitted.set(true);
     if (this.registrationForm().valid()) {
       const formValue = this.registrationModel();
       console.log('Form submitted:', formValue);

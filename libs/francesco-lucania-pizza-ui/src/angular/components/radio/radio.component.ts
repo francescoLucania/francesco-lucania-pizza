@@ -4,10 +4,11 @@ import {
   Component,
   effect,
   forwardRef,
+  inject,
   input,
   model,
   OnInit,
-  output,
+  output, signal, WritableSignal,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import {
@@ -67,17 +68,22 @@ export class RadioComponent implements ControlValueAccessor, OnInit, FormValueCo
 
   // Internal state for backward compatibility
   private _radioId = '';
-  public _checked = false; // Public for template access
+  public _checked = signal(false); // Public for template access
 
-  constructor(private cdr: ChangeDetectorRef) {
-    // Sync value signal with checked state
+  constructor() {
+    // Must use inject() in constructor for proper injection context
+
+    // Sync value signal with checked state (must run in injection context)
     effect(() => {
       const currentValue = this.value();
       const radioVal = this.radioValue();
       const shouldBeChecked = currentValue === radioVal && radioVal !== '';
-      if (shouldBeChecked !== this._checked) {
-        this._checked = shouldBeChecked;
-        this.cdr.detectChanges();
+
+
+      console.log('shouldBeChecked', shouldBeChecked);
+
+      if (shouldBeChecked !== this._checked()) {
+        this._checked.set(shouldBeChecked);
       }
     });
   }
@@ -90,6 +96,8 @@ export class RadioComponent implements ControlValueAccessor, OnInit, FormValueCo
     } else {
       this._radioId = id;
     }
+
+    this._checked.set(false);
   }
 
   public get computedRadioId(): string {
@@ -101,7 +109,7 @@ export class RadioComponent implements ControlValueAccessor, OnInit, FormValueCo
     const { target } = event;
     if (target instanceof HTMLInputElement && target.checked) {
       const radioVal = this.radioValue();
-      this._checked = true;
+      this._checked.set(true);
       this.value.set(radioVal);
       this.dirty.set(true);
       this.touched.set(true);
@@ -127,24 +135,14 @@ export class RadioComponent implements ControlValueAccessor, OnInit, FormValueCo
   public writeValue(value: string): void {
     const stringValue = value === null || value === undefined ? '' : String(value);
     this.value.set(stringValue);
-    this._checked = stringValue === this.radioValue();
-    this.cdr.detectChanges();
+    this._checked.set(stringValue === this.radioValue());
   }
 
   public registerOnChange(fn: (value: unknown) => void): void {
     this.controlValueAccessorChangeFn = fn;
-    this.cdr.detectChanges();
   }
 
   public registerOnTouched(onTouched: () => void): void {
     this.onTouched = onTouched;
-    this.cdr.detectChanges();
-  }
-
-  public setDisabledState(isDisabled: boolean): void {
-    // Note: disabled is now a signal, so we can't directly set it
-    // This method is called by ControlValueAccessor, but the actual disabled state
-    // should be controlled through the input signal or form state
-    this.cdr.detectChanges();
   }
 }

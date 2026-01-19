@@ -1,8 +1,8 @@
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component,
+  computed,
   DoCheck,
   effect,
   ElementRef,
@@ -16,6 +16,7 @@ import {
   OnInit,
   Optional,
   output,
+  signal,
   SkipSelf,
   ViewChild,
 } from '@angular/core';
@@ -95,7 +96,7 @@ export class InputComponent
   public disabled = input<boolean>(false);
   public multiline = input<boolean | undefined>(undefined);
   public commitOnInput = input<boolean>(true); // коммитить по input или по change
-  public invalid = input<boolean>(false);
+  public invalidView = input<boolean>(false);
   public size = input<'small' | 'base' | 'large'>('base');
   public maskitoOptions = input<MaskitoOptions | null>(null);
   public id = input<string>('');
@@ -116,19 +117,28 @@ export class InputComponent
   // Internal value for backward compatibility with ControlValueAccessor
   private _internalValue = '';
 
-  private destroyed = false;
-  public focused = false;
-  private _touched = false; // For backward compatibility
-  public invalidDisplayed = false;
+  private destroyed = signal(false);
+  public focused = signal(false);
+  private _touched = signal(false); // For backward compatibility
   public control: AbstractControl | null = null;
   private onTouchedCallback!: () => void;
-  public showToggle = false;
-  public showPassword = false;
+  public showToggle = computed(() => this.type() === 'password');
+  public showPassword = signal(false);
 
   constructor(
-    private changeDetection: ChangeDetectorRef,
     @Optional() @Host() @SkipSelf() private controlContainer: ControlContainer
-  ) {}
+  ) {
+    // Sync value signal with input element when changed externally (e.g., via formField)
+    effect(() => {
+      const signalValue = this.value();
+      if (signalValue !== this._internalValue && this.inputElement?.nativeElement) {
+        this._internalValue = signalValue;
+        if (this.inputElement.nativeElement.value !== signalValue) {
+          this.inputElement.nativeElement.value = signalValue;
+        }
+      }
+    });
+  }
 
   public ngOnInit(): void {
     if (this.controlContainer && this.formControlName()) {
@@ -145,37 +155,25 @@ export class InputComponent
   }
 
   public ngAfterViewInit(): void {
-    this.check();
-    
-    // Sync value signal with input element when changed externally (e.g., via formField)
-    effect(() => {
-      const signalValue = this.value();
-      if (signalValue !== this._internalValue && this.inputElement) {
-        this._internalValue = signalValue;
-        if (this.inputElement.nativeElement.value !== signalValue) {
-          this.inputElement.nativeElement.value = signalValue;
-        }
-      }
-    });
+    // Signals handle reactivity automatically
   }
 
   public ngOnChanges() {
-    this.check();
+    // Signals handle reactivity automatically
   }
 
   public ngDoCheck() {
     if (this.control) {
       const controlTouched = this.control.touched;
-      this._touched = controlTouched;
+      this._touched.set(controlTouched);
       if (controlTouched !== this.touched()) {
         this.touched.set(controlTouched);
       }
     }
-    this.check();
   }
 
   public ngOnDestroy() {
-    this.destroyed = true;
+    this.destroyed.set(true);
   }
 
   public showButtonKeypress(event: Event): void {
@@ -183,8 +181,7 @@ export class InputComponent
   }
 
   public switchPasswordMode(): void {
-    this.showPassword = !this.showPassword;
-    this.changeDetection.detectChanges();
+    this.showPassword.update(value => !value);
   }
 
   public writeValue(value: string | number) {
@@ -194,31 +191,24 @@ export class InputComponent
     if (this.multiline() && this.inputElement) {
       this.inputElement.nativeElement.value = stringValue;
     }
-    this.check();
-    if (!this.destroyed) {
-      this.changeDetection.detectChanges();
-    }
   }
 
   public handleBlur() {
-    this.focused = false;
+    this.focused.set(false);
     this.touched.set(true);
-    this._touched = true;
+    this._touched.set(true);
     if (this.onTouchedCallback) {
       this.onTouchedCallback();
     }
-    this.check();
-    this.changeDetection.detectChanges();
   }
 
   public handleFocus() {
-    this.focused = true;
+    this.focused.set(true);
     this.touched.set(true);
-    this._touched = true;
+    this._touched.set(true);
     if (this.onTouchedCallback) {
       this.onTouchedCallback();
     }
-    this.check();
   }
 
   public returnFocus(e?: Event) {
@@ -244,7 +234,6 @@ export class InputComponent
     if (this.commitOnInput()) {
       this.commit(newValue);
     }
-    this.check();
   }
 
   public handleChange(): void {
@@ -255,11 +244,10 @@ export class InputComponent
     if (!this.commitOnInput()) {
       this.commit(newValue);
     }
-    this.check();
   }
 
   public forceChange() {
-    this.check();
+    // No-op: signals handle reactivity automatically
   }
 
   public registerOnTouched(fn: () => void) {
@@ -274,11 +262,5 @@ export class InputComponent
     this.focusEvent.emit(event);
   }
 
-  public check() {
-    // Sync invalidDisplayed with invalid() signal or errors()
-    const hasErrors = this.errors().length > 0;
-    const isInvalid = this.invalid() || hasErrors;
-    this.invalidDisplayed = isInvalid;
-  }
   protected commit(value: string): void {}
 }

@@ -1,11 +1,13 @@
-//@use '../../../ui/assets/styles/theme-provider/common/accessibility/mixins/link' as link;
+:host {
+  display: block;
+}
 
-.neo-ui-radio {
+.pizza-ui-radio {
   position: relative;
   display: flex;
 
   &:hover {
-    .neo-ui-radio__view {
+    .pizza-ui-radio__view {
       background: var(--colorSoundLight);
     }
   }
@@ -46,23 +48,23 @@
     width: 0;
     height: 0;
 
-    &:checked + .neo-ui-radio__view:before {
+    &:checked + .pizza-ui-radio__view:before {
       content: '';
     }
 
-    &:disabled + .neo-ui-radio__view,
-    &:disabled + .neo-ui-radio__view + .neo-ui-radio__label {
+    &:disabled + .pizza-ui-radio__view,
+    &:disabled + .pizza-ui-radio__view + .pizza-ui-radio__label {
       opacity: 0.6;
     }
 
-    &:disabled + .neo-ui-radio__view + .neo-ui-radio__label {
+    &:disabled + .pizza-ui-radio__view + .pizza-ui-radio__label {
       pointer-events: none;
     }
 
     &:focus-visible {
-      + .neo-ui-radio__view
-        + .neo-ui-radio__label
-        + .neo-ui-radio__focus-visible {
+      + .pizza-ui-radio__view
+        + .pizza-ui-radio__label
+        + .pizza-ui-radio__focus-visible {
         &::before {
           content: '';
           z-index: -1;

@@ -1,18 +1,19 @@
 <div
-  class="neo-ui-input"
+  class="pizza-ui-input"
   [ngClass]="{
-    'neo-ui-input--multiline': multiline(),
-    'neo-ui-input--invalid': invalid(),
-    'neo-ui-input--disable': disabled()
+    'pizza-ui-input--multiline': multiline(),
+    'pizza-ui-input--invalid': invalidView(),
+    'pizza-ui-input--disable': disabled()
   }"
 >
+
   <ng-container *ngTemplateOutlet="passwordButton"></ng-container>
   @if (!multiline()) {
   <input
-    class="neo-ui-input__tag"
+    class="pizza-ui-input__tag"
     #input
     [attr.name]="name() ? name() : undefined"
-    [attr.type]="showPassword ? 'text' : type() || 'text'"
+    [attr.type]="showPassword() ? 'text' : type() || 'text'"
     [attr.tabIndex]="tabIndex()"
     [attr.id]="id() || null"
     [attr.aria-label]="ariaLabel()"
@@ -23,10 +24,10 @@
     [disabled]="disabled()"
     [value]="value()"
     [readOnly]="readonly() || readOnly() || false"
-    [class.invalid]="invalidDisplayed || invalid() || errors().length > 0"
-    [class.focused]="focused"
-    [class.neo-ui-input__tag--size-small]="size() === 'small'"
-    [class.neo-ui-input__tag--size-large]="size() === 'large'"
+    [class.invalid]="invalidView()"
+    [class.focused]="focused()"
+    [class.pizza-ui-input__tag--size-small]="size() === 'small'"
+    [class.pizza-ui-input__tag--size-large]="size() === 'large'"
     [maskito]="maskitoOptions()"
     (change)="handleChange()"
     (input)="handleInput($event)"
@@ -40,15 +41,15 @@
     @if (type() === 'password' && value().length > 0) {
     <button
       type="button"
-      class="neo-ui-input__show-hide"
+      class="pizza-ui-input__show-hide"
       [attr.tabIndex]="tabIndex()"
-      [class.show]="showPassword"
-      [class.invalid]="invalid()"
+      [class.show]="showPassword()"
+      [class.invalid]="invalidView()"
       (keydown.enter)="showButtonKeypress($event)"
       (click)="switchPasswordMode()"
     >
       {{
-        showPassword
+        showPassword()
           ? 'Введен пароль' + ' ' + value() + ' ' + 'Скрыть пароль'
           : 'Поле пароль заполнено. Нажмите, чтобы посмотреть пароль'
       }}

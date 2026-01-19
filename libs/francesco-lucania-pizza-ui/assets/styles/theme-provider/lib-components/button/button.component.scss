@@ -2,7 +2,7 @@
 @use '../../theme_provider' as theme;
 @use '../../common/accessibility/mixins/actions' as actions;
 
-.neo-ui-button {
+.pizza-ui-button {
   @include button.reset-buttons-styles;
   padding: var(--buttonPaddingTopBase) var(--buttonPaddingRightBase)
     var(--buttonPaddingBottomBase) var(--buttonPaddingLeftBase);

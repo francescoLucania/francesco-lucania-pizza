@@ -1,10 +1,10 @@
-<label class="neo-ui-radio" [for]="computedRadioId">
+<label class="pizza-ui-radio" [for]="computedRadioId">
   <input
-    class="neo-ui-radio__input"
+    class="pizza-ui-radio__input"
     type="radio"
     role="radio"
-    [attr.aria-checked]="_checked || value() === radioValue()"
-    [checked]="_checked || value() === radioValue()"
+    [attr.aria-checked]="_checked() || value() === radioValue()"
+    [checked]="_checked() || value() === radioValue()"
     [disabled]="disabled()"
     (change)="onChange($event)"
     (blur)="notifyBlurEvent($event)"
@@ -14,9 +14,9 @@
     [attr.value]="radioValue()"
     [required]="required()"
   />
-  <span class="neo-ui-radio__view"> </span>
-  <span class="neo-ui-radio__label">
+  <span class="pizza-ui-radio__view"> </span>
+  <span class="pizza-ui-radio__label">
     {{ label() }}
   </span>
-  <span class="neo-ui-radio__focus-visible"> </span>
+  <span class="pizza-ui-radio__focus-visible"> </span>
 </label>

@@ -103,7 +103,7 @@ export class PopoverComponent {
         ?.scrollIntoView(); // scroll to top popover
 
       if (this.eventRef) {
-        const popoverButton = this.eventRef.closest('.js-neo-ui-popover-button');
+        const popoverButton = this.eventRef.closest('.js-pizza-ui-popover-button');
         if (popoverButton) {
           popoverButton.classList.add('is-active');
         }
@@ -151,9 +151,9 @@ export class PopoverComponent {
           next: (e) => {
             if (
               !(
-                (e.target as HTMLElement).closest('.js-neo-ui-popover-body') ||
+                (e.target as HTMLElement).closest('.js-pizza-ui-popover-body') ||
                 (e.target as HTMLElement).closest(
-                  '.js-neo-ui-popover-reference-point'
+                  '.js-pizza-ui-popover-reference-point'
                 )
               )
             ) {
@@ -416,14 +416,14 @@ export class PopoverComponent {
     try {
       if (this.eventRef) {
         this.eventRef.classList.remove('is-active');
-        this.eventRef.classList.remove('js-neo-ui-popover-button');
+        this.eventRef.classList.remove('js-pizza-ui-popover-button');
       }
 
       // if (
       //   this.eventRef &&
       //   this.eventRef
       //     .closest('button')
-      //     .classList.contains('js-neo-ui-popover-reference-point-container')
+      //     .classList.contains('js-pizza-ui-popover-reference-point-container')
       // ) {
       //   this.eventRef
       //     .closest('button')
@@ -738,7 +738,7 @@ export class PopoverComponent {
         !this.container.nativeElement.contains(event.target) &&
         !parentElement.classList.contains('as-n-c-input-box__clear-button') &&
         !parentElement.classList.contains('icon') &&
-        !parentElement.classList.contains('neo-ui-select-body__item') &&
+        !parentElement.classList.contains('pizza-ui-select-body__item') &&
         this.isOpen &&
         this.eventRef !== event.target
       ) {

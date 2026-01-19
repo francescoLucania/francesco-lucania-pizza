@@ -39,7 +39,7 @@ export class PopoverDirective {
         ? this.element?.nativeElement?.querySelector('button')
         : this.element?.nativeElement?.closest('button');
 
-    element.classList?.add('js-neo-ui-popover-reference-point');
+    element.classList?.add('js-pizza-ui-popover-reference-point');
     const popoverData = {
       event: element,
       closeHandler: () => this?.closeHandler?.(),

@@ -1,9 +1,9 @@
-.neo-ui-checkbox {
+.pizza-ui-checkbox {
   position: relative;
   display: flex;
 
   &:hover {
-    .neo-ui-checkbox__view {
+    .pizza-ui-checkbox__view {
       background: var(--colorSoundLight);
     }
   }
@@ -44,23 +44,23 @@
     width: 0;
     height: 0;
 
-    &:checked + .neo-ui-checkbox__view:before {
+    &:checked + .pizza-ui-checkbox__view:before {
       content: '';
     }
 
-    &:disabled + .neo-ui-checkbox__view,
-    &:disabled + .neo-ui-checkbox__view + .neo-ui-checkbox__label {
+    &:disabled + .pizza-ui-checkbox__view,
+    &:disabled + .pizza-ui-checkbox__view + .pizza-ui-checkbox__label {
       opacity: 0.6;
     }
 
-    &:disabled + .neo-ui-checkbox__view + .neo-ui-checkbox__label {
+    &:disabled + .pizza-ui-checkbox__view + .pizza-ui-checkbox__label {
       pointer-events: none;
     }
 
     &:focus-visible {
-      + .neo-ui-checkbox__view
-        + .neo-ui-checkbox__label
-        + .neo-ui-checkbox__focus-visible {
+      + .pizza-ui-checkbox__view
+        + .pizza-ui-checkbox__label
+        + .pizza-ui-checkbox__focus-visible {
         &::before {
           content: '';
           z-index: -1;

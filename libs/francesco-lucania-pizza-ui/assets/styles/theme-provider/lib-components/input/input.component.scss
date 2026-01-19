@@ -1,20 +1,25 @@
 @use '../../common/accessibility/mixins/actions' as link;
 
-.neo-ui-input {
+:host {
+  display: block;
+}
+
+
+.pizza-ui-input {
   position: relative;
 
   &[type='tel'] {
-    padding: 0;
+    padding: 0
   }
 
   &--invalid {
-    .neo-ui-input__tag {
+    .pizza-ui-input__tag {
       border-color: var(--colorError);
     }
   }
 
   &--disable {
-    .neo-ui-input__tag {
+    .pizza-ui-input__tag {
       opacity: 0.4;
       cursor: not-allowed;
     }

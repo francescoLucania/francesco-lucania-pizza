@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HeaderComponent } from 'ngx-neo-ui';
 
 export default {
-  title: 'neo-ui-header',
+  title: 'pizza-ui-header',
   component: HeaderComponent,
   decorators: [
     moduleMetadata({

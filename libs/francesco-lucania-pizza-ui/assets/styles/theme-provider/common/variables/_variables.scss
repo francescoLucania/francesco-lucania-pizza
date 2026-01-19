@@ -142,7 +142,7 @@ html[data-theme='dark'] {
   }
 }
 
-// neo-ui-input
+// pizza-ui-input
 $inputBorderWidth: 1px;
 $inputBorderRadius: 0;
 $inputBackgroundBase: #fff;
@@ -168,7 +168,7 @@ $inputHeightBase: auto;
 $inputHeightLarge: auto;
 
 :root {
-  // neo-ui-input
+  // pizza-ui-input
   --inputBorderWidth: #{$inputBorderWidth};
   --inputBorderRadius: #{$inputBorderRadius};
   --inputBackgroundBase: #{$inputBackgroundBase};
@@ -195,7 +195,7 @@ $inputHeightLarge: auto;
   --inputHeightLarge: #{$inputHeightLarge};
 }
 
-// neo-ui-button
+// pizza-ui-button
 $buttonBorderWidth: 3px;
 $buttonBorderRadius: 0;
 $buttonBackgroundBase: $colorBase;
@@ -226,7 +226,7 @@ $buttonPaddingRightLarge: 30px;
   --transitionBase: #{$transitionBase};
   --transitionLarge: #{$transitionLarge};
 
-  // neo-ui-button
+  // pizza-ui-button
   --buttonBorderWidth: #{$buttonBorderWidth};
   --buttonBorderRadius: #{$buttonBorderRadius};
   --buttonColotBase: #{$buttonColorBase};
@@ -250,7 +250,7 @@ $buttonPaddingRightLarge: 30px;
   --buttonPaddingRightLarge: #{$buttonPaddingRightLarge};
 }
 
-// neo-ui-navigate-list
+// pizza-ui-navigate-list
 $navigateListColorBase: $colorBase;
 $navigateListColorHover: $colorBase;
 $navigateListFontWeight: 400;
@@ -263,7 +263,7 @@ $navigateListTransition: $transitionSmall;
   --navigateListTransition: #{$navigateListTransition};
 }
 
-// neo-ui-modal
+// pizza-ui-modal
 $modalPaddingSm: 16px;
 $modalBorderSm: none;
 $modalBoxShadowSm: none;
@@ -288,8 +288,8 @@ $modalBgColor: #fff;
   --modalBgColor: #{$modalBgColor};
 }
 
-// neo-ui-popover
-// neo-ui-modal
+// pizza-ui-popover
+// pizza-ui-modal
 $popoverPaddingSm: 10px 8px;
 $popoverPadding: 10px 8px;
 $popoverBorder: 1px solid rgba(0, 0, 0, 0.07);

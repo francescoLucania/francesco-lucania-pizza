@@ -1,32 +1,32 @@
 <div
-  class="neo-ui-popover"
-  [ngClass]="{ 'is-open': isOpen, 'neo-ui-popover--not-full-size': isHide }"
+  class="pizza-ui-popover"
+  [ngClass]="{ 'is-open': isOpen, 'pizza-ui-popover--not-full-size': isHide }"
 >
   <div
-    class="neo-ui-popover__fade"
+    class="pizza-ui-popover__fade"
     [ngClass]="{ 'is-hide': isHide }"
     (click)="close()"
   ></div>
   <div
-    class="neo-ui-popover__body js-neo-ui-popover-body"
+    class="pizza-ui-popover__body js-pizza-ui-popover-body"
     [ngStyle]="style"
     #popoverBody
   >
-    <!--    <div class="neo-ui-popover__body-close-fate-emitter" (click)="close()"></div>-->
+    <!--    <div class="pizza-ui-popover__body-close-fate-emitter" (click)="close()"></div>-->
 
     @if (title) {
-    <h6 class="neo-ui-popover__title mb-8">
+    <h6 class="pizza-ui-popover__title mb-8">
       {{ title }}
     </h6>
     }
 
-    <div class="neo-ui-popover__body-scroll-container" #containerPopover>
+    <div class="pizza-ui-popover__body-scroll-container" #containerPopover>
       <div #popoverContent></div>
     </div>
 
     <button
       (click)="close()"
-      class="neo-ui-popover__close"
+      class="pizza-ui-popover__close"
       aria-label="Закрыть"
     ></button>
   </div>

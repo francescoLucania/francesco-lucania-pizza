@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ButtonComponent } from './button.component';
 
 export default {
-  title: 'neo-ui-button',
+  title: 'pizza-ui-button',
   component: ButtonComponent,
   decorators: [
     moduleMetadata({
