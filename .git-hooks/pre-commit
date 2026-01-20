@@ -1,0 +1,13 @@
+#!/bin/sh
+# Git pre-commit hook для запуска lint-staged
+
+# Запускаем lint-staged
+npx lint-staged
+
+# Если lint-staged завершился с ошибкой, прерываем коммит
+if [ $? -ne 0 ]; then
+  echo "❌ lint-staged failed. Commit aborted."
+  exit 1
+fi
+
+exit 0

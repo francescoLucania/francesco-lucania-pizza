@@ -1,7 +1,9 @@
 <section class="section">
   <div class="container">
     <div class="registration-form-container">
-      <pizza-admin-registration-form></pizza-admin-registration-form>
+      <pizza-admin-registration-form
+        (formSubmit)="onFormSubmit($event)"
+      ></pizza-admin-registration-form>
     </div>
   </div>
 </section>

@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal, output } from '@angular/core';
 import {
   form,
   required,
@@ -10,10 +10,15 @@ import {
 } from '@angular/forms/signals';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
-import { Gender, RegistrationBody } from '@francesco-lucania-pizza-models';
+import {
+  Gender,
+  RegistrationBody,
+  CreateResponse,
+} from '@francesco-lucania-pizza-models';
 import { InputComponent } from '@francesco-lucania-pizza/angular-ui';
 import { ButtonComponent } from '@francesco-lucania-pizza/angular-ui';
 import { RadioComponent } from '@francesco-lucania-pizza/angular-ui';
+import { MaskitoOptions } from '@maskito/core';
 
 @Component({
   selector: 'pizza-admin-registration-form',
@@ -29,6 +34,34 @@ import { RadioComponent } from '@francesco-lucania-pizza/angular-ui';
 })
 export class RegistrationForm {
   protected readonly submitted = signal(false);
+  protected readonly isLoading = signal(false);
+
+  // Событие для отправки данных формы в родительский компонент
+  public readonly formSubmit = output<RegistrationBody>();
+
+  // Маска для российского телефона
+  protected readonly phoneMaskOptions: MaskitoOptions = {
+    mask: [
+      '+',
+      '7',
+      ' ',
+      '(',
+      /\d/,
+      /\d/,
+      /\d/,
+      ')',
+      ' ',
+      /\d/,
+      /\d/,
+      /\d/,
+      '-',
+      /\d/,
+      /\d/,
+      '-',
+      /\d/,
+      /\d/,
+    ],
+  };
 
   // Отслеживаем, какие поля были отредактированы
   protected readonly touchedFields = signal<Set<string>>(new Set());
@@ -56,23 +89,26 @@ export class RegistrationForm {
       required(schema.password);
       minLength(schema.password, 8);
       maxLength(schema.password, 16);
-    }
+    },
   );
 
   protected markFieldTouched(fieldName: string): void {
-    this.touchedFields.update(fields => {
+    this.touchedFields.update((fields) => {
       const newFields = new Set(fields);
       newFields.add(fieldName);
       return newFields;
     });
   }
 
-  protected shouldShowError(fieldName: string, fieldFn: () => FieldState<unknown>): boolean {
+  protected shouldShowError(
+    fieldName: string,
+    fieldFn: () => FieldState<unknown>,
+  ): boolean {
     const fieldState = fieldFn();
     return (
-      this.submitted() ||
-      this.touchedFields().has(fieldName)
-    ) && fieldState.invalid();
+      (this.submitted() || this.touchedFields().has(fieldName)) &&
+      fieldState.invalid()
+    );
   }
 
   protected getErrorMessage(errors: readonly ValidationError[]): string {
@@ -102,8 +138,7 @@ export class RegistrationForm {
     this.submitted.set(true);
     if (this.registrationForm().valid()) {
       const formValue = this.registrationModel();
-      console.log('Form submitted:', formValue);
-      // TODO: Implement form submission logic
+      this.formSubmit.emit(formValue);
     }
   }
 }
