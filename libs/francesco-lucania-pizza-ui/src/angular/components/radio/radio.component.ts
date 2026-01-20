@@ -79,9 +79,6 @@ export class RadioComponent implements ControlValueAccessor, OnInit, FormValueCo
       const radioVal = this.radioValue();
       const shouldBeChecked = currentValue === radioVal && radioVal !== '';
 
-
-      console.log('shouldBeChecked', shouldBeChecked);
-
       if (shouldBeChecked !== this._checked()) {
         this._checked.set(shouldBeChecked);
       }

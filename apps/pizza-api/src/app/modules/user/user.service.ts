@@ -4,15 +4,15 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './schemas/user.schema';
 import { FileService, FileType } from './file/file.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { MailService } from '../services/mail/mail.service';
+import { MailService } from '../../services/mail/mail.service';
 import bcrypt from 'bcryptjs';
 import { TokenService, TokenType } from './services/token/token.service';
 import { UserDto } from './dto/user-public.dto';
 import { v4 as uuidv4 } from 'uuid';
 import { ConfigService } from '@nestjs/config';
-import ValidationException from '../exception/validation/validation';
-import UnauthorizedException from '../exception/unauthorized/unauthorized';
-import { LoginBody, LoginType, UserProfile } from '@nx-neo-models';
+import ValidationException from '../../exception/validation/validation';
+import UnauthorizedException from '../../exception/unauthorized/unauthorized';
+import { LoginBody, LoginType, UserProfile } from '@francesco-lucania-pizza-models';
 import { UserLoginDto } from './dto/user-login.dto';
 
 @Injectable()
@@ -34,10 +34,9 @@ export class UserService {
       dto.password = await bcrypt.hash(dto.password, 3);
 
       const activationLink = uuidv4();
-      const date = new Date();
+      const date = new Date().toISOString();
       const creatUser = await this.userModel.create({
         ...dto,
-        listens: 0,
         picture: picturePath ? picturePath : 'unknown.jpg',
         activationLink: activationLink,
         lastActivity: date,
@@ -77,7 +76,7 @@ export class UserService {
       if (!(await this.loginPasswordEquals(user, password))) {
         throw new ValidationException(`BAD_PASSWORD`);
       } else if (user.isActivated) {
-        user.lastActivity = new Date().toString();
+        user.lastActivity = new Date().toISOString();
         // @ts-ignore
         await user?.save();
         return await this.buildUserAuthData(new UserDto(user), true);

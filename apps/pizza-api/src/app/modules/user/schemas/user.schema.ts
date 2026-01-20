@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Gender } from '@nx-neo-models';
+import { Gender } from '@francesco-lucania-pizza-models';
 
 export type UserDocument = User & Document;
 
@@ -38,6 +38,9 @@ export class User {
 
   @Prop({ unique: false, required: false })
   activationLink: string;
+
+  @Prop({ required: false, default: 'unknown.jpg' })
+  picture: string;
 
   _id: mongoose.Types.ObjectId;
 }

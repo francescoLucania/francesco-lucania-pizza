@@ -1,5 +1,3 @@
-import {HttpErrorResponse} from "@angular/common/http";
-
 export type RegistrationBody = {
   email: string;
   phone: string;
@@ -29,7 +27,9 @@ export enum RegistrationErrors {
   MinMaxError = 'MIN_8_MAX_16',
 }
 
-export type RegistrationError = HttpErrorResponse & {
+export type RegistrationError = {
+  status: number;
+  statusText: string;
   error: {
     message: RegistrationErrors;
   };

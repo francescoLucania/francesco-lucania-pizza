@@ -5,7 +5,7 @@ import {
   IsString,
   Length,
 } from 'class-validator';
-import { Gender, RegistrationErrors } from '@nx-neo-models';
+import { Gender, RegistrationErrors } from '@francesco-lucania-pizza-models';
 
 export class CreateUserDto {
   @IsEmail({}, { message: RegistrationErrors.BadEmail })

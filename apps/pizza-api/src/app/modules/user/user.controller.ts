@@ -17,10 +17,10 @@ import {
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserService } from './user.service';
-import { ValidationPipe } from '../pipes/validation/validation';
+import { ValidationPipe } from '../../pipes/validation/validation';
 import { UserDto } from './dto/user-public.dto';
-import { AuthGuard } from '../guards/auth/auth';
-import { LoginBody } from '@nx-neo-models';
+import { AuthGuard } from '../../guards/auth/auth';
+import { LoginBody } from '@francesco-lucania-pizza-models';
 import { UserLoginDto } from './dto/user-login.dto';
 
 @Controller('/user')

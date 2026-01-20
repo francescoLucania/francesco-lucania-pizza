@@ -44,7 +44,13 @@
               "maximumError": "8kb"
             }
           ],
-          "outputHashing": "all"
+          "outputHashing": "all",
+          "fileReplacements": [
+            {
+              "replace": "apps/pizza-admin/src/environments/environment.ts",
+              "with": "apps/pizza-admin/src/environments/environment.prod.ts"
+            }
+          ]
         },
         "development": {
           "optimization": false,

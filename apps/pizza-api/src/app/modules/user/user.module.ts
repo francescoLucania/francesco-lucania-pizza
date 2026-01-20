@@ -4,7 +4,7 @@ import { User, UserSchema } from './schemas/user.schema';
 import { FileService } from './file/file.service';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
-import { MailService } from '../services/mail/mail.service';
+import { MailService } from '../../services/mail/mail.service';
 import { TokenService } from './services/token/token.service';
 import { Token, TokenSchema } from './schemas/token.schema';
 import { ConfigService } from '@nestjs/config';

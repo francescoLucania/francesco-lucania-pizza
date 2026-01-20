@@ -65,11 +65,15 @@ export class TokenService {
     }
   }
 
-  validateToken(type: TokenType, token: string): TokenDocument {
+  validateToken(type: TokenType, token: string): (jwt.JwtPayload & { id: string }) | null {
     try {
       const jwtSecret =
         type === 'ACCESS_TOKEN' ? 'JWT_ACCESS_SECRET' : 'JWT_REFRESH_SECRET';
-      return jwt.verify(token, this.configService.get(jwtSecret));
+      const decoded = jwt.verify(token, this.configService.get(jwtSecret));
+      if (typeof decoded === 'string') {
+        return null;
+      }
+      return decoded as jwt.JwtPayload & { id: string };
     } catch (e) {
       console.log(e);
       return null;
