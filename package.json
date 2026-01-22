@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "serve pizza-store": "nx start pizza-store",
+    "serve pizza-store": "nx dev pizza-store",
     "serve pizza-admin": "nx serve pizza-admin",
     "serve backend": "nx serve pizza-api",
     "prepare": "git config core.hooksPath .git-hooks || echo 'Not in a git repo'",
