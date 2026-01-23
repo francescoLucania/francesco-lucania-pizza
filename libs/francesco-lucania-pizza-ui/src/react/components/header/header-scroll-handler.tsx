@@ -25,6 +25,9 @@ export function HeaderScrollHandler() {
       }
     };
 
+    // Check initial scroll position
+    handleScroll();
+
     window.addEventListener('scroll', handleScroll);
     return () => {
       if (typeof window !== 'undefined') {

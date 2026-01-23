@@ -60,7 +60,7 @@
     }
 
     // Apply scroll styles when body has 'scrolled' class
-    body.scrolled & {
+    :global(body.scrolled) & {
       @include theme.mq(lg) {
         padding: 16px 0;
       }

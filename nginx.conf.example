@@ -1,0 +1,234 @@
+# Пример конфигурации nginx для всех приложений проекта
+# Скопируйте этот файл в /etc/nginx/sites-available/pizza и создайте симлинк в sites-enabled
+
+# Основной сервер для pizza-store (главная страница)
+server {
+    listen 80;
+    server_name your-domain.com www.your-domain.com;  # Замените на ваш домен
+    
+    # Логи
+    access_log /var/log/nginx/pizza-access.log;
+    error_log /var/log/nginx/pizza-error.log;
+    
+    # Gzip сжатие
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_types text/plain text/css text/xml text/javascript application/javascript application/xml+rss application/json application/ld+json;
+    gzip_proxied any;
+    
+    # ============================================
+    # Pizza Store (Next.js) - главная страница
+    # ============================================
+    location / {
+        proxy_pass http://localhost:3001;  # Порт Next.js сервера
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+        
+        # Таймауты
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+    }
+    
+    # Статические файлы Next.js (опционально, можно отдавать напрямую)
+    location /_next/static/ {
+        proxy_pass http://localhost:3001;
+        proxy_cache_valid 200 60m;
+        add_header Cache-Control "public, immutable";
+        expires 1y;
+    }
+    
+    # ============================================
+    # Pizza API (NestJS) - API endpoints
+    # ============================================
+    location /api/ {
+        proxy_pass http://localhost:3000/api/;  # Порт NestJS API
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+        
+        # CORS заголовки (если нужно)
+        add_header Access-Control-Allow-Origin * always;
+        add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS" always;
+        add_header Access-Control-Allow-Headers "Authorization, Content-Type" always;
+        
+        # Обработка preflight запросов
+        if ($request_method = 'OPTIONS') {
+            add_header Access-Control-Allow-Origin *;
+            add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS";
+            add_header Access-Control-Allow-Headers "Authorization, Content-Type";
+            add_header Access-Control-Max-Age 1728000;
+            add_header Content-Type 'text/plain charset=UTF-8';
+            add_header Content-Length 0;
+            return 204;
+        }
+        
+        # Таймауты для API
+        proxy_connect_timeout 30s;
+        proxy_send_timeout 30s;
+        proxy_read_timeout 30s;
+    }
+    
+    # ============================================
+    # Pizza Admin (Angular SSR) - админ панель
+    # ============================================
+    location /admin/ {
+        # Путь к статическим файлам Angular
+        root /path/to/your/project/dist/apps/pizza-admin/browser;
+        try_files $uri $uri/ /admin/index.html;
+        
+        # Кэширование статических файлов
+        location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+            expires 1y;
+            add_header Cache-Control "public, immutable";
+            access_log off;
+        }
+    }
+    
+    # Статические файлы для admin (шрифты, изображения, медиа)
+    location /admin/fonts/ {
+        alias /path/to/your/project/dist/apps/pizza-admin/browser/fonts/;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        access_log off;
+    }
+    
+    location /admin/img/ {
+        alias /path/to/your/project/dist/apps/pizza-admin/browser/img/;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        access_log off;
+    }
+    
+    location /admin/media/ {
+        alias /path/to/your/project/dist/apps/pizza-admin/browser/media/;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        access_log off;
+    }
+    
+    # SSR для admin (все остальные запросы к /admin/)
+    location ~ ^/admin/(?!fonts|img|media|.*\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$) {
+        proxy_pass http://localhost:4000;  # Порт Angular SSR сервера
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+        
+        # Таймауты для SSR рендеринга
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+    }
+    
+    # ============================================
+    # Общие настройки для статических файлов
+    # ============================================
+    
+    # Кэширование статических файлов (общее правило)
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|webp|avif)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        access_log off;
+    }
+    
+    # ============================================
+    # Обработка ошибок
+    # ============================================
+    
+    error_page 404 /404.html;
+    error_page 500 502 503 504 /50x.html;
+    
+    location = /50x.html {
+        root /usr/share/nginx/html;
+    }
+    
+    # Запрет доступа к скрытым файлам
+    location ~ /\. {
+        deny all;
+        access_log off;
+        log_not_found off;
+    }
+}
+
+# ============================================
+# SSL конфигурация (после получения сертификата через certbot)
+# ============================================
+# Раскомментируйте после настройки SSL
+
+# server {
+#     listen 443 ssl http2;
+#     server_name your-domain.com www.your-domain.com;
+#     
+#     # SSL сертификаты (certbot автоматически добавит эти строки)
+#     ssl_certificate /etc/letsencrypt/live/your-domain.com/fullchain.pem;
+#     ssl_certificate_key /etc/letsencrypt/live/your-domain.com/privkey.pem;
+#     include /etc/letsencrypt/options-ssl-nginx.conf;
+#     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+#     
+#     # Остальная конфигурация аналогична серверу на порту 80
+#     # ... (скопируйте все location блоки из выше)
+# }
+# 
+# # Редирект с HTTP на HTTPS
+# server {
+#     listen 80;
+#     server_name your-domain.com www.your-domain.com;
+#     return 301 https://$server_name$request_uri;
+# }
+
+# ============================================
+# Альтернативная конфигурация: отдельные домены
+# ============================================
+# Если вы хотите использовать отдельные домены для каждого приложения:
+
+# # Pizza Store (основной домен)
+# server {
+#     listen 80;
+#     server_name store.your-domain.com;
+#     
+#     location / {
+#         proxy_pass http://localhost:3001;
+#         # ... (настройки proxy как выше)
+#     }
+# }
+# 
+# # Pizza API
+# server {
+#     listen 80;
+#     server_name api.your-domain.com;
+#     
+#     location / {
+#         proxy_pass http://localhost:3000;
+#         # ... (настройки proxy как выше)
+#     }
+# }
+# 
+# # Pizza Admin
+# server {
+#     listen 80;
+#     server_name admin.your-domain.com;
+#     
+#     root /path/to/your/project/dist/apps/pizza-admin/browser;
+#     
+#     location / {
+#         proxy_pass http://localhost:4000;
+#         # ... (настройки proxy как выше)
+#     }
+# }

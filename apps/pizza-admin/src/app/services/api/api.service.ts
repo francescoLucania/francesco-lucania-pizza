@@ -286,7 +286,7 @@ export class ApiService {
 
     return this.http.post<T>(url, formData, {
       headers,
-      params: options.additionalData?.params,
+      params: options.additionalData?.['params'],
     });
   }
 
