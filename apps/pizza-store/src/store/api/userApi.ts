@@ -6,11 +6,14 @@ import {
 } from '@francesco-lucania-pizza-models';
 
 export interface LoginResponse {
-  token: string;
-  user: CreateResponse & {
-    name?: string;
-    phone?: string;
-  };
+  accessToken: string;
+  refreshToken?: string;
+  email: string;
+  fullName: string;
+  lastActivity: string;
+  phone: string;
+  id: string;
+  isActivated: boolean;
 }
 
 export const userApi = baseApi.injectEndpoints({
@@ -31,9 +34,30 @@ export const userApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ['User'],
     }),
-    getProfile: builder.query<LoginResponse['user'], void>({
+    getProfile: builder.query<
+      {
+        email: string;
+        fullName: string;
+        lastActivity: string;
+        phone: string;
+        id: string;
+        isActivated: boolean;
+        name?: string;
+      },
+      void
+    >({
       query: () => '/user/profile',
       providesTags: ['User'],
+    }),
+    activate: builder.mutation<
+      { activation: boolean; userInfo: { name: string; fullName: string; email: string } },
+      string
+    >({
+      query: (activationId) => ({
+        url: `/user/activate?id=${activationId}`,
+        method: 'GET',
+      }),
+      invalidatesTags: ['User'],
     }),
   }),
 });
@@ -42,4 +66,5 @@ export const {
   useRegisterMutation,
   useLoginMutation,
   useGetProfileQuery,
+  useActivateMutation,
 } = userApi;

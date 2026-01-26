@@ -14,7 +14,7 @@ export type ButtonProps = {
   target?: '_blank' | '_self' | '_parent' | '_top';
 };
 
-export const NeoReactButton: React.FC<ButtonProps> = ({
+export const PizzaReactButton: React.FC<ButtonProps> = ({
   onClick,
   label = '',
   theme = 'base',
@@ -76,4 +76,4 @@ export const NeoReactButton: React.FC<ButtonProps> = ({
   );
 };
 
-export default NeoReactButton;
+export default PizzaReactButton;

@@ -48,7 +48,7 @@ const defaultPhoneMask: MaskitoOptions = {
   ],
 };
 
-export const NeoReactInput: React.FC<InputProps> = ({
+export const PizzaReactInput: React.FC<InputProps> = ({
   onInput,
   value,
   name,

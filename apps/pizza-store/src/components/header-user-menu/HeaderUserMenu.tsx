@@ -14,6 +14,13 @@ export const HeaderUserMenu: React.FC<HeaderUserMenuProps> = ({
   activePath,
 }) => {
   const isAuthenticated = useAppSelector((state) => state.user.isAuthenticated);
+  const user = useAppSelector((state) => state.user.user);
+  const token = useAppSelector((state) => state.user.token);
+
+  // Отладочное логирование
+  React.useEffect(() => {
+    console.log('HeaderUserMenu - isAuthenticated:', isAuthenticated, 'user:', user, 'token:', !!token);
+  }, [isAuthenticated, user, token]);
 
   const [LinkComponent, setLinkComponent] = React.useState<React.ComponentType<{
     href: string;
@@ -21,9 +28,19 @@ export const HeaderUserMenu: React.FC<HeaderUserMenuProps> = ({
     children: React.ReactNode;
   }> | null>(null);
 
-  const href = isAuthenticated ? '/profile' : '/login';
-  const label = isAuthenticated ? 'Профиль' : 'Войти';
-  const isActive = activePath === href;
+  // Мемоизируем href и label, чтобы они обновлялись при изменении isAuthenticated
+  const href = React.useMemo(
+    () => (isAuthenticated ? '/profile' : '/login'),
+    [isAuthenticated]
+  );
+  const label = React.useMemo(
+    () => (isAuthenticated ? 'Профиль' : 'Войти'),
+    [isAuthenticated]
+  );
+  const isActive = React.useMemo(
+    () => activePath === href,
+    [activePath, href]
+  );
 
   const linkClassName = [styles['focus-visible'], isActive ? 'is-active' : '']
     .filter(Boolean)

@@ -1,12 +1,12 @@
 /// <reference types="jest" />
 import * as React from 'react';
 import { render } from '@testing-library/react';
-import { NeoReactInput } from './input';
+import { PizzaReactInput } from './input';
 
 describe('Input', () => {
   it('should render successfully', () => {
     const { baseElement } = render(
-      <NeoReactInput
+      <PizzaReactInput
         onInput={() => {}}
         autocomplete={false}
         disabled={false}

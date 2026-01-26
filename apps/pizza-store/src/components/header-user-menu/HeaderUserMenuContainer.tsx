@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import { useAppSelector } from '../../store/hooks';
-import StoreProvider from '../../store/provider';
 import styles from './HeaderUserMenu.module.scss';
 
 export type HeaderUserMenuProps = {
@@ -10,7 +9,7 @@ export type HeaderUserMenuProps = {
   activePath?: string;
 };
 
-const HeaderUserMenu: React.FC<HeaderUserMenuProps> = ({
+export const HeaderUserMenu: React.FC<HeaderUserMenuProps> = ({
   useNextLink = false,
   activePath,
 }) => {
@@ -61,12 +60,4 @@ const HeaderUserMenu: React.FC<HeaderUserMenuProps> = ({
   return <li className={styles['header-user-menu']}>{linkContent}</li>;
 };
 
-export const HeaderUserMenuContainer: React.FC<HeaderUserMenuProps> = (
-  props,
-) => (
-  <StoreProvider>
-    <HeaderUserMenu {...props} />
-  </StoreProvider>
-);
-
-export default HeaderUserMenuContainer;
+export default HeaderUserMenu;

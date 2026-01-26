@@ -1,0 +1,117 @@
+@use 'libs/francesco-lucania-pizza-ui/assets/styles/theme-provider/theme_provider' as theme;
+
+.activate-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 200px);
+  padding: 32px 20px;
+
+  @include theme.mq(md) {
+    padding: 64px 20px;
+  }
+}
+
+.activate-container {
+  width: 100%;
+  max-width: 500px;
+  background-color: var(--bgColor);
+  padding: 32px;
+  border-radius: var(--baseBorderRadius, 8px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  @include theme.mq(md) {
+    padding: 48px;
+  }
+}
+
+.activate-title {
+  margin: 0 0 16px 0;
+  text-align: center;
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--colorBase);
+
+  @include theme.mq(md) {
+    font-size: 32px;
+    margin-bottom: 24px;
+  }
+}
+
+.activate-description {
+  margin: 0 0 24px 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--colorBase);
+  opacity: 0.8;
+  line-height: 1.5;
+}
+
+.activate-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--colorBase);
+}
+
+.input-wrapper {
+  margin-top: 4px;
+}
+
+.success-message {
+  padding: 16px;
+  background-color: rgba(40, 167, 69, 0.1);
+  border: 1px solid rgba(40, 167, 69, 0.3);
+  border-radius: var(--baseBorderRadius, 4px);
+  color: #28a745;
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.error-message {
+  padding: 16px;
+  background-color: rgba(220, 53, 69, 0.1);
+  border: 1px solid rgba(220, 53, 69, 0.3);
+  border-radius: var(--baseBorderRadius, 4px);
+  color: #dc3545;
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+  font-size: 14px;
+  color: var(--colorBase);
+}
+
+.link {
+  color: var(--colorBrand, #007bff);
+  text-decoration: none;
+  font-weight: 500;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.separator {
+  color: var(--colorBase);
+  opacity: 0.5;
+}

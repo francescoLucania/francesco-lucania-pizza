@@ -13,11 +13,23 @@ interface UserState {
   token: string | null;
 }
 
-const initialState: UserState = {
-  user: null,
-  isAuthenticated: false,
-  token: null,
+// Восстанавливаем токен из localStorage при инициализации
+const getInitialState = (): UserState => {
+  let token = null;
+  if (typeof window !== 'undefined') {
+    token = localStorage.getItem('token');
+  }
+
+  return {
+    user: null,
+    // Если есть токен, считаем пользователя аутентифицированным
+    // (но без данных пользователя, их нужно будет загрузить отдельно)
+    isAuthenticated: !!token,
+    token,
+  };
 };
+
+const initialState: UserState = getInitialState();
 
 const userSlice = createSlice({
   name: 'user',
