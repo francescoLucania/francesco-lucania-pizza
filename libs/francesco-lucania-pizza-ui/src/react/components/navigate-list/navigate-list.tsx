@@ -12,6 +12,7 @@ export type NavigateListProps = {
   type?: 'vertical' | 'horizontal';
   useNextLink?: boolean;
   activePath?: string;
+  children?: React.ReactNode;
 };
 
 export const NavigateList: React.FC<NavigateListProps> = ({
@@ -19,6 +20,7 @@ export const NavigateList: React.FC<NavigateListProps> = ({
   type = 'horizontal',
   useNextLink = false,
   activePath,
+  children,
 }) => {
   const listClassName = [
     styles['navigate-list'],
@@ -50,6 +52,7 @@ export const NavigateList: React.FC<NavigateListProps> = ({
           </li>
         );
       })}
+      {children}
     </ol>
   );
 };

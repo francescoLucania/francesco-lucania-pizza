@@ -1,6 +1,7 @@
 import './global.scss';
 import { Header, INavigateList } from '@francesco-lucania-pizza/react-ui';
-import StoreProvider from '../store/provider';
+import HeaderUserMenu from '../components/header-user-menu/HeaderUserMenu';
+import HeaderUserMenuContainer from '../components/header-user-menu/HeaderUserMenuContainer';
 
 export const metadata = {
   title: 'Welcome to pizza-store',
@@ -10,7 +11,6 @@ export const metadata = {
 const navigationItems: INavigateList[] = [
   { name: 'Главная', uri: '/' },
   { name: 'Меню', uri: '/menu' },
-  { name: 'Заказать', uri: '/order' },
   { name: 'Заказать', uri: '/order' },
 ];
 
@@ -22,14 +22,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <StoreProvider>
-          <Header
-            navigate={navigationItems}
-            logoPath="/img/logo.jpg"
-            useNextLink={true}
-          />
-          {children}
-        </StoreProvider>
+        <Header
+          navigate={navigationItems}
+          logoPath="/img/logo.jpg"
+          useNextLink={true}
+        >
+          {' '}
+          <HeaderUserMenuContainer useNextLink={true} />
+        </Header>
+        {children}
       </body>
     </html>
   );

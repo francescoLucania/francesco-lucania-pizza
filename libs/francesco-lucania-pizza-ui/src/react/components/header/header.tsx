@@ -10,6 +10,7 @@ export type HeaderProps = {
   logoPath?: string;
   useNextLink?: boolean;
   activePath?: string;
+  children?: React.ReactNode;
 };
 
 export const Header: React.FC<HeaderProps> = ({
@@ -17,6 +18,7 @@ export const Header: React.FC<HeaderProps> = ({
   logoPath = '../../assets/img/logo.jpg',
   useNextLink = false,
   activePath,
+  children,
 }) => (
   <header className={styles['site-header']}>
     <HeaderScrollHandler />
@@ -39,7 +41,9 @@ export const Header: React.FC<HeaderProps> = ({
             navigate={navigate}
             useNextLink={useNextLink}
             activePath={activePath}
-          />
+          >
+            {children}
+          </NavigateList>
         </nav>
 
         <HeaderMobileMenu
