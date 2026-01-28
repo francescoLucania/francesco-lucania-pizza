@@ -52,3 +52,6 @@ apps/pizza-api/.env
 # Next.js
 .next
 out
+
+# Static files
+static/

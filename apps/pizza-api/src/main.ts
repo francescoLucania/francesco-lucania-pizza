@@ -7,8 +7,69 @@ import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { ConfigService } from '@nestjs/config';
+import * as path from 'path';
+import * as fs from 'fs';
+
+/**
+ * Находит корень проекта, поднимаясь вверх от текущей директории
+ * Ищет nx.json в корне проекта (не в dist)
+ */
+function findProjectRoot(): string {
+  let currentDir = __dirname;
+
+  // Если мы в dist, поднимаемся выше dist
+  if (currentDir.includes(path.sep + 'dist' + path.sep)) {
+    while (currentDir.includes(path.sep + 'dist' + path.sep)) {
+      currentDir = path.dirname(currentDir);
+    }
+    // Теперь ищем nx.json выше dist
+    while (currentDir !== path.dirname(currentDir)) {
+      const nxJsonPath = path.join(currentDir, 'nx.json');
+      if (fs.existsSync(nxJsonPath)) {
+        return currentDir;
+      }
+      currentDir = path.dirname(currentDir);
+    }
+  } else {
+    // В dev-режиме ищем nx.json
+    while (currentDir !== path.dirname(currentDir)) {
+      const nxJsonPath = path.join(currentDir, 'nx.json');
+      if (fs.existsSync(nxJsonPath)) {
+        return currentDir;
+      }
+      currentDir = path.dirname(currentDir);
+    }
+  }
+
+  return process.cwd();
+}
 
 async function bootstrap() {
+  // Создаем папку static в корне проекта при старте
+  const projectRoot = findProjectRoot();
+  const staticPath = path.join(projectRoot, 'static');
+  const staticImagePath = path.join(staticPath, 'image');
+  const staticImageUserAvatarPath = path.join(
+    staticImagePath,
+    'user',
+    'avatar',
+  );
+
+  if (!fs.existsSync(staticPath)) {
+    fs.mkdirSync(staticPath, { recursive: true });
+    Logger.log(`📁 Created static directory: ${staticPath}`);
+  }
+  if (!fs.existsSync(staticImagePath)) {
+    fs.mkdirSync(staticImagePath, { recursive: true });
+    Logger.log(`📁 Created static/image directory: ${staticImagePath}`);
+  }
+  if (!fs.existsSync(staticImageUserAvatarPath)) {
+    fs.mkdirSync(staticImageUserAvatarPath, { recursive: true });
+    Logger.log(
+      `📁 Created static/image/user/avatar directory: ${staticImageUserAvatarPath}`,
+    );
+  }
+
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
   const mode = configService.get<string>('MODE');
