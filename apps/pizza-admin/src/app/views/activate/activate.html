@@ -1,0 +1,53 @@
+<section class="activate">
+  <div class="activate__content-box">
+    <h1 class="activate__title heading-h1">Активация</h1>
+
+    <p class="mt-16 text-center">
+      Введите код активации из письма или откройте ссылку из письма — тогда
+      активация выполнится автоматически.
+    </p>
+
+    <form class="mt-24" (ngSubmit)="send()">
+      <div class="mt-16">
+        <label for="activationCode" class="activate__label"
+          >Код активации</label
+        >
+        <pizza-lib-input
+          class="mt-4"
+          [formField]="activateForm.activationCode"
+          type="text"
+          id="activationCode"
+          name="activationCode"
+          placeholder="Вставьте код из письма"
+          [size]="'large'"
+        />
+        @if (shouldShowError(activateForm.activationCode)) {
+        <div class="text-base-small color-error mt-4">
+          {{ getErrorMessage(activateForm.activationCode().errors()) }}
+        </div>
+        }
+      </div>
+
+      @if (successText(); as ok) {
+      <div
+        class="mt-16 text-base-small"
+        style="color: #28a745; text-align: center"
+      >
+        {{ ok }}
+      </div>
+      } @if (errorText(); as err) {
+      <div class="mt-16 text-base-small color-error text-center">{{ err }}</div>
+      }
+
+      <div class="activate__actions mt-24">
+        <pizza-lib-button
+          [buttonType]="'submit'"
+          [label]="isLoading() ? 'Активируем...' : 'Активировать'"
+          [theme]="'brand'"
+          [disabled]="!activateForm().valid() || isLoading()"
+          [fullWidth]="true"
+        />
+      </div>
+    </form>
+  </div>
+</section>

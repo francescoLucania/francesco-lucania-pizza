@@ -1,0 +1,82 @@
+<section class="profile">
+  <div class="profile__content-box">
+    <h1 class="profile__title heading-h1">Профиль</h1>
+
+    @if (loading()) {
+    <p class="mt-16">Загрузка...</p>
+    } @else if (errorText()) {
+    <p class="mt-16 color-error">{{ errorText() }}</p>
+    } @else { @if (profile(); as profileData) {
+    <div class="mt-24 profile__avatar-block">
+      <div class="profile__avatar-wrapper">
+        <img
+          class="profile__avatar-img"
+          [src]="staticEndpoint() + profileData.picture"
+          alt="Аватар пользователя"
+        />
+      </div>
+      <div class="profile__avatar-controls">
+        <label class="profile__avatar-upload">
+          <span class="text-base-small">Сменить аватар</span>
+          <input
+            type="file"
+            accept="image/*"
+            (change)="onAvatarChange($event)"
+          />
+        </label>
+        @if (avatarUploading()) {
+        <div class="text-base-small mt-4">Загружаем...</div>
+        } @if (avatarError(); as aErr) {
+        <div class="text-base-small color-error mt-4">{{ aErr }}</div>
+        }
+      </div>
+    </div>
+
+    <div class="mt-24 profile__grid">
+      <div>
+        <span class="text-base-small color-secondary">Email:</span> {{
+        profileData.email }}
+      </div>
+      <div>
+        <span class="text-base-small color-secondary">Телефон:</span> {{
+        profileData.phone }}
+      </div>
+      <div>
+        <span class="text-base-small color-secondary">Имя:</span> {{
+        profileData.name }}
+      </div>
+      <div>
+        <span class="text-base-small color-secondary">Полное имя:</span> {{
+        profileData.fullName }}
+      </div>
+      <div>
+        <span class="text-base-small color-secondary">Пол:</span> {{
+        profileData.gender }}
+      </div>
+      <div>
+        <span class="text-base-small color-secondary">Дата выдачи:</span> {{
+        profileData.dateIssue }}
+      </div>
+      <div>
+        <span class="text-base-small color-secondary">Создан:</span> {{
+        profileData.created }}
+      </div>
+      <div>
+        <span class="text-base-small color-secondary"
+          >Последняя активность:</span
+        >
+        {{ profileData.lastActivity }}
+      </div>
+    </div>
+
+    <div class="profile__actions mt-24">
+      <pizza-lib-button
+        [buttonType]="'button'"
+        [label]="'Выйти'"
+        [theme]="'secondary'"
+        (click)="logout()"
+      />
+    </div>
+    } }
+  </div>
+</section>

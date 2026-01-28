@@ -6,18 +6,26 @@ import ValidationException from '../../exception/validation/validation';
 @Injectable()
 export class ValidationPipe implements PipeTransform<any> {
   public async transform(value: any, metadata: ArgumentMetadata): Promise<any> {
-    console.log('value', value);
-    const obj = plainToInstance(metadata.metatype, value);
-    const errors = await validate(obj);
-    console.log('errors', errors);
+    // Если тип не указан или это примитив/обычный Object (например, multipart/form-data),
+    // валидацию не запускаем
+    const metatype = metadata.metatype as any;
+    const isPrimitive =
+      !metatype || [String, Boolean, Number, Array, Object].includes(metatype);
+
+    if (isPrimitive) {
+      return value;
+    }
+
+    const obj = plainToInstance(metatype, value);
+    const errors = await validate(obj, {
+      forbidUnknownValues: false,
+    });
 
     if (errors.length) {
-      const messages = errors.map((error) => {
-        return {
-          name: error.property,
-          message: Object.values(error.constraints)[0],
-        };
-      });
+      const messages = errors.map((error) => ({
+        name: error.property,
+        message: Object.values(error.constraints)[0],
+      }));
 
       if (messages.length === 1) {
         throw new ValidationException(messages[0]);

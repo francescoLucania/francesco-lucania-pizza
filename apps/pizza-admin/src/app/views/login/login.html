@@ -1,0 +1,57 @@
+<section class="login">
+  <div class="login__content-box">
+    <h1 class="login__title heading-h1">Вход</h1>
+
+    <form class="login__form mt-24" (ngSubmit)="send()">
+      <div class="mt-16">
+        <label for="login" class="login__label">Email или телефон</label>
+        <pizza-lib-input
+          class="mt-4"
+          [formField]="loginForm.login"
+          type="text"
+          id="login"
+          name="login"
+          placeholder="Введите email или телефон"
+          [size]="'large'"
+        />
+        @if (submitted() && loginForm.login().invalid()) {
+        <div class="text-base-small color-error mt-4">
+          {{ getErrorMessage(loginForm.login().errors()) }}
+        </div>
+        }
+      </div>
+
+      <div class="mt-16">
+        <label for="password" class="login__label">Пароль</label>
+        <pizza-lib-input
+          class="mt-4"
+          [formField]="loginForm.password"
+          type="password"
+          id="password"
+          name="password"
+          placeholder="Введите пароль"
+          [size]="'large'"
+        />
+        @if (submitted() && loginForm.password().invalid()) {
+        <div class="text-base-small color-error mt-4">
+          {{ getErrorMessage(loginForm.password().errors()) }}
+        </div>
+        }
+      </div>
+
+      @if (errorText(); as err) {
+      <div class="text-base-small color-error mt-16">{{ err }}</div>
+      }
+
+      <div class="login__actions mt-24">
+        <pizza-lib-button
+          [buttonType]="'submit'"
+          [label]="isLoading() ? 'Входим...' : 'Войти'"
+          [theme]="'brand'"
+          [disabled]="!loginForm().valid() || isLoading()"
+          [fullWidth]="true"
+        />
+      </div>
+    </form>
+  </div>
+</section>

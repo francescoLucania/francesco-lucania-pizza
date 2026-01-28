@@ -1,4 +1,4 @@
-import { Component, inject, signal, output } from '@angular/core';
+import { Component, inject, input, output, signal } from '@angular/core';
 import {
   form,
   required,
@@ -10,11 +10,7 @@ import {
 } from '@angular/forms/signals';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
-import {
-  Gender,
-  RegistrationBody,
-  CreateResponse,
-} from '@francesco-lucania-pizza-models';
+import { Gender, RegistrationBody } from '@francesco-lucania-pizza-models';
 import { InputComponent } from '@francesco-lucania-pizza/angular-ui';
 import { ButtonComponent } from '@francesco-lucania-pizza/angular-ui';
 import { RadioComponent } from '@francesco-lucania-pizza/angular-ui';
@@ -35,6 +31,8 @@ import { MaskitoOptions } from '@maskito/core';
 export class RegistrationForm {
   protected readonly submitted = signal(false);
   protected readonly isLoading = signal(false);
+
+  public readonly serverError = input<string | null>(null);
 
   // Событие для отправки данных формы в родительский компонент
   public readonly formSubmit = output<RegistrationBody>();

@@ -35,7 +35,7 @@ export class UserController {
   public async create(
     // @UploadedFiles() avatar,
     @Body() dto: CreateUserDto,
-    @Response() response
+    @Response() response,
   ) {
     // const picture = avatar?.avatar[0];
     const user = await this.userService.create({
@@ -44,12 +44,22 @@ export class UserController {
     return response.send(user);
   }
 
-  @UsePipes(ValidationPipe)
+  @UseGuards(AuthGuard)
   @Post('/uploadAvatar')
   @UseInterceptors(FileFieldsInterceptor([{ name: 'avatar', maxCount: 1 }]))
-  public async uploadAvatar(@UploadedFiles() avatar, @Response() res) {
-    const userData = { avatar: '...' };
-    return res.send(userData);
+  public async uploadAvatar(
+    @UploadedFiles() avatar,
+    @Req() request,
+    @Response() res,
+  ) {
+    const file = avatar?.avatar?.[0];
+    if (!file) {
+      return res.status(400).send({ error: 'NO_FILE' });
+    }
+
+    const token = request?.headers.authorization?.split(' ')?.[1];
+    const picturePath = await this.userService.saveAvatar(file, token);
+    return res.send({ picture: picturePath });
   }
 
   @Get('/activate')
@@ -73,7 +83,7 @@ export class UserController {
         HttpStatus.FORBIDDEN,
         {
           cause: e,
-        }
+        },
       );
     }
   }
@@ -82,10 +92,9 @@ export class UserController {
   @Post('/login')
   public async login(
     @Body() body: UserLoginDto,
-    @Response() response: UserDto
+    @Response() response: UserDto,
   ) {
     const user = await this.userService.login(body);
-    console.log('user', user);
     this.setRefreshToken(response, user).send(user);
   }
 
@@ -99,15 +108,13 @@ export class UserController {
   @Get('/refresh')
   public async refresh(@Req() request, @Response() response) {
     const user = await this.userService.refresh(request.cookies.refreshToken);
-    console.log('user', user);
-
     this.setRefreshToken(response, user).send(user);
   }
 
   @UseGuards(AuthGuard)
   @Get('/getUserData')
   public async getUserData(@Req() request, @Response() response) {
-    const token = request?.headers['authorization']?.split(' ')?.[1];
+    const token = request?.headers.authorization?.split(' ')?.[1];
     const userData = await this.userService.getUserData(token);
     response.send(userData);
   }

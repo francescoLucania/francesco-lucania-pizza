@@ -3,6 +3,7 @@
     <div class="registration-form-container">
       <pizza-admin-registration-form
         (formSubmit)="onFormSubmit($event)"
+        [serverError]="serverError()"
       ></pizza-admin-registration-form>
     </div>
   </div>

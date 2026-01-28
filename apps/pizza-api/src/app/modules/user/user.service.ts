@@ -12,7 +12,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { ConfigService } from '@nestjs/config';
 import ValidationException from '../../exception/validation/validation';
 import UnauthorizedException from '../../exception/unauthorized/unauthorized';
-import { LoginBody, LoginType, UserProfile } from '@francesco-lucania-pizza-models';
+import {
+  LoginBody,
+  LoginType,
+  UserProfile,
+} from '@francesco-lucania-pizza-models';
 import { UserLoginDto } from './dto/user-login.dto';
 
 @Injectable()
@@ -22,10 +26,10 @@ export class UserService {
     private fileService: FileService,
     private mailService: MailService,
     private tokenService: TokenService,
-    private configService: ConfigService
+    private configService: ConfigService,
   ) {}
 
-  async create(dto: CreateUserDto): Promise<UserDto> {
+  public async create(dto: CreateUserDto): Promise<UserDto> {
     const searchByEmail = await this.searchUserInModel({ email: dto.email });
     const searchByPhone = await this.searchUserInModel({ phone: dto.phone });
     const user = searchByEmail || searchByPhone;
@@ -38,7 +42,7 @@ export class UserService {
       const creatUser = await this.userModel.create({
         ...dto,
         picture: picturePath ? picturePath : 'unknown.jpg',
-        activationLink: activationLink,
+        activationLink,
         lastActivity: date,
         created: date,
       });
@@ -46,26 +50,38 @@ export class UserService {
       this.mailService.sendActivationMail(
         dto.email,
         `${this.configService.get(
-          'DOMAIN'
-        )}/api/user/activate?id=${activationLink}`
+          'DOMAIN',
+        )}/api/user/activate?id=${activationLink}`,
       );
 
       return await this.buildUserAuthData(new UserDto(creatUser));
     } else {
       throw new ValidationException(
-        searchByPhone ? 'BUSY_PHONE' : 'BUSY_EMAIL'
+        searchByPhone ? 'BUSY_PHONE' : 'BUSY_EMAIL',
       );
     }
   }
 
-  saveAvatar(picture: any) {
-    const picturePath = this.fileService.createFile(FileType.IMAGE, picture);
+  public async saveAvatar(picture: any, token: string): Promise<string> {
+    // Сохраняем аватар в подпапку user/avatar
+    const picturePath = this.fileService.createFile(
+      FileType.IMAGE,
+      picture,
+      'user/avatar',
+    );
+
+    // Получаем пользователя по токену и обновляем его аватар
+    const user = await this.getUserByToken('ACCESS_TOKEN', token);
+    if (user) {
+      user.picture = picturePath;
+      await user.save();
+    }
+
+    return picturePath;
   }
 
-  async login(body: UserLoginDto): Promise<UserDto> {
+  public async login(body: UserLoginDto): Promise<UserDto> {
     const { login, password, loginType } = body;
-
-    console.log('login body', body);
 
     const user =
       loginType === 'email'
@@ -77,7 +93,7 @@ export class UserService {
         throw new ValidationException(`BAD_PASSWORD`);
       } else if (user.isActivated) {
         user.lastActivity = new Date().toISOString();
-        // @ts-ignore
+        // @ts-expect-error - Mongoose save method type issue
         await user?.save();
         return await this.buildUserAuthData(new UserDto(user), true);
       } else {
@@ -90,7 +106,7 @@ export class UserService {
 
   public async getUserData(token: string) {
     return this.buildUserProfileData(
-      await this.getUserByToken('ACCESS_TOKEN', token)
+      await this.getUserByToken('ACCESS_TOKEN', token),
     );
   }
 
@@ -104,6 +120,7 @@ export class UserService {
       dateIssue,
       created,
       lastActivity,
+      picture,
     } = user;
 
     return {
@@ -115,6 +132,7 @@ export class UserService {
       dateIssue,
       created,
       lastActivity,
+      picture,
     };
   }
 
@@ -135,17 +153,17 @@ export class UserService {
 
   private async loginPasswordEquals(
     user: User,
-    password: string
+    password: string,
   ): Promise<boolean> {
     const result = await bcrypt.compare(password, user.password);
     return result;
   }
 
-  async logout(refreshToken: string): Promise<null> {
+  public async logout(refreshToken: string): Promise<null> {
     return await this.tokenService.removeToken(refreshToken);
   }
 
-  async refresh(refreshToken: string): Promise<UserDto> {
+  public async refresh(refreshToken: string): Promise<UserDto> {
     if (refreshToken) {
       const user = await this.getUserByToken('REFRESH_TOKEN', refreshToken);
       if (user) {
@@ -155,13 +173,13 @@ export class UserService {
     throw new UnauthorizedException('BAD_TOKEN');
   }
 
-  async activate(link: string): Promise<User> {
+  public async activate(link: string): Promise<User> {
     const activatedCandidate = await this.userModel.findOne({
       activationLink: link,
     });
     if (activatedCandidate) {
-      activatedCandidate['isActivated'] = true;
-      activatedCandidate['activationLink'] = null;
+      activatedCandidate.isActivated = true;
+      activatedCandidate.activationLink = null;
     } else {
       throw new Error('INCORRECT_LINK');
     }
@@ -170,7 +188,7 @@ export class UserService {
   }
 
   private async searchUserInModel(
-    searchParam: Partial<CreateUserDto>
+    searchParam: Partial<CreateUserDto>,
   ): Promise<User | null> {
     const user = await this.userModel.findOne(searchParam);
     return user ? user : null;
@@ -178,7 +196,7 @@ export class UserService {
 
   private async getUserByToken(
     type: TokenType,
-    token: string
+    token: string,
   ): Promise<UserDocument> {
     const validToken = this.tokenService.validateToken(type, token);
 
@@ -192,14 +210,12 @@ export class UserService {
 
       const user = await this.userModel.findById(validToken.id);
 
-      console.log('user => ', user);
-
       return user ? user : null;
     }
     return null;
   }
 
-  async deleteAllUsers(): Promise<null> {
+  public async deleteAllUsers(): Promise<null> {
     if (this.configService.get('MODE') === 'DEV') {
       await this.tokenService.removeAll();
       await this.userModel.collection.drop();

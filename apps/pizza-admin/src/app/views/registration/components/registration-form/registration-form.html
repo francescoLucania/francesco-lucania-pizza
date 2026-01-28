@@ -19,6 +19,8 @@
       <div class="text-base-small color-error mt-4">
         {{ getErrorMessage(registrationForm.email().errors()) }}
       </div>
+      } @if (serverError() === 'BUSY_EMAIL') {
+      <div class="text-base-small color-error mt-4">Этот email уже занят</div>
       }
     </div>
 
@@ -40,6 +42,8 @@
       <div class="text-base-small color-error mt-4">
         {{ getErrorMessage(registrationForm.phone().errors()) }}
       </div>
+      } @if (serverError() === 'BUSY_PHONE') {
+      <div class="text-base-small color-error mt-4">Этот телефон уже занят</div>
       }
     </div>
 
@@ -85,7 +89,7 @@
 
     <!-- Gender -->
     <div class="mt-16">
-      <label class="registration-form__label">Пол</label>
+      <span class="registration-form__label">Пол</span>
       <div class="registration-form__radio-group">
         <pizza-lib-radio
           class="mt-8"
@@ -151,10 +155,6 @@
       @if (shouldShowError('password', registrationForm.password)) {
       <div class="text-base-small color-error mt-4">
         {{ getErrorMessage(registrationForm.password().errors()) }}
-      </div>
-      } @if (submitted() || touchedFields().has('password')) {
-      <div class="text-base-small color-error mt-4">
-        Пароль должен содержать от 8 до 16 символов
       </div>
       }
     </div>

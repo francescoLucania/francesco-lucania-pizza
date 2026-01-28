@@ -1,23 +1,22 @@
 <div class="app">
   <pizza-lib-header
     [logoPath]="'img/logo.jpg'"
-    [navigate]="navigate"
+    [navigate]="navigate()"
   ></pizza-lib-header>
   <main>
-<!--    @if (message(); as alertMessage) {-->
-<!--      <section-->
-<!--        role="alert"-->
-<!--        aria-live="assertive"-->
-<!--        style="position: fixed; top: -5000px; left: -5000px"-->
-<!--      >-->
-<!--        >-->
-<!--        <span>{{ alertMessage }}</span>-->
-<!--      </section>-->
-<!--    }-->
+    <!--    @if (message(); as alertMessage) {-->
+    <!--      <section-->
+    <!--        role="alert"-->
+    <!--        aria-live="assertive"-->
+    <!--        style="position: fixed; top: -5000px; left: -5000px"-->
+    <!--      >-->
+    <!--        >-->
+    <!--        <span>{{ alertMessage }}</span>-->
+    <!--      </section>-->
+    <!--    }-->
     <router-outlet></router-outlet>
   </main>
   <pizza-lib-footer></pizza-lib-footer>
   <pizza-lib-modal></pizza-lib-modal>
   <pizza-lib-popover></pizza-lib-popover>
 </div>
-

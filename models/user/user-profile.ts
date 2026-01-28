@@ -9,4 +9,5 @@ export type UserProfile = {
   dateIssue: string;
   created: string;
   lastActivity: string;
+  picture: string;
 };

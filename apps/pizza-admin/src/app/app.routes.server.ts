@@ -1,6 +1,6 @@
 import { RenderMode, ServerRoute } from '@angular/ssr';
-import {Home} from "./views/home/home";
-import {Registration} from "./views/registration/registration";
+import { Home } from './views/home/home';
+import { Registration } from './views/registration/registration';
 
 export const serverRoutes: ServerRoute[] = [
   {
@@ -10,5 +10,17 @@ export const serverRoutes: ServerRoute[] = [
   {
     path: 'registration',
     renderMode: RenderMode.Prerender,
+  },
+  {
+    path: 'activate',
+    renderMode: RenderMode.Prerender,
+  },
+  {
+    path: 'login',
+    renderMode: RenderMode.Prerender,
+  },
+  {
+    path: 'profile',
+    renderMode: RenderMode.Server,
   },
 ];
