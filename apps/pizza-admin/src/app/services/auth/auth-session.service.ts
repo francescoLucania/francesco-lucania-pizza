@@ -1,12 +1,13 @@
 import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { UserDataService } from './user-data.service';
 
 const ACCESS_TOKEN_KEY = 'pizza_admin_access_token';
 
 @Injectable({ providedIn: 'root' })
 export class AuthSessionService {
   private readonly platformId = inject(PLATFORM_ID);
-
+  private readonly userDataService = inject(UserDataService);
   private readonly accessTokenSignal = signal<string | null>(null);
 
   constructor() {
@@ -18,7 +19,7 @@ export class AuthSessionService {
   }
 
   public isAuthenticated(): boolean {
-    return Boolean(this.accessTokenSignal());
+    return Boolean(this.userDataService.getUserData());
   }
 
   public setAccessToken(token: string | null): void {

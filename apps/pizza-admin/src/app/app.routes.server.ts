@@ -17,7 +17,7 @@ export const serverRoutes: ServerRoute[] = [
   },
   {
     path: 'login',
-    renderMode: RenderMode.Prerender,
+    renderMode: RenderMode.Server,
   },
   {
     path: 'profile',
