@@ -16,8 +16,8 @@ export class FileService {
   private findProjectRoot(): string {
     let currentDir = __dirname;
 
-    // В dev: __dirname = apps/pizza-api/src/app/modules/user/file
-    // В prod: __dirname = dist/apps/pizza-api/src/app/modules/user/file
+    // В dev: __dirname = apps/pizza-api/src/app/services/file
+    // В prod: __dirname = dist/apps/pizza-api/src/app/services/file
     // Нужно подняться до корня проекта (где находится nx.json)
 
     // Если мы в dist, сразу поднимаемся выше dist

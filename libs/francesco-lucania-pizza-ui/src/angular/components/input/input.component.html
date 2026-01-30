@@ -31,8 +31,8 @@
     [maskito]="maskitoOptions()"
     (change)="handleChange()"
     (input)="handleInput($event)"
-    (blur)="notifyBlurEvent($event)"
-    (focus)="notifyFocusEvent($event)"
+    (blur)="handleBlur(); notifyBlurEvent($event)"
+    (focus)="handleFocus(); notifyFocusEvent($event)"
     (keyup.enter)="forceChange()"
   />
   }

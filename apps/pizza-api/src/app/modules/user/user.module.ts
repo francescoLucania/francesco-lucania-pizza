@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './schemas/user.schema';
-import { FileService } from './file/file.service';
+import { FileService } from '../../services/file/file.service';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { MailService } from '../../services/mail/mail.service';
@@ -26,5 +26,6 @@ import { NestjsFormDataModule } from 'nestjs-form-data';
     MailService,
     TokenService,
   ],
+  exports: [TokenService],
 })
 export class UserModule {}

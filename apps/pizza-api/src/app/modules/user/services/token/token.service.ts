@@ -1,4 +1,5 @@
 import * as jwt from 'jsonwebtoken';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -7,6 +8,7 @@ import { UserDto } from '../../dto/user-public.dto';
 
 export type TokenType = 'ACCESS_TOKEN' | 'REFRESH_TOKEN';
 
+@Injectable()
 export class TokenService {
   constructor(
     @InjectModel(Token.name) private tokenModel: Model<TokenDocument>,

@@ -8,6 +8,7 @@ import { join } from 'path';
 import * as path from 'path';
 import * as fs from 'fs';
 import { UserModule } from './modules/user/user.module';
+import { MenuModule } from './modules/menu/menu.module';
 
 @Module({
   imports: [
@@ -78,6 +79,7 @@ import { UserModule } from './modules/user/user.module';
       inject: [ConfigService],
     }),
     UserModule,
+    MenuModule,
   ],
   controllers: [AppController],
   providers: [AppService],

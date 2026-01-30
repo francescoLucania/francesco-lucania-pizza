@@ -2,7 +2,7 @@ import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './schemas/user.schema';
-import { FileService, FileType } from './file/file.service';
+import { FileService, FileType } from '../../services/file/file.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { MailService } from '../../services/mail/mail.service';
 import bcrypt from 'bcryptjs';
@@ -93,7 +93,6 @@ export class UserService {
         throw new ValidationException(`BAD_PASSWORD`);
       } else if (user.isActivated) {
         user.lastActivity = new Date().toISOString();
-        // @ts-expect-error - Mongoose save method type issue
         await user?.save();
         return await this.buildUserAuthData(new UserDto(user), true);
       } else {
@@ -189,7 +188,7 @@ export class UserService {
 
   private async searchUserInModel(
     searchParam: Partial<CreateUserDto>,
-  ): Promise<User | null> {
+  ): Promise<UserDocument | null> {
     const user = await this.userModel.findOne(searchParam);
     return user ? user : null;
   }
