@@ -15,7 +15,7 @@ import { InputComponent } from '@francesco-lucania-pizza/angular-ui';
 import { ButtonComponent } from '@francesco-lucania-pizza/angular-ui';
 import { RadioComponent } from '@francesco-lucania-pizza/angular-ui';
 import { MaskitoOptions } from '@maskito/core';
-import { normalizePhone } from '../../../../utils/phone.utils';
+import { normalizePhone } from '@francesco-lucania-pizza/angular-ui';
 
 @Component({
   selector: 'pizza-admin-registration-form',

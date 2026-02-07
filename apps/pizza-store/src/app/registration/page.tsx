@@ -9,7 +9,7 @@ import { setUser } from '../../store/slices/userSlice';
 import type { RegistrationBody, Gender } from '@francesco-lucania-pizza-models';
 import { PizzaReactInput, PizzaReactButton } from '@francesco-lucania-pizza/react-ui';
 import { MaskitoOptions } from '@maskito/core';
-import { normalizePhone } from '../../utils/phone.utils';
+import { normalizePhone } from '@francesco-lucania-pizza/react-ui';
 import styles from './page.module.scss';
 
 interface FieldErrors {
