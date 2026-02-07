@@ -107,7 +107,17 @@ export class UserController {
 
   @Get('/refresh')
   public async refresh(@Req() request, @Response() response) {
-    const user = await this.userService.refresh(request.cookies.refreshToken);
+    const refreshToken = request.cookies?.refreshToken;
+    if (!refreshToken) {
+      throw new HttpException(
+        {
+          status: HttpStatus.UNAUTHORIZED,
+          error: 'REFRESH_TOKEN_MISSING',
+        },
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+    const user = await this.userService.refresh(refreshToken);
     this.setRefreshToken(response, user).send(user);
   }
 

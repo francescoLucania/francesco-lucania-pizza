@@ -9,6 +9,7 @@ export class AuthSessionService {
   private readonly platformId = inject(PLATFORM_ID);
   private readonly userDataService = inject(UserDataService);
   private readonly accessTokenSignal = signal<string | null>(null);
+  public readonly authenticated = signal<boolean>(false);
 
   constructor() {
     this.hydrateFromStorage();
@@ -19,11 +20,12 @@ export class AuthSessionService {
   }
 
   public isAuthenticated(): boolean {
-    return Boolean(this.userDataService.getUserData());
+    return Boolean(this.userDataService.getUserData() && this.authenticated());
   }
 
   public setAccessToken(token: string | null): void {
     this.accessTokenSignal.set(token);
+    this.authenticated.set(Boolean(token));
 
     if (!isPlatformBrowser(this.platformId)) {
       return;
@@ -45,5 +47,6 @@ export class AuthSessionService {
     }
     const accessToken = localStorage.getItem(ACCESS_TOKEN_KEY);
     this.accessTokenSignal.set(accessToken);
+    this.authenticated.set(Boolean(accessToken));
   }
 }

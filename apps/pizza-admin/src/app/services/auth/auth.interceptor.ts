@@ -1,97 +1,108 @@
 import {
   HttpErrorResponse,
   HttpEvent,
-  HttpHandler,
-  HttpInterceptor,
+  HttpHandlerFn,
   HttpRequest,
 } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
+import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, Subject, throwError } from 'rxjs';
 import { catchError, filter, switchMap, take } from 'rxjs/operators';
 import { AuthSessionService } from './auth-session.service';
 import { AuthService } from './auth.service';
 
-@Injectable()
-export class AuthInterceptor implements HttpInterceptor {
-  private readonly session = inject(AuthSessionService);
-  private readonly authService = inject(AuthService);
-  private readonly router = inject(Router);
-  private isRefreshing = false;
-  private refreshTokenSubject: Subject<string | null> = new Subject<
-    string | null
-  >();
+// Глобальные переменные для управления обновлением токена
+let isRefreshing = false;
+const refreshTokenSubject: Subject<string | null> = new Subject<
+  string | null
+>();
 
-  public intercept(
-    req: HttpRequest<unknown>,
-    next: HttpHandler,
-  ): Observable<HttpEvent<unknown>> {
-    const token = this.session.accessToken();
-    if (!token) {
-      return next.handle(req);
-    }
+export function authInterceptor(
+  req: HttpRequest<unknown>,
+  next: HttpHandlerFn,
+): Observable<HttpEvent<unknown>> {
+  const session = inject(AuthSessionService);
+  const authService = inject(AuthService);
+  const router = inject(Router);
 
-    const authReq = req.clone({
-      setHeaders: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+  const token = session.accessToken();
+  // if (!token) {
+  //   return next(req);
+  // }
 
-    return next.handle(authReq).pipe(
-      catchError((error: HttpErrorResponse) => {
-        if (error.status === 401 && !req.url.includes('user/refresh')) {
-          return this.handle401Error(authReq, next);
-        }
-        return throwError(() => error);
-      }),
-    );
-  }
+  const authReq = req.clone({
+    withCredentials: true,
+    setHeaders: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
-  private handle401Error(
-    req: HttpRequest<unknown>,
-    next: HttpHandler,
-  ): Observable<HttpEvent<unknown>> {
-    if (this.isRefreshing) {
-      // Если уже идет обновление токена, ждем его завершения
-      return this.refreshTokenSubject.pipe(
-        filter((token) => token !== null),
-        take(1),
-        switchMap((token) => {
-          const newReq = req.clone({
-            setHeaders: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          return next.handle(newReq);
-        }),
-      );
-    }
+  return next(authReq).pipe(
+    catchError((error: HttpErrorResponse) => {
+      // Проверяем, что это не запрос на refresh, чтобы избежать бесконечного цикла
+      const isRefreshRequest = req.url.includes('user/refresh');
 
-    this.isRefreshing = true;
-    this.refreshTokenSubject.next(null);
+      if (error.status === 401 && !isRefreshRequest) {
+        session.authenticated.set(false);
+        // Вызываем handle401Error, который должен сделать refresh
+        // Важно: возвращаем Observable из handle401Error, который будет подписан
+        return handle401Error(req, next, session, authService, router);
+      }
+      return throwError(() => error);
+    }),
+  );
+}
 
-    // Refresh token хранится в httpOnly cookie, поэтому просто пытаемся обновить
-    return this.authService.refresh().pipe(
-      switchMap((response: { accessToken: string; refreshToken?: string }) => {
-        this.isRefreshing = false;
-        this.session.setAccessToken(response.accessToken);
-        this.refreshTokenSubject.next(response.accessToken);
-
-        // Повторяем оригинальный запрос с новым токеном
+function handle401Error(
+  req: HttpRequest<unknown>,
+  next: HttpHandlerFn,
+  session: AuthSessionService,
+  authService: AuthService,
+  router: Router,
+): Observable<HttpEvent<unknown>> {
+  if (isRefreshing) {
+    // Если уже идет обновление токена, ждем его завершения
+    return refreshTokenSubject.pipe(
+      filter((token) => token !== null),
+      take(1),
+      switchMap((token) => {
         const newReq = req.clone({
           setHeaders: {
-            Authorization: `Bearer ${response.accessToken}`,
+            Authorization: `Bearer ${token}`,
           },
         });
-        return next.handle(newReq);
-      }),
-      catchError((error) => {
-        this.isRefreshing = false;
-        this.refreshTokenSubject.next(null);
-        this.session.logout();
-        void this.router.navigateByUrl('/');
-        return throwError(() => error);
+        return next(newReq);
       }),
     );
   }
+
+  isRefreshing = true;
+  refreshTokenSubject.next(null);
+
+  // Refresh token хранится в httpOnly cookie, поэтому просто пытаемся обновить
+  // Важно: refresh() должен быть вызван здесь, чтобы обновить токен
+  // Этот Observable будет подписан автоматически, когда интерцептор вернет его
+  return authService.refresh().pipe(
+    switchMap((response: { accessToken: string; refreshToken?: string }) => {
+      isRefreshing = false;
+      session.setAccessToken(response.accessToken);
+      refreshTokenSubject.next(response.accessToken);
+
+      // Повторяем оригинальный запрос с новым токеном
+      const newReq = req.clone({
+        setHeaders: {
+          Authorization: `Bearer ${response.accessToken}`,
+        },
+      });
+      return next(newReq);
+    }),
+    catchError((refreshError) => {
+      isRefreshing = false;
+      refreshTokenSubject.next(null);
+      session.authenticated.set(false);
+      session.logout();
+      void router.navigateByUrl('/');
+      return throwError(() => refreshError);
+    }),
+  );
 }

@@ -9,6 +9,7 @@ import { AppModule } from './app/app.module';
 import { ConfigService } from '@nestjs/config';
 import * as path from 'path';
 import * as fs from 'fs';
+import cookieParser from 'cookie-parser';
 
 /**
  * Находит корень проекта, поднимаясь вверх от текущей директории
@@ -71,6 +72,10 @@ async function bootstrap() {
   }
 
   const app = await NestFactory.create(AppModule);
+
+  // Настраиваем cookie parser для работы с httpOnly cookies
+  app.use(cookieParser());
+
   const configService = app.get(ConfigService);
   const mode = configService.get<string>('MODE');
 

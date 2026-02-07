@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { ApiService } from '../api/api.service';
 import {
   RegistrationBody,
@@ -7,6 +7,7 @@ import {
   LoginBody,
   UserProfile,
 } from '@francesco-lucania-pizza-models';
+import { UserDataService } from './user-data.service';
 
 export type LoginResponse = {
   accessToken: string;
@@ -24,6 +25,7 @@ export type LoginResponse = {
 })
 export class AuthService {
   private readonly apiService = inject(ApiService);
+  private readonly userService = inject(UserDataService);
 
   /**
    * Отправляет запрос на регистрацию пользователя
@@ -44,7 +46,11 @@ export class AuthService {
   }
 
   public getUserData(): Observable<UserProfile> {
-    return this.apiService.get<UserProfile>('user/getUserData');
+    return this.apiService.get<UserProfile>('user/getUserData').pipe(
+      tap((data) => {
+        this.userService.setUserData(data);
+      }),
+    );
   }
 
   public activate(activationId: string): Observable<{

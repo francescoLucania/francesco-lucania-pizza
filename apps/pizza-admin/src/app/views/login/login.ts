@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
@@ -23,7 +23,7 @@ import { LoginBody } from '@francesco-lucania-pizza-models';
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
-export class Login {
+export class Login implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly session = inject(AuthSessionService);
   private readonly router = inject(Router);
@@ -43,6 +43,12 @@ export class Login {
     required(schema.login);
     required(schema.password);
   });
+
+  public ngOnInit(): void {
+    if (this.session.isAuthenticated()) {
+      this.router.navigateByUrl('/profile');
+    }
+  }
 
   protected shouldShowError(
     fieldName: string,

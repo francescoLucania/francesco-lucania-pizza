@@ -8,33 +8,30 @@ import {
 import { isPlatformBrowser } from '@angular/common';
 import {
   provideHttpClient,
-  withInterceptorsFromDi,
+  withInterceptors,
+  withFetch,
 } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 import { appRoutes } from './app.routes';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { AuthInterceptor } from './services/auth/auth.interceptor';
+import { authInterceptor } from './services/auth/auth.interceptor';
 import {
   provideClientHydration,
   withEventReplay,
 } from '@angular/platform-browser';
 import { AuthService } from './services/auth/auth.service';
 import { UserDataService } from './services/auth/user-data.service';
-import { firstValueFrom, of, throwError } from 'rxjs';
+import { of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideClientHydration(withEventReplay()),
     provideBrowserGlobalErrorListeners(),
-    provideHttpClient(withInterceptorsFromDi()),
+    provideHttpClient(
+      withInterceptors([authInterceptor]),
+      withFetch(), // Используем fetch API, который автоматически отправляет cookies
+    ),
     provideRouter(appRoutes),
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: AuthInterceptor,
-      multi: true,
-    },
-
     provideAppInitializer(() => {
       // Inject services directly within the function
       const authService = inject(AuthService);
@@ -42,10 +39,13 @@ export const appConfig: ApplicationConfig = {
       const platformId = inject(PLATFORM_ID);
 
       if (isPlatformBrowser(platformId)) {
+        // Не используем catchError здесь, чтобы интерцептор мог обработать 401 и сделать refresh
+        // Ошибки будут обработаны интерцептором, который попытается обновить токен
         return authService.getUserData().pipe(
           catchError((e) => {
+            // Обрабатываем ошибку только если интерцептор не смог её обработать
+            // (например, если refresh тоже не удался)
             userDataService.setUserData(null);
-
             return of(null);
           }),
         );
