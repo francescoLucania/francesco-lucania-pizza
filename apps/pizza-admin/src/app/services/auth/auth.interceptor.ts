@@ -101,7 +101,6 @@ function handle401Error(
       refreshTokenSubject.next(null);
       session.authenticated.set(false);
       session.logout();
-      void router.navigateByUrl('/');
       return throwError(() => refreshError);
     }),
   );

@@ -22,6 +22,7 @@ import { UserDto } from './dto/user-public.dto';
 import { AuthGuard } from '../../guards/auth/auth';
 import { LoginBody } from '@francesco-lucania-pizza-models';
 import { UserLoginDto } from './dto/user-login.dto';
+import { normalizePhone } from './utils/phone.utils';
 
 @Controller('/user')
 export class UserController {
@@ -38,9 +39,25 @@ export class UserController {
     @Response() response,
   ) {
     // const picture = avatar?.avatar[0];
-    const user = await this.userService.create({
+    // Нормализуем телефон перед передачей в service
+    const normalizedDto = {
       ...dto,
+      phone: normalizePhone(dto.phone),
+    };
+    
+    console.log('=== РЕГИСТРАЦИЯ ПОЛЬЗОВАТЕЛЯ ===');
+    console.log('Входящие данные регистрации:', {
+      email: normalizedDto.email,
+      phone: normalizedDto.phone,
+      name: normalizedDto.name,
+      fullName: normalizedDto.fullName,
+      gender: normalizedDto.gender,
+      dateIssue: normalizedDto.dateIssue,
+      password: normalizedDto.password, // Внимание: пароль в открытом виде
     });
+    
+    const user = await this.userService.create(normalizedDto);
+    
     return response.send(user);
   }
 
@@ -94,7 +111,20 @@ export class UserController {
     @Body() body: UserLoginDto,
     @Response() response: UserDto,
   ) {
-    const user = await this.userService.login(body);
+    // Нормализуем телефон перед передачей в service, если вход по телефону
+    const normalizedBody = {
+      ...body,
+      login: body.loginType === 'phone' ? normalizePhone(body.login) : body.login,
+    };
+    
+    console.log('=== АУТЕНТИФИКАЦИЯ ПОЛЬЗОВАТЕЛЯ ===');
+    console.log('Входящие данные логина:', {
+      login: normalizedBody.login,
+      password: normalizedBody.password, // Пароль, присылаемый пользователем
+      loginType: normalizedBody.loginType,
+    });
+    
+    const user = await this.userService.login(normalizedBody);
     this.setRefreshToken(response, user).send(user);
   }
 

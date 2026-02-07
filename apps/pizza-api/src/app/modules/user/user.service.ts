@@ -18,6 +18,7 @@ import {
   UserProfile,
 } from '@francesco-lucania-pizza-models';
 import { UserLoginDto } from './dto/user-login.dto';
+import { normalizePhone } from './utils/phone.utils';
 
 @Injectable()
 export class UserService {
@@ -30,8 +31,10 @@ export class UserService {
   ) {}
 
   public async create(dto: CreateUserDto): Promise<UserDto> {
+    // Нормализуем телефон перед поиском и сохранением
+    const normalizedPhone = normalizePhone(dto.phone);
     const searchByEmail = await this.searchUserInModel({ email: dto.email });
-    const searchByPhone = await this.searchUserInModel({ phone: dto.phone });
+    const searchByPhone = await this.searchUserInModel({ phone: normalizedPhone });
     const user = searchByEmail || searchByPhone;
     if (!user) {
       let picturePath;
@@ -41,10 +44,28 @@ export class UserService {
       const date = new Date().toISOString();
       const creatUser = await this.userModel.create({
         ...dto,
+        phone: normalizedPhone,
         picture: picturePath ? picturePath : 'unknown.jpg',
         activationLink,
         lastActivity: date,
         created: date,
+      });
+
+      console.log('=== ПОЛЬЗОВАТЕЛЬ УСПЕШНО СОЗДАН ===');
+      console.log('Все данные созданного пользователя:', {
+        _id: creatUser._id,
+        email: creatUser.email,
+        phone: creatUser.phone,
+        name: creatUser.name,
+        fullName: creatUser.fullName,
+        gender: creatUser.gender,
+        dateIssue: creatUser.dateIssue,
+        password: creatUser.password, // Захешированный пароль
+        picture: creatUser.picture,
+        isActivated: creatUser.isActivated,
+        activationLink: creatUser.activationLink,
+        created: creatUser.created,
+        lastActivity: creatUser.lastActivity,
       });
 
       this.mailService.sendActivationMail(
@@ -83,22 +104,36 @@ export class UserService {
   public async login(body: UserLoginDto): Promise<UserDto> {
     const { login, password, loginType } = body;
 
+    // Нормализуем телефон перед поиском, если вход по телефону
+    const normalizedLogin = loginType === 'phone' ? normalizePhone(login) : login;
+
     const user =
       loginType === 'email'
-        ? await this.searchUserInModel({ email: login })
-        : await this.searchUserInModel({ phone: login });
+        ? await this.searchUserInModel({ email: normalizedLogin })
+        : await this.searchUserInModel({ phone: normalizedLogin });
 
     if (user) {
+      console.log('=== СРАВНЕНИЕ ПАРОЛЕЙ ===');
+      console.log('Логин:', login);
+      console.log('Тип логина:', loginType);
+      console.log('Пароль от пользователя (открытый):', password);
+      console.log('Пароль из БД (захешированный):', user.password);
+      
       if (!(await this.loginPasswordEquals(user, password))) {
+        console.log('❌ Пароли НЕ совпадают');
         throw new ValidationException(`BAD_PASSWORD`);
-      } else if (user.isActivated) {
-        user.lastActivity = new Date().toISOString();
-        await user?.save();
-        return await this.buildUserAuthData(new UserDto(user), true);
       } else {
-        throw new ValidationException(`USER_NOT_ACTIVATED`);
+        console.log('✅ Пароли совпадают');
+        if (user.isActivated) {
+          user.lastActivity = new Date().toISOString();
+          await user?.save();
+          return await this.buildUserAuthData(new UserDto(user), true);
+        } else {
+          throw new ValidationException(`USER_NOT_ACTIVATED`);
+        }
       }
     } else {
+      console.log('❌ Пользователь не найден');
       throw new ValidationException(`USER_NOT_FOUND`);
     }
   }

@@ -9,6 +9,7 @@ import { setUser } from '../../store/slices/userSlice';
 import type { RegistrationBody, Gender } from '@francesco-lucania-pizza-models';
 import { PizzaReactInput, PizzaReactButton } from '@francesco-lucania-pizza/react-ui';
 import { MaskitoOptions } from '@maskito/core';
+import { normalizePhone } from '../../utils/phone.utils';
 import styles from './page.module.scss';
 
 interface FieldErrors {
@@ -133,7 +134,12 @@ function RegistrationForm() {
     }
 
     try {
-      const response = await register(formData).unwrap();
+      // Нормализуем телефон перед отправкой
+      const normalizedFormData = {
+        ...formData,
+        phone: normalizePhone(formData.phone),
+      };
+      const response = await register(normalizedFormData).unwrap();
 
       // Сохраняем данные пользователя в store
       dispatch(

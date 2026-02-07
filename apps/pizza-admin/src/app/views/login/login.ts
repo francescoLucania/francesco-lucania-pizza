@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, effect, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
@@ -15,7 +15,8 @@ import {
 } from '@francesco-lucania-pizza/angular-ui';
 import { AuthService, LoginResponse } from '../../services/auth/auth.service';
 import { AuthSessionService } from '../../services/auth/auth-session.service';
-import { LoginBody } from '@francesco-lucania-pizza-models';
+import { LoginBody, LoginType } from '@francesco-lucania-pizza-models';
+import { normalizePhone } from '../../utils/phone.utils';
 
 @Component({
   selector: 'pizza-admin-login',
@@ -43,6 +44,26 @@ export class Login implements OnInit {
     required(schema.login);
     required(schema.password);
   });
+
+  constructor() {
+    // Автоматически определяем тип входа при изменении поля логина
+    effect(() => {
+      const loginValue = this.model().login;
+      if (loginValue) {
+        const isEmail = loginValue.includes('@');
+        const currentLoginType = this.model().loginType;
+        const newLoginType = (isEmail ? 'email' : 'phone') as LoginType;
+        
+        // Обновляем loginType только если он изменился
+        if (currentLoginType !== newLoginType) {
+          this.model.update((prev) => ({
+            ...prev,
+            loginType: newLoginType,
+          }));
+        }
+      }
+    });
+  }
 
   public ngOnInit(): void {
     if (this.session.isAuthenticated()) {
@@ -82,9 +103,15 @@ export class Login implements OnInit {
 
     this.isLoading.set(true);
     const body = this.model();
+    
+    // Нормализуем телефон перед отправкой, если вход по телефону
+    const normalizedBody: LoginBody = {
+      ...body,
+      login: body.loginType === 'phone' ? normalizePhone(body.login) : body.login,
+    };
 
     this.authService
-      .login(body)
+      .login(normalizedBody)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res: LoginResponse) => {

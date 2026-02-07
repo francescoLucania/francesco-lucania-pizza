@@ -8,6 +8,7 @@ import { useAppDispatch } from '../../store/hooks';
 import { setUser, setToken } from '../../store/slices/userSlice';
 import type { LoginBody, LoginType } from '@francesco-lucania-pizza-models';
 import { PizzaReactInput, PizzaReactButton } from '@francesco-lucania-pizza/react-ui';
+import { normalizePhone } from '../../utils/phone.utils';
 import styles from './page.module.scss';
 
 function LoginForm() {
@@ -28,7 +29,12 @@ function LoginForm() {
     setErrorMessage('');
 
     try {
-      const response = await login(formData).unwrap();
+      // Нормализуем телефон перед отправкой, если вход по телефону
+      const normalizedFormData = {
+        ...formData,
+        login: formData.loginType === 'phone' ? normalizePhone(formData.login) : formData.login,
+      };
+      const response = await login(normalizedFormData).unwrap();
 
       // Сохраняем accessToken и данные пользователя одновременно
       if (response.accessToken) {

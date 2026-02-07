@@ -15,6 +15,7 @@ import { InputComponent } from '@francesco-lucania-pizza/angular-ui';
 import { ButtonComponent } from '@francesco-lucania-pizza/angular-ui';
 import { RadioComponent } from '@francesco-lucania-pizza/angular-ui';
 import { MaskitoOptions } from '@maskito/core';
+import { normalizePhone } from '../../../../utils/phone.utils';
 
 @Component({
   selector: 'pizza-admin-registration-form',
@@ -136,7 +137,12 @@ export class RegistrationForm {
     this.submitted.set(true);
     if (this.registrationForm().valid()) {
       const formValue = this.registrationModel();
-      this.formSubmit.emit(formValue);
+      // Нормализуем телефон перед отправкой
+      const normalizedFormValue = {
+        ...formValue,
+        phone: normalizePhone(formValue.phone),
+      };
+      this.formSubmit.emit(normalizedFormValue);
     }
   }
 }
