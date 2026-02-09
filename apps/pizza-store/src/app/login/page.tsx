@@ -8,7 +8,7 @@ import { useAppDispatch } from '../../store/hooks';
 import { setUser, setToken } from '../../store/slices/userSlice';
 import type { LoginBody, LoginType } from '@francesco-lucania-pizza-models';
 import { PizzaReactInput, PizzaReactButton } from '@francesco-lucania-pizza/react-ui';
-import { normalizePhone } from '@francesco-lucania-pizza/react-ui';
+import { normalizePhone } from '@francesco-lucania-pizza/utils';
 import styles from './page.module.scss';
 
 function LoginForm() {

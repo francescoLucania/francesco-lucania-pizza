@@ -44,8 +44,20 @@ export class Profile {
   }
 
   protected logout(): void {
-    this.session.logout();
-    void this.router.navigateByUrl('/');
+    this.authService
+      .logout()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.session.logout();
+          void this.router.navigateByUrl('/');
+        },
+        error: () => {
+          // Даже если запрос не удался, очищаем локальную сессию
+          this.session.logout();
+          void this.router.navigateByUrl('/');
+        },
+      });
   }
 
   protected onAvatarChange(event: Event): void {

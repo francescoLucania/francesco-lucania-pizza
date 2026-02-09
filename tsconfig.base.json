@@ -22,6 +22,9 @@
       ],
       "@francesco-lucania-pizza/react-ui": [
         "libs/francesco-lucania-pizza-ui/src/react/index.ts"
+      ],
+      "@francesco-lucania-pizza/utils": [
+        "libs/francesco-lucania-pizza-ui/src/utils/index.ts"
       ]
     }
   },

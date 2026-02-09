@@ -18,7 +18,7 @@ import {
   UserProfile,
 } from '@francesco-lucania-pizza-models';
 import { UserLoginDto } from './dto/user-login.dto';
-import { normalizePhone } from '@francesco-lucania-pizza/react-ui';
+import { normalizePhone } from '@francesco-lucania-pizza/utils';
 
 @Injectable()
 export class UserService {

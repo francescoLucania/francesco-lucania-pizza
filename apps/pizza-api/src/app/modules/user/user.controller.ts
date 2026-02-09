@@ -22,7 +22,7 @@ import { UserDto } from './dto/user-public.dto';
 import { AuthGuard } from '../../guards/auth/auth';
 import { LoginBody } from '@francesco-lucania-pizza-models';
 import { UserLoginDto } from './dto/user-login.dto';
-import { normalizePhone } from '@francesco-lucania-pizza/react-ui';
+import { normalizePhone } from '@francesco-lucania-pizza/utils';
 
 @Controller('/user')
 export class UserController {

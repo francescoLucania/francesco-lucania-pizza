@@ -75,4 +75,8 @@ export class AuthService {
   public refresh(): Observable<LoginResponse> {
     return this.apiService.get<LoginResponse>('user/refresh');
   }
+
+  public logout(): Observable<{ action: string }> {
+    return this.apiService.get<{ action: string }>('user/logout');
+  }
 }

@@ -16,7 +16,7 @@ import {
 import { AuthService, LoginResponse } from '../../services/auth/auth.service';
 import { AuthSessionService } from '../../services/auth/auth-session.service';
 import { LoginBody, LoginType } from '@francesco-lucania-pizza-models';
-import { normalizePhone } from '@francesco-lucania-pizza/angular-ui';
+import { normalizePhone } from '@francesco-lucania-pizza/utils';
 
 @Component({
   selector: 'pizza-admin-login',
