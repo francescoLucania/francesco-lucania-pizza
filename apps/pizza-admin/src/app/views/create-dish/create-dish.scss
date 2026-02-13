@@ -1,0 +1,38 @@
+@use 'libs/francesco-lucania-pizza-ui/assets/styles/theme-provider/theme_provider'
+  as theme;
+
+.create-dish {
+  max-width: 800px;
+  margin: 0 auto;
+
+  &__title {
+  }
+
+  &__form {
+    width: 100%;
+  }
+
+  &__label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  &__error {
+    padding: 12px;
+    background-color: var(--colorErrorLight);
+    border-radius: 4px;
+  }
+
+  &__success {
+    padding: 12px;
+    background-color: var(--colorSuccessLight);
+    border-radius: 4px;
+    color: var(--colorSuccess);
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: center;
+  }
+}

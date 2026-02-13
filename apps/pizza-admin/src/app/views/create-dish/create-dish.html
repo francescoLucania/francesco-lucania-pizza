@@ -1,0 +1,161 @@
+<section class="section">
+  <div class="container">
+    <div class="create-dish">
+      <h1 class="create-dish__title heading-h1">Добавить блюдо</h1>
+
+      @if (errorText()) {
+      <div class="create-dish__error text-base-small color-error mt-16">
+        {{ errorText() }}
+      </div>
+      } @if (successMessage()) {
+      <div class="create-dish__success text-base-small mt-16">
+        {{ successMessage() }}
+      </div>
+      }
+
+      <form (ngSubmit)="onSubmit()" class="create-dish__form mt-24">
+        <!-- Name -->
+        <div class="mt-16">
+          <label for="name" class="create-dish__label">Название</label>
+          <pizza-lib-input
+            class="mt-4"
+            [formField]="dishForm.name"
+            type="text"
+            id="name"
+            name="name"
+            placeholder="Введите название блюда"
+            [size]="'large'"
+            (blurEvent)="markFieldTouched('name')"
+          />
+          @if (shouldShowError('name', dishForm.name)) {
+          <div class="text-base-small color-error mt-4">
+            {{ getErrorMessage(dishForm.name().errors()) }}
+          </div>
+          }
+        </div>
+
+        <!-- Full Name -->
+        <div class="mt-16">
+          <label for="fullName" class="create-dish__label"
+            >Полное название</label
+          >
+          <pizza-lib-input
+            class="mt-4"
+            [formField]="dishForm.fullName"
+            type="text"
+            id="fullName"
+            name="fullName"
+            placeholder="Введите полное название блюда"
+            [size]="'large'"
+            (blurEvent)="markFieldTouched('fullName')"
+          />
+          @if (shouldShowError('fullName', dishForm.fullName)) {
+          <div class="text-base-small color-error mt-4">
+            {{ getErrorMessage(dishForm.fullName().errors()) }}
+          </div>
+          }
+        </div>
+
+        <!-- Description -->
+        <div class="mt-16">
+          <label for="description" class="create-dish__label">Описание</label>
+          <pizza-lib-input
+            class="mt-4"
+            [formField]="dishForm.description"
+            type="text"
+            id="description"
+            name="description"
+            placeholder="Введите описание блюда"
+            [size]="'large'"
+            (blurEvent)="markFieldTouched('description')"
+          />
+          @if (shouldShowError('description', dishForm.description)) {
+          <div class="text-base-small color-error mt-4">
+            {{ getErrorMessage(dishForm.description().errors()) }}
+          </div>
+          }
+        </div>
+
+        <!-- Ingredients -->
+        <div class="mt-16">
+          <label for="ingredients" class="create-dish__label"
+            >Ингредиенты</label
+          >
+          <pizza-lib-input
+            class="mt-4"
+            [formField]="dishForm.ingredients"
+            type="text"
+            id="ingredients"
+            name="ingredients"
+            placeholder="Введите список ингредиентов"
+            [size]="'large'"
+            (blurEvent)="markFieldTouched('ingredients')"
+          />
+          @if (shouldShowError('ingredients', dishForm.ingredients)) {
+          <div class="text-base-small color-error mt-4">
+            {{ getErrorMessage(dishForm.ingredients().errors()) }}
+          </div>
+          }
+        </div>
+
+        <!-- Recipe -->
+        <div class="mt-16">
+          <label for="recipe" class="create-dish__label">Рецепт</label>
+          <pizza-lib-input
+            class="mt-4"
+            [formField]="dishForm.recipe"
+            type="text"
+            id="recipe"
+            name="recipe"
+            placeholder="Введите рецепт приготовления"
+            [size]="'large'"
+            (blurEvent)="markFieldTouched('recipe')"
+          />
+          @if (shouldShowError('recipe', dishForm.recipe)) {
+          <div class="text-base-small color-error mt-4">
+            {{ getErrorMessage(dishForm.recipe().errors()) }}
+          </div>
+          }
+        </div>
+
+        <!-- Picture -->
+        <div class="mt-16">
+          <label for="picture" class="create-dish__label"
+            >Изображение блюда</label
+          >
+          <input
+            class="create-dish__file-input mt-4"
+            type="file"
+            id="picture"
+            name="picture"
+            accept="image/*"
+            (change)="onPictureChange($event)"
+          />
+        </div>
+
+        <!-- Is Active -->
+        <!--        <div class="mt-16">-->
+        <!--          <label class="create-dish__label">-->
+        <!--            <input-->
+        <!--              type="checkbox"-->
+        <!--              [checked]="dishModel().isActive"-->
+        <!--              (change)="dishModel.update(m => ({ ...m, isActive: !m.isActive }))"-->
+        <!--            />-->
+        <!--            <span class="ml-8">Активно</span>-->
+        <!--          </label>-->
+        <!--        </div>-->
+
+        <!-- Submit Button -->
+        <div class="create-dish__actions mt-24">
+          <pizza-lib-button
+            [buttonType]="'submit'"
+            [label]="isLoading() ? 'Создание...' : 'Создать блюдо'"
+            [theme]="'brand'"
+            [disabled]="!dishForm().valid() || isLoading()"
+            [fullWidth]="true"
+          />
+        </div>
+      </form>
+    </div>
+  </div>
+</section>

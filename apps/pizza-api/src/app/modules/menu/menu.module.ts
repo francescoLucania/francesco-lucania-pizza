@@ -6,6 +6,7 @@ import { MenuController } from './menu.controller';
 import { Category, CategorySchema } from './schemas/category.schema';
 import { Menu, MenuSchema } from './schemas/menu.schema';
 import { UserModule } from '../user/user.module';
+import { FileService } from '../../services/file/file.service';
 
 @Module({
   imports: [
@@ -17,6 +18,6 @@ import { UserModule } from '../user/user.module';
     UserModule,
   ],
   controllers: [MenuController],
-  providers: [MenuService],
+  providers: [MenuService, FileService],
 })
 export class MenuModule {}
