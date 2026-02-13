@@ -6,34 +6,33 @@ export type DishDocument = Dish & Document;
 @Schema()
 export class Dish {
   @Prop({ required: true })
-  name: string;
+  public name: string;
 
   @Prop({ required: true })
-  fullName: string;
+  public fullName: string;
 
   @Prop({ required: true })
-  description: string; // html
+  public description: string; // html
 
   @Prop({ required: true })
-  ingredients: string; // html
+  public ingredients: string; // html
 
   @Prop({ required: true })
-  recipe: string; // html
+  public recipe: string; // html
 
   @Prop({ required: true })
-  created: string;
+  public created: string;
 
   @Prop({ required: true, default: false })
-  isActive: boolean;
+  public isActive: boolean;
 
   @Prop({ required: false, default: 'unknown.jpg' })
-  picture: string;
+  public picture: string;
 
-  @Prop({ required: true, default: [] })
-  images: string[];
+  @Prop({ required: false, default: [] })
+  public images: string[];
 
-
-  _id: mongoose.Types.ObjectId;
+  public _id: mongoose.Types.ObjectId;
 }
 
 export const DishSchema = SchemaFactory.createForClass(Dish);

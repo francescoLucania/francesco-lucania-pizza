@@ -1,15 +1,15 @@
-import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { Injectable, inject, signal } from '@angular/core';
 import { UserDataService } from './user-data.service';
+import { PlatformService } from '../platform/platform.service';
 
 const ACCESS_TOKEN_KEY = 'pizza_admin_access_token';
 
 @Injectable({ providedIn: 'root' })
 export class AuthSessionService {
-  private readonly platformId = inject(PLATFORM_ID);
   private readonly userDataService = inject(UserDataService);
+  private readonly platformService = inject(PlatformService);
   private readonly accessTokenSignal = signal<string | null>(null);
-  public readonly authenticated = signal<boolean>(false);
+  public readonly authenticated = signal<boolean | undefined>(undefined);
 
   constructor() {
     this.hydrateFromStorage();
@@ -20,14 +20,16 @@ export class AuthSessionService {
   }
 
   public isAuthenticated(): boolean {
-    return Boolean(this.userDataService.getUserData() && this.authenticated());
+    const userData = this.userDataService.getUserData();
+    // Не считаем аутентифицированным, если userData еще не загружен (undefined)
+    return Boolean(userData !== undefined && userData !== null && this.authenticated());
   }
 
   public setAccessToken(token: string | null): void {
     this.accessTokenSignal.set(token);
     this.authenticated.set(Boolean(token));
 
-    if (!isPlatformBrowser(this.platformId)) {
+    if (!this.platformService.isBrowser()) {
       return;
     }
     if (token) {
@@ -42,7 +44,7 @@ export class AuthSessionService {
   }
 
   private hydrateFromStorage(): void {
-    if (!isPlatformBrowser(this.platformId)) {
+    if (!this.platformService.isBrowser()) {
       return;
     }
     const accessToken = localStorage.getItem(ACCESS_TOKEN_KEY);

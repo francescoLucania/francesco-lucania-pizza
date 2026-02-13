@@ -21,6 +21,14 @@ export const serverRoutes: ServerRoute[] = [
   },
   {
     path: 'profile',
+    renderMode: RenderMode.Client,
+  },
+  {
+    path: 'menu',
     renderMode: RenderMode.Server,
+  },
+  {
+    path: 'create-dish',
+    renderMode: RenderMode.Client,
   },
 ];

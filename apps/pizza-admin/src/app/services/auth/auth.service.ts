@@ -8,23 +8,14 @@ import {
   UserProfile,
 } from '@francesco-lucania-pizza-models';
 import { UserDataService } from './user-data.service';
-
-export type LoginResponse = {
-  accessToken: string;
-  refreshToken?: string;
-  email?: string;
-  phone?: string;
-  fullName?: string;
-  lastActivity?: string;
-  id?: unknown;
-  isActivated?: boolean;
-};
+import {AuthSessionService} from "./auth-session.service";
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   private readonly apiService = inject(ApiService);
+  private readonly session = inject(AuthSessionService);
   private readonly userService = inject(UserDataService);
 
   /**
@@ -41,8 +32,16 @@ export class AuthService {
     );
   }
 
-  public login(body: LoginBody): Observable<LoginResponse> {
-    return this.apiService.post<LoginResponse>('user/login', body);
+  public login(body: LoginBody): Observable<UserProfile> {
+    return this.apiService.post<UserProfile>('user/login', body)
+      .pipe(
+        tap((data) => {
+          if (data.accessToken) {
+            this.session.setAccessToken(data.accessToken);
+          }
+          this.userService.setUserData(data);
+        }),
+      );
   }
 
   public getUserData(): Observable<UserProfile> {
@@ -72,8 +71,8 @@ export class AuthService {
     );
   }
 
-  public refresh(): Observable<LoginResponse> {
-    return this.apiService.get<LoginResponse>('user/refresh');
+  public refresh(): Observable<UserProfile> {
+    return this.apiService.get<UserProfile>('user/refresh');
   }
 
   public logout(): Observable<{ action: string }> {

@@ -40,6 +40,10 @@ export class UserService {
       let picturePath;
       dto.password = await bcrypt.hash(dto.password, 3);
 
+      // Проверяем, есть ли уже пользователи в БД
+      const userCount = await this.userModel.countDocuments();
+      const role = userCount === 0 ? 'admin' : 'guest';
+
       const activationLink = uuidv4();
       const date = new Date().toISOString();
       const creatUser = await this.userModel.create({
@@ -49,6 +53,7 @@ export class UserService {
         activationLink,
         lastActivity: date,
         created: date,
+        role,
       });
 
       console.log('=== ПОЛЬЗОВАТЕЛЬ УСПЕШНО СОЗДАН ===');
@@ -155,6 +160,7 @@ export class UserService {
       created,
       lastActivity,
       picture,
+      role,
     } = user;
 
     return {
@@ -167,6 +173,7 @@ export class UserService {
       created,
       lastActivity,
       picture,
+      role,
     };
   }
 

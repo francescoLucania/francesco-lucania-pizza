@@ -8,6 +8,7 @@ import {
   PopoverComponent,
 } from '@francesco-lucania-pizza/angular-ui';
 import { AuthSessionService } from './services/auth/auth-session.service';
+import {PlatformService} from "./services/platform/platform.service";
 
 @Component({
   imports: [
@@ -23,15 +24,22 @@ import { AuthSessionService } from './services/auth/auth-session.service';
 })
 export class App {
   private readonly session = inject(AuthSessionService);
+  private readonly platformService = inject(PlatformService);
 
-  public readonly navigate = computed<INavigateList[]>(() => {
+
+  public readonly navigate
+    = computed<INavigateList[]>(() => {
     const base: INavigateList[] = [
       { name: 'Главная', uri: '' },
-      { name: 'Меню', uri: 'styles/global' },
+      { name: 'Меню', uri: 'menu' },
       { name: 'Заказы', uri: 'components' },
       { name: 'Пользователи', uri: 'accessibility' },
       { name: 'Контакты', uri: 'Contacts' },
     ];
+
+    if (!this.platformService.isBrowser() || this.session.isAuthenticated() === undefined) {
+      return [...base]
+    }
 
     const authItem: INavigateList = this.session.isAuthenticated()
       ? { name: 'Профиль', uri: 'profile' }

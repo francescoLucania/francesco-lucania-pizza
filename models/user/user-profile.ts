@@ -10,4 +10,7 @@ export type UserProfile = {
   created: string;
   lastActivity: string;
   picture: string;
+  role: 'admin' | 'user' | 'guest';
+  accessToken?: string | undefined;
+  refreshToken?: string | undefined;
 };

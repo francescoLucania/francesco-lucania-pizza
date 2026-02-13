@@ -83,10 +83,16 @@ function handle401Error(
   // Важно: refresh() должен быть вызван здесь, чтобы обновить токен
   // Этот Observable будет подписан автоматически, когда интерцептор вернет его
   return authService.refresh().pipe(
-    switchMap((response: { accessToken: string; refreshToken?: string }) => {
+    switchMap((response: { accessToken?: string; refreshToken?: string }) => {
       isRefreshing = false;
-      session.setAccessToken(response.accessToken);
-      refreshTokenSubject.next(response.accessToken);
+
+      if (response.accessToken) {
+        session.setAccessToken(response.accessToken);
+      }
+
+      if (response.accessToken) {
+        refreshTokenSubject.next(response.accessToken);
+      }
 
       // Повторяем оригинальный запрос с новым токеном
       const newReq = req.clone({

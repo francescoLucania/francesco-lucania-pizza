@@ -3,9 +3,7 @@ import {
   provideBrowserGlobalErrorListeners,
   inject,
   provideAppInitializer,
-  PLATFORM_ID,
 } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
 import {
   provideHttpClient,
   withInterceptors,
@@ -18,8 +16,9 @@ import {
   provideClientHydration,
   withEventReplay,
 } from '@angular/platform-browser';
-import { AuthService } from './services/auth/auth.service';
-import { UserDataService } from './services/auth/user-data.service';
+import { AuthService } from './services/auth';
+import { UserDataService } from './services/auth';
+import { PlatformService } from './services/platform/platform.service';
 import { of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
@@ -36,9 +35,9 @@ export const appConfig: ApplicationConfig = {
       // Inject services directly within the function
       const authService = inject(AuthService);
       const userDataService = inject(UserDataService);
-      const platformId = inject(PLATFORM_ID);
+      const platformService = inject(PlatformService);
 
-      if (isPlatformBrowser(platformId)) {
+      if (platformService.isBrowser()) {
         // Не используем catchError здесь, чтобы интерцептор мог обработать 401 и сделать refresh
         // Ошибки будут обработаны интерцептором, который попытается обновить токен
         return authService.getUserData().pipe(
@@ -50,6 +49,7 @@ export const appConfig: ApplicationConfig = {
           }),
         );
       }
+      // На сервере всегда null (уже установлено в конструкторе UserDataService)
       userDataService.setUserData(null);
       return of(null);
     }),

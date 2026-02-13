@@ -8,6 +8,12 @@ export class ValidationPipe implements PipeTransform<any> {
   public async transform(value: any, metadata: ArgumentMetadata): Promise<any> {
     // Если тип не указан или это примитив/обычный Object (например, multipart/form-data),
     // валидацию не запускаем
+    // Если значение отсутствует вовсе (например, при multipart/form-data
+    // и отсутствии соответствующей части тела), не пытаемся его валидировать
+    if (value === undefined || value === null) {
+      return value;
+    }
+
     const metatype = metadata.metatype as any;
     const isPrimitive =
       !metatype || [String, Boolean, Number, Array, Object].includes(metatype);

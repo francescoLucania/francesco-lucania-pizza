@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import {Component, DestroyRef, inject, OnInit, signal} from '@angular/core';
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonComponent } from '@francesco-lucania-pizza/angular-ui';
@@ -7,6 +7,8 @@ import { AuthSessionService } from '../../services/auth/auth-session.service';
 import { UserProfile } from '@francesco-lucania-pizza-models';
 import { ApiService } from '../../services/api/api.service';
 import { environment } from '../../../environments';
+import {UserDataService} from "../../services/auth";
+import {filter} from "rxjs/operators";
 
 @Component({
   selector: 'pizza-admin-profile',
@@ -14,8 +16,9 @@ import { environment } from '../../../environments';
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
 })
-export class Profile {
+export class Profile implements OnInit {
   private readonly authService = inject(AuthService);
+  private readonly userService = inject(UserDataService);
   private readonly session = inject(AuthSessionService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
@@ -27,13 +30,17 @@ export class Profile {
   protected readonly avatarUploading = signal(false);
   protected readonly avatarError = signal<string | null>(null);
 
-  constructor() {
-    this.authService
-      .getUserData()
-      .pipe(takeUntilDestroyed(this.destroyRef))
+  public ngOnInit(): void {
+    this.userService.userData$
+      .pipe(
+        filter(data => Boolean(data)),
+        takeUntilDestroyed(this.destroyRef)
+      )
       .subscribe({
         next: (data) => {
-          this.profile.set(data);
+          if (data) {
+            this.profile.set(data);
+          }
           this.loading.set(false);
         },
         error: () => {

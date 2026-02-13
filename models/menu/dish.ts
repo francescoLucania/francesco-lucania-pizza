@@ -1,0 +1,16 @@
+export enum DishErrors {
+  NameMustNotBeEmpty = 'NAME_MUST_NOT_BE_EMPTY',
+  FullNameMustNotBeEmpty = 'FULL_NAME_MUST_NOT_BE_EMPTY',
+  DescriptionMustNotBeEmpty = 'DESCRIPTION_MUST_NOT_BE_EMPTY',
+  IngredientsMustNotBeEmpty = 'INGREDIENTS_MUST_NOT_BE_EMPTY',
+  RecipeMustNotBeEmpty = 'RECIPE_MUST_NOT_BE_EMPTY',
+  NameMustBeString = 'NAME_MUST_BE_STRING',
+  FullNameMustBeString = 'FULL_NAME_MUST_BE_STRING',
+  DescriptionMustBeString = 'DESCRIPTION_MUST_BE_STRING',
+  IngredientsMustBeString = 'INGREDIENTS_MUST_BE_STRING',
+  RecipeMustBeString = 'RECIPE_MUST_BE_STRING',
+  PictureMustBeString = 'PICTURE_MUST_BE_STRING',
+  IsActiveMustBeBoolean = 'IS_ACTIVE_MUST_BE_BOOLEAN',
+  ImagesMustBeArray = 'IMAGES_MUST_BE_ARRAY',
+  ImageItemMustBeString = 'IMAGE_ITEM_MUST_BE_STRING',
+}

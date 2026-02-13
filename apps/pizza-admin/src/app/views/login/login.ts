@@ -13,10 +13,13 @@ import {
   ButtonComponent,
   InputComponent,
 } from '@francesco-lucania-pizza/angular-ui';
-import { AuthService, LoginResponse } from '../../services/auth/auth.service';
+import { AuthService } from '../../services/auth';
 import { AuthSessionService } from '../../services/auth/auth-session.service';
+import { UserDataService } from '../../services/auth';
 import { LoginBody, LoginType } from '@francesco-lucania-pizza-models';
 import { normalizePhone } from '@francesco-lucania-pizza/utils';
+import {filter, switchMap, take} from 'rxjs/operators';
+import {tap} from "rxjs";
 
 @Component({
   selector: 'pizza-admin-login',
@@ -27,6 +30,7 @@ import { normalizePhone } from '@francesco-lucania-pizza/utils';
 export class Login implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly session = inject(AuthSessionService);
+  private readonly userDataService = inject(UserDataService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -53,7 +57,7 @@ export class Login implements OnInit {
         const isEmail = loginValue.includes('@');
         const currentLoginType = this.model().loginType;
         const newLoginType = (isEmail ? 'email' : 'phone') as LoginType;
-        
+
         // Обновляем loginType только если он изменился
         if (currentLoginType !== newLoginType) {
           this.model.update((prev) => ({
@@ -66,9 +70,18 @@ export class Login implements OnInit {
   }
 
   public ngOnInit(): void {
-    if (this.session.isAuthenticated()) {
-      this.router.navigateByUrl('/profile');
-    }
+    // Подписываемся на изменения userData и редиректим, когда значение изменится с undefined
+    this.userDataService.userData$
+      .pipe(
+        filter((userData) => userData !== undefined),
+        take(1),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((userData) => {
+        if (this.session.isAuthenticated() && userData) {
+          this.router.navigateByUrl('/profile');
+        }
+      });
   }
 
   protected shouldShowError(
@@ -103,7 +116,7 @@ export class Login implements OnInit {
 
     this.isLoading.set(true);
     const body = this.model();
-    
+
     // Нормализуем телефон перед отправкой, если вход по телефону
     const normalizedBody: LoginBody = {
       ...body,
@@ -112,10 +125,13 @@ export class Login implements OnInit {
 
     this.authService
       .login(normalizedBody)
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(
+        switchMap(() => this.userDataService.userData$),
+        filter(res => Boolean(res)),
+        takeUntilDestroyed(this.destroyRef)
+      )
       .subscribe({
-        next: (res: LoginResponse) => {
-          this.session.setAccessToken(res.accessToken);
+        next: () => {
           this.isLoading.set(false);
           void this.router.navigateByUrl('/profile');
         },

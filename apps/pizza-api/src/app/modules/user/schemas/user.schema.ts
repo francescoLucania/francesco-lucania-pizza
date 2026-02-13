@@ -7,42 +7,50 @@ export type UserDocument = User & Document;
 @Schema()
 export class User {
   @Prop({ unique: true, required: true })
-  email: string;
+  public email: string;
 
   @Prop({ required: true })
-  password: string;
+  public password: string;
 
   @Prop({ unique: true, required: true })
-  phone: string;
+  public phone: string;
 
   @Prop({ required: true })
-  name: string;
+  public name: string;
 
   @Prop({ required: true })
-  fullName: string;
+  public fullName: string;
 
   @Prop({ type: String, required: true })
-  gender: Gender;
+  public gender: Gender;
 
   @Prop({ required: true })
-  dateIssue: string;
+  public dateIssue: string;
 
   @Prop({ required: true })
-  created: string;
+  public created: string;
 
   @Prop({ required: true })
-  lastActivity: string;
+  public lastActivity: string;
 
   @Prop({ required: true, default: false })
-  isActivated: boolean;
+  public isActivated: boolean;
 
   @Prop({ unique: false, required: false })
-  activationLink: string;
+  public activationLink: string;
 
   @Prop({ required: false, default: 'unknown.jpg' })
-  picture: string;
+  public picture: string;
 
-  _id: mongoose.Types.ObjectId;
+  @Prop({
+    type: String,
+    enum: ['admin', 'user', 'guest'],
+    default: 'guest',
+    required: true,
+  })
+  public role: 'admin' | 'user' | 'guest';
+
+  public _id: mongoose.Types.ObjectId;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

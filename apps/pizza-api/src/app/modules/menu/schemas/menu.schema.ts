@@ -6,12 +6,11 @@ export type MenuDocument = Menu & Document;
 
 @Schema()
 export class Menu {
-
   @Prop({ required: true })
-  categories: CategoryDocument[];
-  popular: mongoose.Types.ObjectId[];
-  calendar: CategoryDocument[];
-  _id: mongoose.Types.ObjectId;
+  public categories: CategoryDocument[];
+  public popular: mongoose.Types.ObjectId[];
+  public calendar: CategoryDocument[];
+  public _id: mongoose.Types.ObjectId;
 }
 
 export const MenuSchema = SchemaFactory.createForClass(Menu);

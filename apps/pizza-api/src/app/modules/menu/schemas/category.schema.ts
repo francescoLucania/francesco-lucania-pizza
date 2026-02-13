@@ -6,17 +6,16 @@ export type CategoryDocument = Category & Document;
 
 @Schema()
 export class Category {
+  @Prop({ required: true })
+  public name: string;
 
   @Prop({ required: true })
-  name: string;
+  public description: string;
 
   @Prop({ required: true })
-  description: string;
+  public list: mongoose.Types.ObjectId[];
 
-  @Prop({ required: true })
-  list: mongoose.Types.ObjectId[];
-
-  _id: mongoose.Types.ObjectId;
+  public _id: mongoose.Types.ObjectId;
 }
 
 export const CategorySchema = SchemaFactory.createForClass(Category);
