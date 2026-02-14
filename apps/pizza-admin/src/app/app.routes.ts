@@ -7,7 +7,8 @@ import { Activate } from './views/activate/activate';
 import { Menu } from './views/menu/menu';
 import { authGuard } from './guards/auth.guard';
 import { roleGuard } from './guards/role.guard';
-import {CreateDish} from "./views/create-dish/create-dish";
+import {CreateDish} from "./views/menu/components/create-dish/create-dish";
+import {Categories} from "./views/menu/components/categories/categories";
 
 export const appRoutes: Route[] = [
   {
@@ -36,8 +37,13 @@ export const appRoutes: Route[] = [
     component: Menu,
   },
   {
-    path: 'create-dish',
+    path: 'menu/create-dish',
     component: CreateDish,
+    canActivate: [authGuard, roleGuard],
+  },
+  {
+    path: 'menu/categories',
+    component: Categories,
     canActivate: [authGuard, roleGuard],
   },
 ];

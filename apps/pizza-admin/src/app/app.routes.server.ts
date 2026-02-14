@@ -28,7 +28,11 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Server,
   },
   {
-    path: 'create-dish',
+    path: 'menu/create-dish',
+    renderMode: RenderMode.Client,
+  },
+  {
+    path: 'menu/categories',
     renderMode: RenderMode.Client,
   },
 ];

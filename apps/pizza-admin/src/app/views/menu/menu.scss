@@ -1,0 +1,25 @@
+@use 'libs/francesco-lucania-pizza-ui/assets/styles/theme-provider/theme_provider' as theme;
+
+:host {
+  display: flex;
+}
+
+.menu {
+  flex-grow: 1;
+  width: 100%;
+
+  &__admin-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    align-items: center;
+    padding: 24px 0;
+    border-bottom: 1px solid var(--colorBorder);
+    margin-bottom: 24px;
+  }
+
+  &__admin-link {
+    text-decoration: none;
+    display: inline-block;
+  }
+}

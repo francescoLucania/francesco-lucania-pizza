@@ -1,0 +1,299 @@
+@use '../../../../../../../../libs/francesco-lucania-pizza-ui/assets/styles/theme-provider/theme_provider'
+  as theme;
+
+.categories {
+  max-width: 1200px;
+  margin: 0 auto;
+
+  &__title {
+  }
+
+  &__form {
+    width: 100%;
+  }
+
+  &__label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  &__error {
+    padding: 12px;
+    background-color: var(--colorErrorLight);
+    border-radius: 4px;
+  }
+
+  &__success {
+    padding: 12px;
+    background-color: var(--colorSuccessLight);
+    border-radius: 4px;
+    color: var(--colorSuccess);
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__dishes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 12px;
+    border: 1px solid var(--colorBorder);
+    border-radius: 4px;
+    background-color: var(--colorBackgroundSecondary);
+  }
+
+  &__dish-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: var(--colorBackgroundHover);
+    }
+
+    input[type='checkbox'] {
+      cursor: pointer;
+    }
+  }
+
+  &__list {
+    margin-top: 48px;
+  }
+
+  &__list-title {
+    margin-bottom: 16px;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+  }
+
+  &__card {
+    padding: 16px;
+    border: 1px solid var(--colorBorder);
+    border-radius: 8px;
+    background-color: #fff;
+    transition: box-shadow 0.2s;
+
+    &:hover {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  &__card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 8px;
+  }
+
+  &__card-title {
+    flex: 1;
+    margin: 0;
+  }
+
+  &__card-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  &__action-btn {
+    padding: 6px 12px;
+    border: 1px solid var(--colorBorder);
+    border-radius: 4px;
+    background-color: var(--colorBackground);
+    color: var(--colorText);
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+
+    &:hover:not(:disabled) {
+      background-color: var(--colorBackgroundHover);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    &--danger {
+      color: var(--colorError);
+      border-color: var(--colorError);
+
+      &:hover:not(:disabled) {
+        background-color: var(--colorErrorLight);
+      }
+    }
+  }
+
+  &__card-description {
+    color: var(--colorTextSecondary);
+  }
+
+  &__card-dishes {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--colorBorder);
+  }
+
+  &__dishes-list-small {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    li {
+      padding: 4px 8px;
+      background-color: var(--colorBackground);
+      border-radius: 4px;
+    }
+  }
+
+  &__add-dish {
+    margin-bottom: 16px;
+  }
+
+  &__add-dish-input {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  &__dish-id-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--colorBorder);
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: var(--colorBackground);
+    color: var(--colorText);
+
+    &:focus {
+      outline: none;
+      border-color: var(--colorPrimary);
+      box-shadow: 0 0 0 2px var(--colorPrimaryLight);
+    }
+  }
+
+  &__selected-dishes {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--colorBorder);
+  }
+
+  &__selected-dishes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__selected-dish-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background-color: var(--colorBackgroundSecondary);
+    border-radius: 4px;
+    border: 1px solid var(--colorBorder);
+  }
+
+  &__dish-id {
+    font-family: monospace;
+    font-size: 12px;
+  }
+
+  &__remove-dish-btn {
+    margin-left: auto;
+    padding: 4px 8px;
+    border: none;
+    background-color: transparent;
+    color: var(--colorError);
+    cursor: pointer;
+    font-size: 20px;
+    line-height: 1;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: var(--colorErrorLight);
+    }
+  }
+
+  &__all-dishes {
+    margin-top: 48px;
+    padding-top: 48px;
+    border-top: 2px solid var(--colorBorder);
+  }
+
+  &__dishes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 16px;
+  }
+
+  &__dish-card {
+    position: relative;
+    padding: 16px;
+    border: 1px solid var(--colorBorder);
+    border-radius: 8px;
+    background-color: var(--colorBackgroundSecondary);
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      border-color: var(--colorPrimary);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transform: translateY(-2px);
+    }
+
+    &--selected {
+      border-color: var(--colorSuccess);
+      background-color: var(--colorSuccessLight);
+    }
+  }
+
+  &__dish-card-content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__dish-card-name {
+    margin: 0;
+    color: var(--colorText);
+  }
+
+  &__dish-card-id {
+    margin-top: 4px;
+    font-family: monospace;
+    word-break: break-all;
+  }
+
+  &__dish-card-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    padding: 4px 8px;
+    background-color: var(--colorSuccess);
+    color: #fff;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+}

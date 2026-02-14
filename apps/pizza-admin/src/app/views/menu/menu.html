@@ -1,0 +1,51 @@
+<div class="menu">
+  @if (isAdmin()) {
+  <section class="section">
+    <div class="container">
+      <div class="menu__admin-actions">
+        <pizza-lib-button
+          [label]="'Создать блюдо'"
+          [theme]="'brand'"
+          [link]="'/menu/create-dish'"
+        />
+
+        <pizza-lib-button
+          [label]="'Создать категорию'"
+          [theme]="'brand'"
+          [link]="'/menu/categories'"
+        />
+      </div>
+    </div>
+  </section>
+  }
+
+  <section class="section">
+    <div class="container">
+      <h2 class="heading-h2 text-center">Популярное:</h2>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2 class="heading-h2 text-center">Пицца:</h2>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2 class="heading-h2 text-center">Паста:</h2>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2 class="heading-h2 text-center">Казан/Мангал:</h2>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2 class="heading-h2 text-center">Суп:</h2>
+    </div>
+  </section>
+</div>

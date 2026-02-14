@@ -10,12 +10,18 @@ import {
   UseInterceptors,
   UploadedFiles,
   Get,
+  Query,
+  Param,
+  Put,
+  Delete,
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { MenuService } from './menu.service';
 import { AuthGuard } from '../../guards/auth/auth';
 import { ValidationPipe } from '../../pipes/validation/validation';
 import { CreateDishDto } from './dto/create-dish.dto';
+import { GetDishesDto } from './dto/get-dishes.dto';
+import { CreateCategoryDto } from './dto/create-category.dto';
 import { FileService, FileType } from '../../services/file/file.service';
 
 @Controller('/menu')
@@ -92,5 +98,171 @@ export class MenuController {
   @Get('/deleteAllDishes')
   public deleteAllDishes() {
     return this.menuService.deleteAllDishes();
+  }
+
+  @Get('/dishes')
+  @UsePipes(ValidationPipe)
+  public async getAllDishes(
+    @Query() query: GetDishesDto,
+    @Response() response,
+  ) {
+    try {
+      const result = await this.menuService.getAllDishes(
+        query.limit,
+        query.skip,
+      );
+      return response.send(result);
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: e.status || HttpStatus.INTERNAL_SERVER_ERROR,
+          error: e.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: e,
+        },
+      );
+    }
+  }
+
+  @UseGuards(AuthGuard)
+  @UsePipes(ValidationPipe)
+  @Post('/category')
+  public async createCategory(
+    @Body() dto: CreateCategoryDto,
+    @Response() response,
+  ) {
+    try {
+      const category = await this.menuService.addCategory(dto);
+      return response.send(category);
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: e.status || HttpStatus.INTERNAL_SERVER_ERROR,
+          error: e.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: e,
+        },
+      );
+    }
+  }
+
+  @Get('/categories')
+  public async getAllCategories(@Response() response) {
+    try {
+      const categories = await this.menuService.getAllCategories();
+      return response.send(categories);
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: e.status || HttpStatus.INTERNAL_SERVER_ERROR,
+          error: e.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: e,
+        },
+      );
+    }
+  }
+
+  @Get('/category/:id')
+  public async getCategoryById(
+    @Param('id') id: string,
+    @Response() response,
+  ) {
+    try {
+      const category = await this.menuService.getCategoryById(id);
+      if (!category) {
+        throw new HttpException(
+          {
+            status: HttpStatus.NOT_FOUND,
+            error: 'Category not found',
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      return response.send(category);
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: e.status || HttpStatus.INTERNAL_SERVER_ERROR,
+          error: e.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: e,
+        },
+      );
+    }
+  }
+
+  @UseGuards(AuthGuard)
+  @UsePipes(ValidationPipe)
+  @Put('/category/:id')
+  public async updateCategory(
+    @Param('id') id: string,
+    @Body() dto: Partial<CreateCategoryDto>,
+    @Response() response,
+  ) {
+    try {
+      const category = await this.menuService.updateCategory(id, dto);
+      if (!category) {
+        throw new HttpException(
+          {
+            status: HttpStatus.NOT_FOUND,
+            error: 'Category not found',
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      return response.send(category);
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: e.status || HttpStatus.INTERNAL_SERVER_ERROR,
+          error: e.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: e,
+        },
+      );
+    }
+  }
+
+  @UseGuards(AuthGuard)
+  @Delete('/category/:id')
+  public async deleteCategory(
+    @Param('id') id: string,
+    @Response() response,
+  ) {
+    try {
+      const deleted = await this.menuService.deleteCategory(id);
+      if (!deleted) {
+        throw new HttpException(
+          {
+            status: HttpStatus.NOT_FOUND,
+            error: 'Category not found',
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      return response.send({ success: true });
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: e.status || HttpStatus.INTERNAL_SERVER_ERROR,
+          error: e.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: e,
+        },
+      );
+    }
   }
 }
