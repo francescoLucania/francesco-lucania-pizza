@@ -5,7 +5,7 @@ module.exports = {
   output: {
     path: join(__dirname, '../../dist/apps/pizza-api'),
     clean: true,
-    ...(process.env.NODE_ENV !== 'production' && {
+    ...(process.env.MODE !== 'PROD' && {
       devtoolModuleFilenameTemplate: '[absolute-resource-path]',
     }),
   },

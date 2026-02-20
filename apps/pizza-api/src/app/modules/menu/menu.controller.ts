@@ -21,6 +21,7 @@ import { AuthGuard } from '../../guards/auth/auth';
 import { ValidationPipe } from '../../pipes/validation/validation';
 import { CreateDishDto } from './dto/create-dish.dto';
 import { GetDishesDto } from './dto/get-dishes.dto';
+import { GetDishesByCategoryDto } from './dto/get-dishes-by-category.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { FileService, FileType } from '../../services/file/file.service';
 
@@ -108,6 +109,33 @@ export class MenuController {
   ) {
     try {
       const result = await this.menuService.getAllDishes(
+        query.limit,
+        query.skip,
+      );
+      return response.send(result);
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: e.status || HttpStatus.INTERNAL_SERVER_ERROR,
+          error: e.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: e,
+        },
+      );
+    }
+  }
+
+  @Get('/dishes/category')
+  @UsePipes(ValidationPipe)
+  public async getDishesByCategory(
+    @Query() query: GetDishesByCategoryDto,
+    @Response() response,
+  ) {
+    try {
+      const result = await this.menuService.getDishesByCategoryName(
+        query.categoryName,
         query.limit,
         query.skip,
       );

@@ -1,9 +1,17 @@
 <section class="section">
   <div class="container">
     <div class="categories">
-      <h1 class="categories__title heading-h1">
-        {{ editingCategoryId() ? 'Редактировать категорию' : 'Создать категорию' }}
-      </h1>
+      <div class="categories__header">
+        <h1 class="categories__title heading-h1">Категории</h1>
+        @if (!isCreating() && !editingCategoryId()) {
+        <pizza-lib-button
+          [buttonType]="'button'"
+          [label]="'Создать категорию'"
+          [theme]="'brand'"
+          (click)="startCreate()"
+        />
+        }
+      </div>
 
       @if (errorText()) {
       <div class="categories__error text-base-small color-error mt-16">
@@ -15,7 +23,11 @@
       </div>
       }
 
+      @if (isCreating() || editingCategoryId()) {
       <form (ngSubmit)="onSubmit()" class="categories__form mt-24">
+        <h2 class="categories__form-title heading-h2">
+          {{ editingCategoryId() ? 'Редактировать категорию' : 'Создать категорию' }}
+        </h2>
         <!-- Name -->
         <div class="mt-16">
           <label for="name" class="categories__label">Название</label>
@@ -56,80 +68,84 @@
           }
         </div>
 
-        <!-- Dishes List -->
-        <div class="mt-16">
-          <label class="categories__label">Блюда в категории</label>
-          
-          @if (editingCategoryId()) {
-          <!-- Add Dish by ID (only when editing) -->
-          <div class="categories__add-dish mt-8">
-            <div class="categories__add-dish-input">
-              <input
-                type="text"
-                class="categories__dish-id-input"
-                [value]="dishIdInput()"
-                (input)="dishIdInput.set($any($event.target).value)"
-                placeholder="Введите ID блюда или нажмите на блюдо ниже"
-              />
-              <pizza-lib-button
-                [buttonType]="'button'"
-                [label]="'Добавить'"
-                [theme]="'brand'"
-                (click)="addDishById()"
-                [disabled]="!dishIdInput().trim()"
-              />
-            </div>
-          </div>
-          }
 
-          <div class="categories__dishes-list mt-8">
-            @if (dishes().length === 0) {
-            <p class="text-base-small color-text-secondary">
-              Загрузка блюд...
-            </p>
-            } @else {
-            @for (dish of dishes(); track dish._id) {
-            <label class="categories__dish-item">
-              <input
-                type="checkbox"
-                [checked]="isDishSelected(dish._id)"
-                (change)="toggleDishInList(dish._id)"
-              />
-              <span class="ml-8">{{ dish.name || dish.fullName }}</span>
-            </label>
-            }
-            }
-          </div>
+        @if (editingCategoryId()) {
 
-          <!-- Selected Dishes List (only when editing) -->
-          @if (editingCategoryId() && categoryModel().list.length > 0) {
-          <div class="categories__selected-dishes mt-16">
-            <p class="categories__label text-base-small">Добавленные блюда:</p>
-            <div class="categories__selected-dishes-list mt-8">
-              @for (dishId of categoryModel().list; track dishId) {
-              <div class="categories__selected-dish-item">
-                <span class="text-base-small">{{ getDishName(dishId) }}</span>
-                <span class="categories__dish-id text-base-small color-text-secondary">
-                  (ID: {{ dishId }})
-                </span>
-                <button
-                  type="button"
-                  class="categories__remove-dish-btn"
-                  (click)="removeDishFromList(dishId)"
-                  title="Удалить из категории"
-                >
-                  ×
-                </button>
+          <div class="mt-16">
+            <label class="categories__label">Доступные блюда</label>
+
+            @if (editingCategoryId()) {
+              <!-- Add Dish by ID (only when editing) -->
+              <div class="categories__add-dish mt-8">
+                <div class="categories__add-dish-input">
+                  <pizza-lib-input
+                    type="text"
+                    [value]="dishIdInput()"
+                    (input)="onDishIdInputChange($event)"
+                    placeholder="Введите ID блюда или нажмите на блюдо ниже"
+                    [size]="'large'"
+                  />
+                  <pizza-lib-button
+                    [buttonType]="'button'"
+                    [label]="'Добавить'"
+                    [theme]="'brand'"
+                    (click)="addDishById()"
+                    [disabled]="!dishIdInput().trim()"
+                  />
+                </div>
               </div>
+            }
+
+
+
+            <div class="categories__dishes-list mt-8">
+              @if (dishes().length === 0) {
+                <p class="text-base-small color-text-secondary">
+                  Загрузка блюд...
+                </p>
+              } @else {
+                @for (dish of dishes(); track dish._id) {
+                  <div class="categories__dish-item">
+                    <pizza-lib-checkbox
+                      [checked]="isDishSelected(dish._id)"
+                      [value]="dish._id"
+                      [label]="dish.name || dish.fullName"
+                      (changed)="toggleDishInList($event)"
+                    />
+                  </div>
+                }
               }
             </div>
+
+            <!-- Selected Dishes List (only when editing) -->
+            @if (editingCategoryId() && categoryModel().list.length > 0) {
+              <div class="categories__selected-dishes mt-16">
+                <p class="categories__label text-base-small">Добавленные блюда:</p>
+                <div class="categories__selected-dishes-list mt-8">
+                  @for (dishId of categoryModel().list; track dishId) {
+                    <div class="categories__selected-dish-item">
+                      <span class="text-base-small">{{ getDishName(dishId) }}</span>
+                      <span class="categories__dish-id text-base-small color-text-secondary">
+                  (ID: {{ dishId }})
+                </span>
+                      <button
+                        type="button"
+                        class="categories__remove-dish-btn"
+                        (click)="removeDishFromList(dishId)"
+                        title="Удалить из категории"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
           </div>
-          }
-        </div>
+        }
 
         <!-- Submit Button -->
         <div class="categories__actions mt-24">
-          @if (editingCategoryId()) {
           <pizza-lib-button
             [buttonType]="'button'"
             [label]="'Отмена'"
@@ -137,7 +153,6 @@
             (click)="cancelEdit()"
             [disabled]="isLoading()"
           />
-          }
           <pizza-lib-button
             [buttonType]="'submit'"
             [label]="
@@ -149,10 +164,14 @@
             "
             [theme]="'brand'"
             [disabled]="!categoryForm().valid() || isLoading()"
-            [fullWidth]="!editingCategoryId()"
+            [fullWidth]="isCreating()"
           />
         </div>
+
+        <!-- Dishes List -->
+
       </form>
+      }
 
       <!-- Categories List -->
       <div class="categories__list mt-48">
@@ -161,21 +180,18 @@
         </h2>
 
         @if (isLoading() && categories().length === 0) {
-        <p class="text-base-small color-text-secondary mt-16">
+        <p class="text-base-small color-text-secondary mt-32">
           Загрузка категорий...
         </p>
         } @else if (categories().length === 0) {
-        <p class="text-base-small color-text-secondary mt-16">
+        <p class="text-base-small color-text-secondary mt-32">
           Категории не найдены
         </p>
         } @else {
-        <div class="categories__grid mt-16">
+        <div class="categories__grid mt-32">
           @for (category of categories(); track category._id) {
           <div class="categories__card">
             <div class="categories__card-header">
-              <h3 class="categories__card-title heading-h3">
-                {{ category.name }}
-              </h3>
               <div class="categories__card-actions">
                 <button
                   class="categories__action-btn"
@@ -192,6 +208,10 @@
                   {{ isDeleting() === category._id ? 'Удаление...' : 'Удалить' }}
                 </button>
               </div>
+
+              <h3 class="categories__card-title heading-h3">
+                {{ category.name }}
+              </h3>
             </div>
             <p class="categories__card-description text-base mt-8">
               {{ category.description }}

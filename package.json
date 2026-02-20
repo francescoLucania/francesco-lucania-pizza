@@ -5,7 +5,7 @@
   "scripts": {
     "serve pizza-store": "nx dev pizza-store",
     "serve pizza-admin": "nx serve pizza-admin",
-    "serve backend": "nx serve pizza-api",
+    "serve backend": "nx serve pizza-api --watch",
     "build:pizza-store": "nx build pizza-store",
     "build:pizza-admin": "nx build pizza-admin",
     "build:pizza-admin:prod": "nx build pizza-admin --configuration=production",

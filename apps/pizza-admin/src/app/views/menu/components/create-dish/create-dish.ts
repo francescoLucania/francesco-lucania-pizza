@@ -13,7 +13,7 @@ import {
   InputComponent,
   ButtonComponent,
 } from '@francesco-lucania-pizza/angular-ui';
-import { ApiService } from '../../../../services/api/api.service';
+import { MenuService } from '../../services/menu.service';
 
 interface CreateDishForm {
   name: string;
@@ -32,7 +32,7 @@ interface CreateDishForm {
   styleUrl: './create-dish.scss',
 })
 export class CreateDish {
-  private readonly apiService = inject(ApiService);
+  private readonly menuService = inject(MenuService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -131,12 +131,8 @@ export class CreateDish {
     };
 
     const request$ = formValue.picture
-      ? this.apiService.uploadFile('/menu/create', {
-          file: formValue.picture,
-          fieldName: 'picture',
-          additionalData: baseData,
-        })
-      : this.apiService.post('/menu/create', baseData);
+      ? this.menuService.createDishWithImage$(baseData, formValue.picture)
+      : this.menuService.createDish$(baseData);
 
     request$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {

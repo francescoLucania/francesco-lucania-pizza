@@ -1,5 +1,5 @@
 <div class="menu">
-  @if (isAdmin()) {
+  @if (browserService.isBrowser && isAdmin()) {
   <section class="section">
     <div class="container">
       <div class="menu__admin-actions">
@@ -19,33 +19,55 @@
   </section>
   }
 
-  <section class="section">
-    <div class="container">
-      <h2 class="heading-h2 text-center">Популярное:</h2>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="container">
-      <h2 class="heading-h2 text-center">Пицца:</h2>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="container">
-      <h2 class="heading-h2 text-center">Паста:</h2>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="container">
-      <h2 class="heading-h2 text-center">Казан/Мангал:</h2>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="container">
-      <h2 class="heading-h2 text-center">Суп:</h2>
-    </div>
-  </section>
+  @if (isLoadingCategories()) {
+    <section class="section">
+      <div class="container">
+        <div class="menu__loading">
+          <p class="text-base-small color-text-secondary">Загрузка меню...</p>
+        </div>
+      </div>
+    </section>
+  } @else {
+    @for (categoryData of categoriesWithDishes(); track categoryData.category._id) {
+      <section class="section">
+        <div class="container">
+          <h2 class="heading-h2 text-center">{{ categoryData.category.name }}:</h2>
+          @if (categoryData.category.description) {
+            <p class="menu__category-description text-base-small color-text-secondary text-center">
+              {{ categoryData.category.description }}
+            </p>
+          }
+          @if (categoryData.isLoading) {
+            <div class="menu__loading">
+              <p class="text-base-small color-text-secondary">Загрузка блюд...</p>
+            </div>
+          } @else if (categoryData.dishes.length === 0) {
+            <div class="menu__empty">
+              <p class="text-base-small color-text-secondary">В этой категории пока нет блюд</p>
+            </div>
+          } @else {
+            <div class="menu__dishes-grid">
+              @for (dish of categoryData.dishes; track dish._id) {
+                <div class="menu__dish-card">
+                  @if (dish.picture) {
+                    <div class="menu__dish-image">
+                      <img [src]="getDishImageUrl(dish.picture)" [alt]="dish.name || dish.fullName" />
+                    </div>
+                  }
+                  <div class="menu__dish-content">
+                    <h3 class="menu__dish-name heading-h4">
+                      {{ dish.name || dish.fullName }}
+                    </h3>
+                    @if (dish.description) {
+                      <div class="menu__dish-description text-base-small" [innerHTML]="dish.description"></div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </section>
+    }
+  }
 </div>

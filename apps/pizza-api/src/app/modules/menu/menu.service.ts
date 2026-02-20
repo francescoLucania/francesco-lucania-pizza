@@ -93,4 +93,51 @@ export class MenuService {
     const result = await this.categoryModel.findByIdAndDelete(id).exec();
     return !!result;
   }
+
+  public async getDishesByCategoryName(
+    categoryName: string,
+    limit?: number,
+    skip?: number,
+  ): Promise<{ dishes: DishDocument[]; total: number }> {
+    // Находим категорию по названию
+    const category = await this.categoryModel
+      .findOne({ name: categoryName })
+      .exec();
+
+    if (!category) {
+      return {
+        dishes: [],
+        total: 0,
+      };
+    }
+
+    // Преобразуем массив строк в ObjectId
+    const dishIds = category.list.map(
+      (id) => new mongoose.Types.ObjectId(id),
+    );
+
+    // Подсчитываем общее количество блюд в категории
+    const total = dishIds.length;
+
+    // Создаем запрос для поиска блюд по ID
+    const query = this.dishModel.find({
+      _id: { $in: dishIds },
+    });
+
+    // Применяем пагинацию
+    if (skip !== undefined) {
+      query.skip(skip);
+    }
+
+    if (limit !== undefined) {
+      query.limit(limit);
+    }
+
+    const dishes = await query.exec();
+
+    return {
+      dishes,
+      total,
+    };
+  }
 }

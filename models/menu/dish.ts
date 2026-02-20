@@ -14,3 +14,30 @@ export enum DishErrors {
   ImagesMustBeArray = 'IMAGES_MUST_BE_ARRAY',
   ImageItemMustBeString = 'IMAGE_ITEM_MUST_BE_STRING',
 }
+
+export type Dish = {
+  _id: string;
+  name: string;
+  fullName: string;
+  description?: string;
+  ingredients?: string;
+  recipe?: string;
+  created?: string;
+  isActive?: boolean;
+  picture?: string;
+  images?: string[];
+};
+
+export type CreateDishDto = {
+  name: string;
+  fullName: string;
+  description: string;
+  ingredients: string;
+  recipe: string;
+  isActive: boolean;
+};
+
+export type DishesResponse = {
+  dishes: Dish[];
+  total: number;
+};

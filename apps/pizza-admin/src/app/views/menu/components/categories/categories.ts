@@ -12,27 +12,16 @@ import { FormField } from '@angular/forms/signals';
 import {
   InputComponent,
   ButtonComponent,
+  CheckboxComponent,
 } from '@francesco-lucania-pizza/angular-ui';
-import { ApiService } from '../../../../services/api/api.service';
 import { CommonModule } from '@angular/common';
+import { MenuService } from '../../services/menu.service';
+import type { Category, Dish } from '@francesco-lucania-pizza-models';
 
 interface CategoryForm {
   name: string;
   description: string;
   list: string[];
-}
-
-interface Category {
-  _id: string;
-  name: string;
-  description: string;
-  list: string[];
-}
-
-interface Dish {
-  _id: string;
-  name: string;
-  fullName: string;
 }
 
 @Component({
@@ -42,13 +31,14 @@ interface Dish {
     FormField,
     InputComponent,
     ButtonComponent,
+    CheckboxComponent,
     CommonModule,
   ],
   templateUrl: './categories.html',
   styleUrl: './categories.scss',
 })
 export class Categories implements OnInit {
-  private readonly apiService = inject(ApiService);
+  private readonly menuService = inject(MenuService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -61,6 +51,7 @@ export class Categories implements OnInit {
   protected readonly editingCategoryId = signal<string | null>(null);
   protected readonly isDeleting = signal<string | null>(null);
   protected readonly dishIdInput = signal<string>('');
+  protected readonly isCreating = signal<boolean>(false);
 
   protected readonly categoryModel = signal<CategoryForm>({
     name: '',
@@ -120,8 +111,8 @@ export class Categories implements OnInit {
 
   protected loadCategories(): void {
     this.isLoading.set(true);
-    this.apiService
-      .get<Category[]>('/menu/categories')
+    this.menuService
+      .getCategories$()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (categories) => {
@@ -138,8 +129,8 @@ export class Categories implements OnInit {
   }
 
   protected loadDishes(): void {
-    this.apiService
-      .get<{ dishes: Dish[]; total: number }>('/menu/dishes')
+    this.menuService
+      .getDishes$()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
@@ -170,6 +161,7 @@ export class Categories implements OnInit {
 
   protected startEdit(category: Category): void {
     this.editingCategoryId.set(category._id);
+    this.isCreating.set(false);
     this.categoryModel.set({
       name: category.name,
       description: category.description,
@@ -182,6 +174,22 @@ export class Categories implements OnInit {
   }
 
   protected cancelEdit(): void {
+    this.editingCategoryId.set(null);
+    this.isCreating.set(false);
+    this.categoryModel.set({
+      name: '',
+      description: '',
+      list: [],
+    });
+    this.dishIdInput.set('');
+    this.errorText.set(null);
+    this.successMessage.set(null);
+    this.submitted.set(false);
+    this.touchedFields.set(new Set());
+  }
+
+  protected startCreate(): void {
+    this.isCreating.set(true);
     this.editingCategoryId.set(null);
     this.categoryModel.set({
       name: '',
@@ -209,8 +217,8 @@ export class Categories implements OnInit {
     const categoryId = this.editingCategoryId();
 
     const request$ = categoryId
-      ? this.apiService.put(`/menu/category/${categoryId}`, formValue)
-      : this.apiService.post('/menu/category', formValue);
+      ? this.menuService.updateCategory$(categoryId, formValue)
+      : this.menuService.createCategory$(formValue);
 
     request$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
@@ -223,6 +231,7 @@ export class Categories implements OnInit {
         this.loadCategories();
         setTimeout(() => {
           this.cancelEdit();
+          this.isCreating.set(false);
         }, 2000);
       },
       error: (error) => {
@@ -241,8 +250,8 @@ export class Categories implements OnInit {
     }
 
     this.isDeleting.set(categoryId);
-    this.apiService
-      .delete(`/menu/category/${categoryId}`)
+    this.menuService
+      .deleteCategory$(categoryId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
@@ -306,5 +315,12 @@ export class Categories implements OnInit {
       const list = model.list.filter((id) => id !== dishId);
       return { ...model, list };
     });
+  }
+
+  protected onDishIdInputChange(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    if (target) {
+      this.dishIdInput.set(target.value);
+    }
   }
 }
