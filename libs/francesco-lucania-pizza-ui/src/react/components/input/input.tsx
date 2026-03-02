@@ -5,6 +5,7 @@ import styles from './input.module.scss';
 export type InputProps = {
   onInput?: (value: string) => void;
   value?: string | number;
+  id?: string;
   name?: string;
   formControlName?: string;
   type?: string; // password, email, number итд
@@ -21,6 +22,7 @@ export type InputProps = {
   invalid?: boolean;
   size?: 'small' | 'base' | 'large';
   autoFocus?: boolean;
+  required?: boolean;
   maskitoOptions?: MaskitoOptions;
   phoneMask?: MaskitoOptions;
 };
@@ -51,6 +53,7 @@ const defaultPhoneMask: MaskitoOptions = {
 export const PizzaReactInput: React.FC<InputProps> = ({
   onInput,
   value,
+  id,
   name,
   formControlName,
   type = 'text',
@@ -67,6 +70,7 @@ export const PizzaReactInput: React.FC<InputProps> = ({
   invalid = false,
   size = 'base',
   autoFocus = false,
+  required = false,
   maskitoOptions,
   phoneMask = defaultPhoneMask,
 }) => {
@@ -121,6 +125,7 @@ export const PizzaReactInput: React.FC<InputProps> = ({
 
   const sharedProps = {
     value: displayValue,
+    id,
     name,
     placeholder,
     tabIndex: tabIndexValue,
@@ -130,6 +135,7 @@ export const PizzaReactInput: React.FC<InputProps> = ({
     minLength: minLengthValue,
     maxLength: maxLengthValue,
     autoFocus,
+    required,
     autoComplete: autocomplete ? 'on' : 'off',
     onInput: commitOnInput ? handleInput : undefined,
     onChange: commitOnInput ? undefined : handleInput,

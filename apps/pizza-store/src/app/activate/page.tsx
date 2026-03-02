@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { Suspense, useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useActivateMutation } from '../../store/api/userApi';
@@ -140,5 +140,9 @@ function ActivateForm() {
 }
 
 export default function ActivatePage() {
-  return <ActivateForm />;
+  return (
+    <Suspense fallback={<div className={styles['activate-page']}>Загрузка...</div>}>
+      <ActivateForm />
+    </Suspense>
+  );
 }
