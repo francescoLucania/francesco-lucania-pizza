@@ -127,6 +127,34 @@ export class MenuController {
     }
   }
 
+  @Get('/dish/:id')
+  public async getDishById(@Param('id') id: string, @Response() response) {
+    try {
+      const dish = await this.menuService.getDishById(id);
+      if (!dish) {
+        throw new HttpException(
+          {
+            status: HttpStatus.NOT_FOUND,
+            error: 'Dish not found',
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      return response.send(dish);
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: e.status || HttpStatus.INTERNAL_SERVER_ERROR,
+          error: e.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: e,
+        },
+      );
+    }
+  }
+
   @Get('/dishes/category')
   @UsePipes(ValidationPipe)
   public async getDishesByCategory(
@@ -214,6 +242,88 @@ export class MenuController {
         );
       }
       return response.send(category);
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: e.status || HttpStatus.INTERNAL_SERVER_ERROR,
+          error: e.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: e,
+        },
+      );
+    }
+  }
+
+  @UseGuards(AuthGuard)
+  @UsePipes(ValidationPipe)
+  @Put('/dish/:id')
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: 'picture', maxCount: 1 }]),
+  )
+  public async updateDish(
+    @Param('id') id: string,
+    @UploadedFiles() files,
+    @Body() dto: Partial<CreateDishDto>,
+    @Response() response,
+  ) {
+    try {
+      const file = files?.picture?.[0];
+      const data: Partial<CreateDishDto & { picture: string }> = file
+        ? {
+            ...dto,
+            picture: this.fileService.createFile(
+              FileType.IMAGE,
+              file,
+              'menu/dishes',
+            ),
+          }
+        : dto;
+
+      const dish = await this.menuService.updateDish(id, data);
+
+      if (!dish) {
+        throw new HttpException(
+          {
+            status: HttpStatus.NOT_FOUND,
+            error: 'Dish not found',
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      return response.send(dish);
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: e.status || HttpStatus.INTERNAL_SERVER_ERROR,
+          error: e.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: e,
+        },
+      );
+    }
+  }
+
+  @UseGuards(AuthGuard)
+  @Delete('/dish/:id')
+  public async deleteDish(@Param('id') id: string, @Response() response) {
+    try {
+      const deleted = await this.menuService.deleteDish(id);
+      if (!deleted) {
+        throw new HttpException(
+          {
+            status: HttpStatus.NOT_FOUND,
+            error: 'Dish not found',
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      return response.send({ success: true });
     } catch (e) {
       throw new HttpException(
         {

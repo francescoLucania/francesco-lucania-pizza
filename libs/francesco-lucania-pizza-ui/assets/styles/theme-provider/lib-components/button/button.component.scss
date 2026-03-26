@@ -2,8 +2,14 @@
 @use '../../theme_provider' as theme;
 @use '../../common/accessibility/mixins/actions' as actions;
 
+:host {
+  display: block;
+}
+
 .pizza-ui-button {
   @include button.reset-buttons-styles;
+
+  display: block;
   padding: var(--buttonPaddingTopBase) var(--buttonPaddingRightBase)
     var(--buttonPaddingBottomBase) var(--buttonPaddingLeftBase);
   font-size: 16px;

@@ -32,6 +32,14 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Client,
   },
   {
+    path: 'menu/edit-dish/:id',
+    renderMode: RenderMode.Client,
+  },
+  {
+    path: 'menu/dish/:id',
+    renderMode: RenderMode.Server,
+  },
+  {
     path: 'menu/categories',
     renderMode: RenderMode.Client,
   },

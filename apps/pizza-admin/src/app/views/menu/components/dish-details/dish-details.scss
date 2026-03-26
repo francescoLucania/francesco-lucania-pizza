@@ -1,0 +1,40 @@
+@use '../../../../../../../../libs/francesco-lucania-pizza-ui/assets/styles/theme-provider/theme_provider'
+  as theme;
+
+.dish-details {
+  max-width: 800px;
+  margin: 0 auto;
+
+  &__error {
+    padding: 12px;
+    background-color: var(--colorErrorLight);
+    border-radius: 4px;
+  }
+
+  &__image-wrap {
+    width: 100%;
+    display: flex;
+  }
+
+  &__image {
+    width: 100%;
+    max-width: 500px;
+    border-radius: 8px;
+    object-fit: cover;
+  }
+
+  &__actions {
+    @include theme.mq(sm) {
+      * {
+        &:not(:first-child) {
+          margin-top: 8px;
+        }
+      }
+    }
+
+    @include theme.mq(md) {
+      display: flex;
+      gap: 12px;
+    }
+  }
+}

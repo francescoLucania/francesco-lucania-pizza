@@ -1,0 +1,54 @@
+<section class="section">
+  <div class="container">
+    <div class="dish-details">
+      @if (isLoading()) {
+        <p class="text-base-small color-text-secondary">Загрузка блюда...</p>
+      } @else if (errorText()) {
+        <div class="dish-details__error text-base-small color-error">
+          {{ errorText() }}
+        </div>
+      } @else if (dish(); as currentDish) {
+        <h1 class="heading-h1">{{ currentDish.name || currentDish.fullName }}</h1>
+
+        <div class="dish-details__image-wrap mt-24">
+          <img
+            class="dish-details__image"
+            [src]="getDishImageUrl(currentDish.picture)"
+            [alt]="currentDish.name || currentDish.fullName"
+          />
+        </div>
+
+        <div class="dish-details__content mt-24">
+          <h3 class="heading-h3">Полное название</h3>
+          <p class="text-base-small mt-8">{{ currentDish.fullName }}</p>
+
+          <h3 class="heading-h3 mt-24">Описание</h3>
+          <p class="text-base-small mt-8">{{ currentDish.description || '-' }}</p>
+
+          <h3 class="heading-h3 mt-24">Ингредиенты</h3>
+          <p class="text-base-small mt-8">{{ currentDish.ingredients || '-' }}</p>
+
+          <h3 class="heading-h3 mt-24">Рецепт</h3>
+          <p class="text-base-small mt-8">{{ currentDish.recipe || '-' }}</p>
+        </div>
+
+        @if (isAdmin()) {
+          <div class="dish-details__actions mt-24">
+            <pizza-lib-button
+              [fullWidth]="true"
+              [label]="'Редактировать блюдо'"
+              [theme]="'brand'"
+              [link]="'/menu/edit-dish/' + currentDish._id"
+            />
+            <pizza-lib-button
+              [fullWidth]="true"
+              [label]="isDeleting() ? 'Удаление...' : 'Удалить блюдо'"
+              [disabled]="isDeleting()"
+              (click)="deleteDish()"
+            />
+          </div>
+        }
+      }
+    </div>
+  </div>
+</section>

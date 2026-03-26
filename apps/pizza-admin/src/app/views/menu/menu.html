@@ -48,14 +48,16 @@
           } @else {
             <div class="menu__dishes-grid">
               @for (dish of categoryData.dishes; track dish._id) {
+                <div class="menu__dish-card">
+                  <pizza-lib-product-card
+                    [title]="dish.name || dish.fullName"
+                    [description]="dish.description"
+                    [image]="getDishImageUrl(dish.picture)"
+                    [moreLink]="'/menu/dish/' + dish._id"
+                  >
+                  </pizza-lib-product-card>
 
-                <pizza-lib-product-card
-                  [title]="dish.name || dish.fullName"
-                  [description]="dish.description"
-                  [image]="getDishImageUrl(dish.picture)"
-                  [moreLink]="'product/' + dish._id"
-                >
-                </pizza-lib-product-card>
+                </div>
 
               }
             </div>

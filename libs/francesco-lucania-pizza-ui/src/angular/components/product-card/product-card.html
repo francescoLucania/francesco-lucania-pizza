@@ -27,14 +27,19 @@
 
   <footer class="product-card__footer">
     @if (moreLink()) {
-      <pizza-lib-button
-        [size]="'large'"
-        [fullWidth]="true"
-        [link]="moreLink()"
-        [fullCardClick]="!!moreLink()"
-      >
-        Подробнее
-      </pizza-lib-button>
+      <div>
+        <pizza-lib-button
+          [size]="'large'"
+          [fullWidth]="true"
+          [link]="moreLink()"
+          [fullCardClick]="!!moreLink()"
+        >
+          Подробнее
+        </pizza-lib-button>
+      </div>
+      <div>
+        <ng-content></ng-content>
+      </div>
     }
      </footer>
 </article>

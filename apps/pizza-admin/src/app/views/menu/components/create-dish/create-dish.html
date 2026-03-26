@@ -1,7 +1,9 @@
 <section class="section">
   <div class="container">
     <div class="create-dish">
-      <h1 class="create-dish__title heading-h1">Добавить блюдо</h1>
+      <h1 class="create-dish__title heading-h1">
+        {{ isEditMode() ? 'Редактировать блюдо' : 'Добавить блюдо' }}
+      </h1>
 
       @if (errorText()) {
       <div class="create-dish__error text-base-small color-error mt-16">
@@ -121,7 +123,8 @@
         <!-- Picture -->
         <div class="mt-16">
           <label for="picture" class="create-dish__label"
-            >Изображение блюда</label
+            >Изображение блюда
+            {{ isEditMode() ? '(оставьте пустым, чтобы не менять)' : '' }}</label
           >
           <input
             class="create-dish__file-input mt-4"
@@ -149,7 +152,15 @@
         <div class="create-dish__actions mt-24">
           <pizza-lib-button
             [buttonType]="'submit'"
-            [label]="isLoading() ? 'Создание...' : 'Создать блюдо'"
+            [label]="
+              isLoading()
+                ? isEditMode()
+                  ? 'Сохранение...'
+                  : 'Создание...'
+                : isEditMode()
+                  ? 'Сохранить изменения'
+                  : 'Создать блюдо'
+            "
             [theme]="'brand'"
             [disabled]="!dishForm().valid() || isLoading()"
             [fullWidth]="true"

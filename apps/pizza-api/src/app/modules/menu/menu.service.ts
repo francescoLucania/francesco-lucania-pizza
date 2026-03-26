@@ -55,6 +55,36 @@ export class MenuService {
     };
   }
 
+  public async getDishById(id: string): Promise<DishDocument | null> {
+    return this.dishModel.findById(id).exec();
+  }
+
+  public async updateDish(
+    id: string,
+    data: Partial<{
+      name: string;
+      fullName: string;
+      description: string;
+      ingredients: string;
+      recipe: string;
+      isActive: boolean;
+      picture: string;
+    }>,
+  ): Promise<DishDocument | null> {
+    return this.dishModel.findByIdAndUpdate(id, data, { new: true }).exec();
+  }
+
+  public async deleteDish(id: string): Promise<boolean> {
+    const result = await this.dishModel.findByIdAndDelete(id).exec();
+
+    if (!result) {
+      return false;
+    }
+
+    await this.categoryModel.updateMany({}, { $pull: { list: id } }).exec();
+    return true;
+  }
+
   public async addCategory(data: {
     name: string;
     description: string;

@@ -92,12 +92,12 @@ export class MenuService {
    * Получает все блюда с пагинацией
    */
   public getDishes$(params?: GetDishesParams): Observable<DishesResponse> {
-    const queryParams: { [key: string]: any } = {};
+    const queryParams: { limit?: number; skip?: number } = {};
     if (params?.limit !== undefined) {
-      queryParams['limit'] = params.limit;
+      queryParams.limit = params.limit;
     }
     if (params?.skip !== undefined) {
-      queryParams['skip'] = params.skip;
+      queryParams.skip = params.skip;
     }
 
     return this.apiService.get<DishesResponse>('/menu/dishes', {
@@ -118,14 +118,18 @@ export class MenuService {
       return of(loadedDishes);
     }
 
-    const queryParams: { [key: string]: any } = {
+    const queryParams: {
+      categoryName: string;
+      limit?: number;
+      skip?: number;
+    } = {
       categoryName: params.categoryName,
     };
     if (params.limit !== undefined) {
-      queryParams['limit'] = params.limit;
+      queryParams.limit = params.limit;
     }
     if (params.skip !== undefined) {
-      queryParams['skip'] = params.skip;
+      queryParams.skip = params.skip;
     }
 
     return this.apiService.get<DishesResponse>('/menu/dishes/category', {
@@ -161,5 +165,46 @@ export class MenuService {
       additionalData: data,
     };
     return this.apiService.uploadFile<Dish>('/menu/create', uploadOptions);
+  }
+
+  /**
+   * Получает блюдо по ID
+   */
+  public getDishById$(id: string): Observable<Dish> {
+    return this.apiService.get<Dish>(`/menu/dish/${id}`);
+  }
+
+  /**
+   * Обновляет существующее блюдо
+   */
+  public updateDish$(id: string, data: Partial<CreateDishDto>): Observable<Dish> {
+    return this.apiService.put<Dish>(`/menu/dish/${id}`, data);
+  }
+
+  /**
+   * Обновляет блюдо с загрузкой нового изображения
+   */
+  public updateDishWithImage$(
+    id: string,
+    data: Partial<CreateDishDto>,
+    picture: File,
+  ): Observable<Dish> {
+    const formData = new FormData();
+    formData.append('picture', picture, picture.name);
+
+    Object.entries(data).forEach(([key, value]) => {
+      if (value !== null && value !== undefined) {
+        formData.append(key, String(value));
+      }
+    });
+
+    return this.apiService.put<Dish>(`/menu/dish/${id}`, formData);
+  }
+
+  /**
+   * Удаляет блюдо
+   */
+  public deleteDish$(id: string): Observable<void> {
+    return this.apiService.delete<void>(`/menu/dish/${id}`);
   }
 }
