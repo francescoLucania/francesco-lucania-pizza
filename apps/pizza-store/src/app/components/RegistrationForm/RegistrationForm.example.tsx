@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { useRegisterMutation } from '../../store/api/userApi';
-import { useAppDispatch } from '../../store/hooks';
-import { setUser, setToken } from '../../store/slices/userSlice';
+import { useRegisterMutation } from '../../../store/api/userApi';
+import { useAppDispatch } from '../../../store/hooks';
+import { setUser } from '../../../store/slices/userSlice';
 import type { RegistrationBody } from '@francesco-lucania-pizza-models';
 
 /**
@@ -29,9 +29,7 @@ export function RegistrationFormExample() {
 
     try {
       const response = await register(formData).unwrap();
-      
-      // После успешной регистрации можно:
-      // 1. Сохранить данные пользователя в store
+
       dispatch(
         setUser({
           id: response.id,
@@ -40,16 +38,9 @@ export function RegistrationFormExample() {
         })
       );
 
-      // 2. Если есть токен, сохранить его
-      // dispatch(setToken(token));
-
-      // 3. Перенаправить на страницу входа или профиля
-      // router.push('/login');
-      
       console.log('Регистрация успешна:', response);
     } catch (err) {
       console.error('Ошибка регистрации:', err);
-      // Обработать ошибку (показать сообщение пользователю)
     }
   };
 

@@ -48,15 +48,17 @@ export function MyComponent() {
 ```tsx
 'use client';
 
-import { useGetMenuQuery } from '@/store/api/menuApi';
+import { useGetCategoriesQuery, useGetDishesByCategoryQuery } from '@/store/api/menuApi';
 
 export function MenuComponent() {
-  const { data, isLoading, error } = useGetMenuQuery();
+  const { data: categories, isLoading: categoriesLoading } = useGetCategoriesQuery();
+  const { data: dishesData, isLoading: dishesLoading } = useGetDishesByCategoryQuery({
+    categoryName: 'Пицца',
+  });
 
-  if (isLoading) return <div>Загрузка...</div>;
-  if (error) return <div>Ошибка</div>;
+  if (categoriesLoading || dishesLoading) return <div>Загрузка...</div>;
 
-  return <div>{/* Рендер меню */}</div>;
+  return <div>{/* Рендер меню по категориям и блюдам */}</div>;
 }
 ```
 

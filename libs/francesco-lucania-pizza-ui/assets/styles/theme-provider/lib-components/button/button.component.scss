@@ -80,4 +80,13 @@
     display: block;
     width: 100%;
   }
+
+  &--full-card-click {
+    &::before {
+      content: '';
+      z-index: 0;
+      position: absolute;
+      inset: 0;
+    }
+  }
 }

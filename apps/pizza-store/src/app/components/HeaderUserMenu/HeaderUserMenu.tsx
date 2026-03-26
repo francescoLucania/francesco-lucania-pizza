@@ -1,8 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { useAppSelector } from '../store/hooks';
-import StoreProvider from '../store/provider';
+import { useAppSelector } from '../../../store/hooks';
 import styles from './HeaderUserMenu.module.scss';
 
 export type HeaderUserMenuProps = {
@@ -10,7 +9,7 @@ export type HeaderUserMenuProps = {
   activePath?: string;
 };
 
-const HeaderUserMenuContent: React.FC<HeaderUserMenuProps> = ({
+export const HeaderUserMenu: React.FC<HeaderUserMenuProps> = ({
   useNextLink = false,
   activePath,
 }) => {
@@ -32,13 +31,11 @@ const HeaderUserMenuContent: React.FC<HeaderUserMenuProps> = ({
 
   React.useEffect(() => {
     if (useNextLink) {
-      // Dynamic import for Next.js Link
       import('next/link')
         .then((module) => {
           setLinkComponent(() => module.default);
         })
         .catch(() => {
-          // Next.js not available
           setLinkComponent(null);
         });
     }
@@ -60,11 +57,5 @@ const HeaderUserMenuContent: React.FC<HeaderUserMenuProps> = ({
 
   return <li className={styles['header-user-menu']}>{linkContent}</li>;
 };
-
-export const HeaderUserMenu: React.FC<HeaderUserMenuProps> = (props) => (
-  <StoreProvider>
-    <HeaderUserMenuContent {...props} />
-  </StoreProvider>
-);
 
 export default HeaderUserMenu;

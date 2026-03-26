@@ -1,7 +1,7 @@
 'use client';
 
 import { Header, INavigateList } from '@francesco-lucania-pizza/react-ui';
-import HeaderUserMenu from '../header-user-menu/HeaderUserMenu';
+import HeaderUserMenu from '../HeaderUserMenu/HeaderUserMenu';
 
 const navigationItems: INavigateList[] = [
   { name: 'Главная', uri: '/' },

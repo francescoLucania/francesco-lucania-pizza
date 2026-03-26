@@ -27,7 +27,8 @@ export class ButtonComponent {
   public disabled = input<boolean>(false);
   public buttonType = input<'submit' | 'reset' | 'button'>('button');
 
-  public link = input<string>('');
+  public link = input<string | undefined>('');
+  public fullCardClick = input<boolean>(false);
   public target = input<'_blank' | '_self' | '_parent' | '_top'>('_self');
 
   public title = input<string | undefined>(undefined);

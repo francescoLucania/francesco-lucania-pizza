@@ -23,6 +23,7 @@ export class UserDataService {
   }
 
   public setUserData(userData: UserProfile | null | undefined): void {
+    console.log('setUserData', userData);
     this.userDataSubject.next(userData);
   }
 }

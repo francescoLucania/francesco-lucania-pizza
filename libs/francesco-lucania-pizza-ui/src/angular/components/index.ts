@@ -7,3 +7,4 @@ export * from './header/';
 export * from './modal/';
 export * from './popover';
 export * from './navigate-list';
+export * from './product-card';

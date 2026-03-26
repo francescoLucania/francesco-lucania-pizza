@@ -1,0 +1,40 @@
+<article class="product-card"
+         tabindex="0"
+         [ngClass]="{'product-card--link': moreLink()}"
+>
+  <header class="product-card__header">
+    @if (image()) {
+      <div class="product-card__image">
+        <img [src]="image()"
+             [alt]="title()"
+             aria-hidden="true"
+        >
+      </div>
+    }
+    @if (title()) {
+      <h3 class="product-card__title mt-16 heading-h3">{{ title() }}</h3>
+    }
+  </header>
+
+  <div class="product-card__body">
+
+    @if (description()) {
+      <div class="product-card__description">
+        {{ description() }}
+      </div>
+    }
+  </div>
+
+  <footer class="product-card__footer">
+    @if (moreLink()) {
+      <pizza-lib-button
+        [size]="'large'"
+        [fullWidth]="true"
+        [link]="moreLink()"
+        [fullCardClick]="!!moreLink()"
+      >
+        Подробнее
+      </pizza-lib-button>
+    }
+     </footer>
+</article>

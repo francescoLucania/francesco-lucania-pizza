@@ -2,7 +2,7 @@ import { Component, inject, computed, signal, OnInit, DestroyRef } from '@angula
 import { RouterModule } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { UserDataService } from '../../services/auth/user-data.service';
-import {BrowserService, ButtonComponent} from '@francesco-lucania-pizza/angular-ui';
+import {BrowserService, ButtonComponent, ProductCard} from '@francesco-lucania-pizza/angular-ui';
 import { CommonModule } from '@angular/common';
 import { MenuService } from './services/menu.service';
 import type { Category, Dish } from '@francesco-lucania-pizza-models';
@@ -16,7 +16,7 @@ interface CategoryWithDishes {
 
 @Component({
   selector: 'app-menu',
-  imports: [RouterModule, ButtonComponent, CommonModule],
+  imports: [RouterModule, ButtonComponent, CommonModule, ProductCard],
   templateUrl: './menu.html',
   styleUrl: './menu.scss',
 })

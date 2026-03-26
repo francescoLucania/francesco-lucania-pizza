@@ -33,7 +33,7 @@
         <div class="container">
           <h2 class="heading-h2 text-center">{{ categoryData.category.name }}:</h2>
           @if (categoryData.category.description) {
-            <p class="menu__category-description text-base-small color-text-secondary text-center">
+            <p class="text-base-small color-text-secondary text-center mt-16">
               {{ categoryData.category.description }}
             </p>
           }
@@ -48,21 +48,15 @@
           } @else {
             <div class="menu__dishes-grid">
               @for (dish of categoryData.dishes; track dish._id) {
-                <div class="menu__dish-card">
-                  @if (dish.picture) {
-                    <div class="menu__dish-image">
-                      <img [src]="getDishImageUrl(dish.picture)" [alt]="dish.name || dish.fullName" />
-                    </div>
-                  }
-                  <div class="menu__dish-content">
-                    <h3 class="menu__dish-name heading-h4">
-                      {{ dish.name || dish.fullName }}
-                    </h3>
-                    @if (dish.description) {
-                      <div class="menu__dish-description text-base-small" [innerHTML]="dish.description"></div>
-                    }
-                  </div>
-                </div>
+
+                <pizza-lib-product-card
+                  [title]="dish.name || dish.fullName"
+                  [description]="dish.description"
+                  [image]="getDishImageUrl(dish.picture)"
+                  [moreLink]="'product/' + dish._id"
+                >
+                </pizza-lib-product-card>
+
               }
             </div>
           }

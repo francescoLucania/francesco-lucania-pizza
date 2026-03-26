@@ -1,6 +1,6 @@
 import './global.scss';
-import { AppHeader } from '../components/app-header/AppHeader';
-import { Providers } from '../components/Providers';
+import { AppHeader } from './components/AppHeader/AppHeader';
+import { Providers } from './components/Providers/Providers';
 
 export const metadata = {
   title: 'Welcome to pizza-store',
