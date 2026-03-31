@@ -5,8 +5,22 @@ import {
   useGetDishesByCategoryQuery,
 } from '../../../store/api/menuApi';
 import type { Category } from '@francesco-lucania-pizza-models';
-import { ProductCard } from '../ProductCard/ProductCard';
+import { PizzaReactProductCard } from '@francesco-lucania-pizza/react-ui';
 import styles from './MenuContent.module.scss';
+
+const staticBaseUrl =
+  process.env.NEXT_PUBLIC_STATIC_URL ||
+  (typeof window !== 'undefined'
+    ? ''
+    : process.env.NEXT_PUBLIC_API_URL?.replace(/\/api\/?$/, '') ||
+      'http://localhost:5000');
+
+function getDishImageUrl(picture: string | undefined): string {
+  if (!picture) {
+    return `${staticBaseUrl}/image/menu/dishes/unknown.jpg`;
+  }
+  return `${staticBaseUrl}/${picture}`;
+}
 
 function CategorySection({ category }: { category: Category }) {
   const { data, isLoading } = useGetDishesByCategoryQuery({
@@ -15,20 +29,40 @@ function CategorySection({ category }: { category: Category }) {
   const dishes = data?.dishes ?? [];
 
   return (
-    <section className={styles.section}>
-      <div className={styles.container}>
-        <h2 className={styles.heading}>{category.name}:</h2>
+    <section className={styles['pizza-ui-menu-page__section']}>
+      <div className={styles['pizza-ui-menu-page__container']}>
+        <h2 className={styles['pizza-ui-menu-page__heading']}>
+          {category.name}:
+        </h2>
         {category.description && (
-          <p className={styles.categoryDescription}>{category.description}</p>
+          <p className={styles['pizza-ui-menu-page__category-description']}>
+            {category.description}
+          </p>
         )}
         {isLoading ? (
-          <div className={styles.loading}>Загрузка блюд...</div>
+          <div className={styles['pizza-ui-menu-page__state']}>
+            Загрузка блюд...
+          </div>
         ) : dishes.length === 0 ? (
-          <div className={styles.empty}>В этой категории пока нет блюд</div>
+          <div className={styles['pizza-ui-menu-page__state']}>
+            В этой категории пока нет блюд
+          </div>
         ) : (
-          <div className={styles.dishesGrid}>
+          <div className={styles['pizza-ui-menu-page__dishes-grid']}>
             {dishes.map((dish) => (
-              <ProductCard key={dish._id} dish={dish} />
+              <PizzaReactProductCard
+                key={dish._id}
+                title={dish.name || dish.fullName}
+                image={dish.picture ? getDishImageUrl(dish.picture) : undefined}
+                moreLink={`/dishes/${dish._id}`}
+                description={
+                  dish.description ? (
+                    <div
+                      dangerouslySetInnerHTML={{ __html: dish.description }}
+                    />
+                  ) : undefined
+                }
+              />
             ))}
           </div>
         )}
@@ -42,10 +76,12 @@ export function MenuContent() {
 
   if (isLoading) {
     return (
-      <div className={styles.wrapper}>
-        <section className={styles.section}>
-          <div className={styles.container}>
-            <div className={styles.loading}>Загрузка меню...</div>
+      <div className={styles['pizza-ui-menu-page__wrapper']}>
+        <section className={styles['pizza-ui-menu-page__section']}>
+          <div className={styles['pizza-ui-menu-page__container']}>
+            <div className={styles['pizza-ui-menu-page__state']}>
+              Загрузка меню...
+            </div>
           </div>
         </section>
       </div>
@@ -54,10 +90,12 @@ export function MenuContent() {
 
   if (error) {
     return (
-      <div className={styles.wrapper}>
-        <section className={styles.section}>
-          <div className={styles.container}>
-            <div className={styles.error}>
+      <div className={styles['pizza-ui-menu-page__wrapper']}>
+        <section className={styles['pizza-ui-menu-page__section']}>
+          <div className={styles['pizza-ui-menu-page__container']}>
+            <div
+              className={`${styles['pizza-ui-menu-page__state']} ${styles['pizza-ui-menu-page__state--error']}`}
+            >
               Не удалось загрузить меню. Попробуйте обновить страницу.
             </div>
           </div>
@@ -68,10 +106,12 @@ export function MenuContent() {
 
   if (!categories?.length) {
     return (
-      <div className={styles.wrapper}>
-        <section className={styles.section}>
-          <div className={styles.container}>
-            <div className={styles.empty}>Меню пока пусто</div>
+      <div className={styles['pizza-ui-menu-page__wrapper']}>
+        <section className={styles['pizza-ui-menu-page__section']}>
+          <div className={styles['pizza-ui-menu-page__container']}>
+            <div className={styles['pizza-ui-menu-page__state']}>
+              Меню пока пусто
+            </div>
           </div>
         </section>
       </div>
@@ -79,7 +119,7 @@ export function MenuContent() {
   }
 
   return (
-    <div className={styles.wrapper}>
+    <div className={styles['pizza-ui-menu-page__wrapper']}>
       {categories.map((category) => (
         <CategorySection key={category._id} category={category} />
       ))}

@@ -14,8 +14,10 @@ import {
   Param,
   Put,
   Delete,
+  Req,
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { Request } from 'express';
 import { MenuService } from './menu.service';
 import { AuthGuard } from '../../guards/auth/auth';
 import { ValidationPipe } from '../../pipes/validation/validation';
@@ -24,12 +26,14 @@ import { GetDishesDto } from './dto/get-dishes.dto';
 import { GetDishesByCategoryDto } from './dto/get-dishes-by-category.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { FileService, FileType } from '../../services/file/file.service';
+import { TokenService } from '../user/services/token/token.service';
 
 @Controller('/menu')
 export class MenuController {
   constructor(
     private menuService: MenuService,
     private fileService: FileService,
+    private tokenService: TokenService,
   ) {}
 
   @UseGuards(AuthGuard)
@@ -56,9 +60,7 @@ export class MenuController {
   @UseGuards(AuthGuard)
   @UsePipes(ValidationPipe)
   @Post('/create')
-  @UseInterceptors(
-    FileFieldsInterceptor([{ name: 'picture', maxCount: 1 }]),
-  )
+  @UseInterceptors(FileFieldsInterceptor([{ name: 'picture', maxCount: 1 }]))
   public async create(
     @UploadedFiles() files,
     @Body() dto: CreateDishDto,
@@ -68,17 +70,16 @@ export class MenuController {
       // Если передана картинка, сохраняем её по аналогии с аватаром
       const file = files?.picture?.[0];
 
-      const data: CreateDishDto | (CreateDishDto & { picture: string }) =
-        file
-          ? {
-              ...dto,
-              picture: this.fileService.createFile(
-                FileType.IMAGE,
-                file,
-                'menu/dishes',
-              ),
-            }
-          : dto;
+      const data: CreateDishDto | (CreateDishDto & { picture: string }) = file
+        ? {
+            ...dto,
+            picture: this.fileService.createFile(
+              FileType.IMAGE,
+              file,
+              'menu/dishes',
+            ),
+          }
+        : dto;
 
       const dish = await this.menuService.addDish(data);
       return response.send(dish);
@@ -128,7 +129,11 @@ export class MenuController {
   }
 
   @Get('/dish/:id')
-  public async getDishById(@Param('id') id: string, @Response() response) {
+  public async getDishById(
+    @Param('id') id: string,
+    @Req() request: Request,
+    @Response() response,
+  ) {
     try {
       const dish = await this.menuService.getDishById(id);
       if (!dish) {
@@ -140,7 +145,22 @@ export class MenuController {
           HttpStatus.NOT_FOUND,
         );
       }
-      return response.send(dish);
+
+      const token = request?.headers?.authorization?.split(' ')?.[1];
+      const decoded = token
+        ? this.tokenService.validateToken('ACCESS_TOKEN', token)
+        : null;
+      const isAdmin = decoded?.role === 'admin';
+
+      if (isAdmin) {
+        return response.send(dish);
+      }
+
+      const { recipe: _recipe, ...dishWithoutRecipe } = JSON.parse(
+        JSON.stringify(dish),
+      );
+
+      return response.send(dishWithoutRecipe);
     } catch (e) {
       throw new HttpException(
         {
@@ -226,10 +246,7 @@ export class MenuController {
   }
 
   @Get('/category/:id')
-  public async getCategoryById(
-    @Param('id') id: string,
-    @Response() response,
-  ) {
+  public async getCategoryById(@Param('id') id: string, @Response() response) {
     try {
       const category = await this.menuService.getCategoryById(id);
       if (!category) {
@@ -259,9 +276,7 @@ export class MenuController {
   @UseGuards(AuthGuard)
   @UsePipes(ValidationPipe)
   @Put('/dish/:id')
-  @UseInterceptors(
-    FileFieldsInterceptor([{ name: 'picture', maxCount: 1 }]),
-  )
+  @UseInterceptors(FileFieldsInterceptor([{ name: 'picture', maxCount: 1 }]))
   public async updateDish(
     @Param('id') id: string,
     @UploadedFiles() files,
@@ -374,10 +389,7 @@ export class MenuController {
 
   @UseGuards(AuthGuard)
   @Delete('/category/:id')
-  public async deleteCategory(
-    @Param('id') id: string,
-    @Response() response,
-  ) {
+  public async deleteCategory(@Param('id') id: string, @Response() response) {
     try {
       const deleted = await this.menuService.deleteCategory(id);
       if (!deleted) {

@@ -1,8 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  input,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 import { RouterLink } from '@angular/router';
 import { NgTemplateOutlet } from '@angular/common';
@@ -16,6 +12,9 @@ import { NgTemplateOutlet } from '@angular/common';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink, NgTemplateOutlet],
+  host: {
+    '[class.full-width]': 'fullWidth()',
+  },
 })
 export class ButtonComponent {
   public label = input<string | undefined>(undefined);

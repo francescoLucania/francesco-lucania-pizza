@@ -1,6 +1,7 @@
 import { baseApi } from './baseApi';
 import type {
   Category,
+  Dish,
   DishesResponse,
   GetDishesParams,
   GetDishesByCategoryParams,
@@ -57,6 +58,10 @@ export const menuApi = baseApi.injectEndpoints({
             ]
           : [{ type: 'Menu', id: `CATEGORY-${categoryName}` }],
     }),
+    getDishById: builder.query<Dish, string>({
+      query: (id) => `/menu/dish/${id}`,
+      providesTags: (_result, _error, id) => [{ type: 'Menu', id }],
+    }),
   }),
 });
 
@@ -65,4 +70,5 @@ export const {
   useGetCategoryByIdQuery,
   useGetDishesQuery,
   useGetDishesByCategoryQuery,
+  useGetDishByIdQuery,
 } = menuApi;
