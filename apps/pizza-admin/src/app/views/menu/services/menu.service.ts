@@ -1,6 +1,9 @@
 import { inject, Injectable } from '@angular/core';
-import {BehaviorSubject, Observable, of, tap} from 'rxjs';
-import { ApiService, FileUploadOptions } from '../../../services/api/api.service';
+import { BehaviorSubject, Observable, of, tap } from 'rxjs';
+import {
+  ApiService,
+  FileUploadOptions,
+} from '../../../services/api/api.service';
 import type {
   Category,
   Dish,
@@ -28,17 +31,24 @@ export class MenuService {
   /**
    * Observable для подписки на изменения dishesByCategory
    */
-  public readonly dishesByCategory$ = this.dishesByCategorySubject$.asObservable();
+  public readonly dishesByCategory$ =
+    this.dishesByCategorySubject$.asObservable();
 
   /**
    * BehaviorSubject для хранения списка категорий
    */
-  private readonly categoriesSubject$ = new BehaviorSubject<Category[] | null>(null);
+  private readonly categoriesSubject$ = new BehaviorSubject<Category[] | null>(
+    null,
+  );
 
   /**
    * Observable для подписки на изменения categories
    */
   public readonly categories$ = this.categoriesSubject$.asObservable();
+
+  private invalidateDishesByCategoryCache(): void {
+    this.dishesByCategorySubject$.next({});
+  }
 
   /**
    * Получает все категории
@@ -68,7 +78,11 @@ export class MenuService {
    * Создает новую категорию
    */
   public createCategory$(data: CreateCategoryDto): Observable<Category> {
-    return this.apiService.post<Category>('/menu/category', data);
+    return this.apiService.post<Category>('/menu/category', data).pipe(
+      tap(() => {
+        this.invalidateDishesByCategoryCache();
+      }),
+    );
   }
 
   /**
@@ -78,14 +92,22 @@ export class MenuService {
     id: string,
     data: UpdateCategoryDto,
   ): Observable<Category> {
-    return this.apiService.put<Category>(`/menu/category/${id}`, data);
+    return this.apiService.put<Category>(`/menu/category/${id}`, data).pipe(
+      tap(() => {
+        this.invalidateDishesByCategoryCache();
+      }),
+    );
   }
 
   /**
    * Удаляет категорию
    */
   public deleteCategory$(id: string): Observable<void> {
-    return this.apiService.delete<void>(`/menu/category/${id}`);
+    return this.apiService.delete<void>(`/menu/category/${id}`).pipe(
+      tap(() => {
+        this.invalidateDishesByCategoryCache();
+      }),
+    );
   }
 
   /**
@@ -111,8 +133,8 @@ export class MenuService {
   public getDishesByCategory$(
     params: GetDishesByCategoryParams,
   ): Observable<DishesResponse> {
-
-    const loadedDishes = this.dishesByCategorySubject$.getValue()[params.categoryName];
+    const loadedDishes =
+      this.dishesByCategorySubject$.getValue()[params.categoryName];
 
     if (loadedDishes) {
       return of(loadedDishes);
@@ -132,24 +154,30 @@ export class MenuService {
       queryParams.skip = params.skip;
     }
 
-    return this.apiService.get<DishesResponse>('/menu/dishes/category', {
-      params: queryParams,
-    }).pipe(
-      tap((response) => {
-        const currentValue = this.dishesByCategorySubject$.value;
-        this.dishesByCategorySubject$.next({
-          ...currentValue,
-          [params.categoryName]: response,
-        });
-      }),
-    );
+    return this.apiService
+      .get<DishesResponse>('/menu/dishes/category', {
+        params: queryParams,
+      })
+      .pipe(
+        tap((response) => {
+          const currentValue = this.dishesByCategorySubject$.value;
+          this.dishesByCategorySubject$.next({
+            ...currentValue,
+            [params.categoryName]: response,
+          });
+        }),
+      );
   }
 
   /**
    * Создает новое блюдо
    */
   public createDish$(data: CreateDishDto): Observable<Dish> {
-    return this.apiService.post<Dish>('/menu/create', data);
+    return this.apiService.post<Dish>('/menu/create', data).pipe(
+      tap(() => {
+        this.invalidateDishesByCategoryCache();
+      }),
+    );
   }
 
   /**
@@ -164,7 +192,11 @@ export class MenuService {
       fieldName: 'picture',
       additionalData: data,
     };
-    return this.apiService.uploadFile<Dish>('/menu/create', uploadOptions);
+    return this.apiService.uploadFile<Dish>('/menu/create', uploadOptions).pipe(
+      tap(() => {
+        this.invalidateDishesByCategoryCache();
+      }),
+    );
   }
 
   /**
@@ -177,8 +209,15 @@ export class MenuService {
   /**
    * Обновляет существующее блюдо
    */
-  public updateDish$(id: string, data: Partial<CreateDishDto>): Observable<Dish> {
-    return this.apiService.put<Dish>(`/menu/dish/${id}`, data);
+  public updateDish$(
+    id: string,
+    data: Partial<CreateDishDto>,
+  ): Observable<Dish> {
+    return this.apiService.put<Dish>(`/menu/dish/${id}`, data).pipe(
+      tap(() => {
+        this.invalidateDishesByCategoryCache();
+      }),
+    );
   }
 
   /**
@@ -198,13 +237,21 @@ export class MenuService {
       }
     });
 
-    return this.apiService.put<Dish>(`/menu/dish/${id}`, formData);
+    return this.apiService.put<Dish>(`/menu/dish/${id}`, formData).pipe(
+      tap(() => {
+        this.invalidateDishesByCategoryCache();
+      }),
+    );
   }
 
   /**
    * Удаляет блюдо
    */
   public deleteDish$(id: string): Observable<void> {
-    return this.apiService.delete<void>(`/menu/dish/${id}`);
+    return this.apiService.delete<void>(`/menu/dish/${id}`).pipe(
+      tap(() => {
+        this.invalidateDishesByCategoryCache();
+      }),
+    );
   }
 }
