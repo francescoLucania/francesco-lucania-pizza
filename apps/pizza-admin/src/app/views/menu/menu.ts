@@ -28,6 +28,8 @@ export class Menu implements OnInit {
 
   protected readonly isAdmin = computed(() => {
     const userData = this.userDataService.getUserData();
+
+    console.log('isAdmin userData', userData)
     return userData?.role === 'admin';
   });
 

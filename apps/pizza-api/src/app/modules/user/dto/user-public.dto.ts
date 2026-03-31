@@ -6,6 +6,7 @@ export class UserDto {
   fullName: string;
   lastActivity: string;
   phone: string;
+  role: 'admin' | 'user' | 'guest';
   id: mongoose.Types.ObjectId;
   isActivated: boolean;
   refreshToken: string;
@@ -16,6 +17,7 @@ export class UserDto {
     this.phone = model.phone;
     this.fullName = model.fullName;
     this.lastActivity = model.lastActivity;
+    this.role = model.role;
     this.id = model._id;
     this.isActivated = model.isActivated;
   }

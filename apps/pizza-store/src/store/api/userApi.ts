@@ -12,6 +12,7 @@ export interface LoginResponse {
   fullName: string;
   lastActivity: string;
   phone: string;
+  role: 'admin' | 'user' | 'guest';
   id: string;
   isActivated: boolean;
 }
