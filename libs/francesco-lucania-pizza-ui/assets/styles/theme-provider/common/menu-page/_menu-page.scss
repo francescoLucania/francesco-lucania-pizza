@@ -1,8 +1,6 @@
 @use '../../core/mixins/mixins' as mixins;
 
 .pizza-ui-menu-page {
-  text-align: center;
-
   &__wrapper {
     width: 100%;
   }
@@ -53,61 +51,5 @@
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 24px;
     margin-top: 32px;
-  }
-}
-
-.pizza-ui-dish-details {
-  max-width: 800px;
-  margin: 0 auto;
-
-  &__error {
-    padding: 12px;
-    color: var(--colorError);
-    background-color: var(--colorErrorLight);
-    border-radius: 4px;
-  }
-
-  &__image-wrap {
-    width: 100%;
-    display: flex;
-  }
-
-  &__image {
-    width: 100%;
-    max-width: 500px;
-    border-radius: 8px;
-    object-fit: cover;
-  }
-
-  &__content {
-    color: var(--colorBase);
-  }
-
-  &__text {
-    margin: 0;
-    color: var(--colorBase);
-
-    p {
-      margin: 0 0 8px;
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
-  }
-
-  &__actions {
-    @include mixins.mq(sm) {
-      * {
-        &:not(:first-child) {
-          margin-top: 8px;
-        }
-      }
-    }
-
-    @include mixins.mq(md) {
-      display: flex;
-      gap: 12px;
-    }
   }
 }
