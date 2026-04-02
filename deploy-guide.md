@@ -401,8 +401,8 @@ cd /var/www/html/francesco-lucania-pizza
 # Соберите на сервере (см. раздел 1.2 — NEXT_PUBLIC_* до сборки)
 npx nx build pizza-store
 
-STANDALONE_DIR="/var/www/html/francesco-lucania-pizza/apps/pizza-store/.next/standalone/apps/pizza-store"
-test -f "$STANDALONE_DIR/server.js" || { echo "Нет standalone — сборка не прошла"; exit 1; }
+STANDALONE_DIR="$(dirname "$(find /var/www/html/francesco-lucania-pizza/apps/pizza-store/.next/standalone -type f -path '*/apps/pizza-store/server.js' 2>/dev/null | head -n 1)")"
+test -f "$STANDALONE_DIR/server.js" || { echo "Нет standalone — сборка не прошла или другой путь; проверьте find …/server.js"; exit 1; }
 test -d "$STANDALONE_DIR/.next/static/chunks" || { echo "Нет .next/static в standalone — проверьте project.json (post-build copy)"; exit 1; }
 
 pm2 delete pizza-store 2>/dev/null || true
