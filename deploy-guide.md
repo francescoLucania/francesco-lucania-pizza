@@ -94,6 +94,7 @@ WantedBy=multi-user.target
 ```
 
 Затем:
+
 ```bash
 sudo systemctl daemon-reload
 sudo systemctl enable pizza-admin
@@ -115,30 +116,34 @@ export API_URL=https://your-api-domain.com/api
 
 ```javascript
 module.exports = {
-  apps: [{
-    name: 'pizza-admin',
-    script: './dist/apps/pizza-admin/server/server.mjs',
-    env: {
-      NODE_ENV: 'production',
-      PORT: 4000,
-      API_URL: 'http://localhost:3000/api'
-    }
-  }]
+  apps: [
+    {
+      name: 'pizza-admin',
+      script: './dist/apps/pizza-admin/server/server.mjs',
+      env: {
+        NODE_ENV: 'production',
+        PORT: 4000,
+        API_URL: 'http://localhost:3000/api',
+      },
+    },
+  ],
 };
 ```
 
 ## Шаг 4: Проверка работы
 
 1. **Проверьте Node.js сервер:**
+
    ```bash
    curl http://localhost:4000
    ```
 
 2. **Проверьте логи:**
+
    ```bash
    # Логи PM2
    pm2 logs pizza-admin
-   
+
    # Логи systemd
    sudo journalctl -u pizza-admin -f
    ```
@@ -242,6 +247,7 @@ WantedBy=multi-user.target
 ```
 
 Затем:
+
 ```bash
 sudo systemctl daemon-reload
 sudo systemctl enable pizza-api
@@ -284,32 +290,36 @@ ACTIVATION_URL=https://yourdomain.com/activate
 
 ```javascript
 module.exports = {
-  apps: [{
-    name: 'pizza-api',
-    script: './dist/apps/pizza-api/main.js',
-    env: {
-      NODE_ENV: 'production',
-      PORT: 3000,
-      MODE: 'PROD',
-      MONGODB_URI: 'mongodb://localhost:27017/pizza-db',
-      // ... остальные переменные
-    }
-  }]
+  apps: [
+    {
+      name: 'pizza-api',
+      script: './dist/apps/pizza-api/main.js',
+      env: {
+        NODE_ENV: 'production',
+        PORT: 3000,
+        MODE: 'PROD',
+        MONGODB_URI: 'mongodb://localhost:27017/pizza-db',
+        // ... остальные переменные
+      },
+    },
+  ],
 };
 ```
 
 ## Шаг 4: Проверка работы
 
 1. **Проверьте API сервер:**
+
    ```bash
    curl http://localhost:3000/api
    ```
 
 2. **Проверьте логи:**
+
    ```bash
    # Логи PM2
    pm2 logs pizza-api
-   
+
    # Логи systemd
    sudo journalctl -u pizza-api -f
    ```
@@ -358,18 +368,37 @@ npm run build:pizza-store
 
 Результат сборки будет в `dist/apps/pizza-store/.next/`
 
+> Для запуска **только из `dist/`** используется `output: 'standalone'`.
+> В этом проекте entrypoint после сборки находится здесь:
+> `dist/apps/pizza-store/.next/standalone/apps/pizza-store/server.js`
+
 ## Шаг 2: Настройка Node.js сервера
 
 ### 2.1 Запуск через PM2 (рекомендуется)
 
 ```bash
-# Запустите приложение
-cd /path/to/your/project
-pm2 start npm --name pizza-store -- start --prefix apps/pizza-store
+# Установите PM2 (если ещё не установлен)
+npm install -g pm2
 
-# Или если используете собранную версию
-cd /path/to/your/project/apps/pizza-store
-pm2 start npm --name pizza-store -- start
+# Перейдите в репозиторий на сервере
+cd /var/www/html/francesco-lucania-pizza
+
+# (обязательно) соберите standalone билд
+npx nx build pizza-store
+
+# Standalone entrypoint
+STORE_STANDALONE_DIR="dist/apps/pizza-store/.next/standalone/apps/pizza-store"
+
+# Важно: standalone сервер ожидает, что рядом будут .next/static и public
+mkdir -p "$STORE_STANDALONE_DIR/.next"
+cp -R dist/apps/pizza-store/.next/static "$STORE_STANDALONE_DIR/.next/" 2>/dev/null || true
+cp -R apps/pizza-store/public "$STORE_STANDALONE_DIR/public" 2>/dev/null || true
+
+# Запустите standalone сервер из dist
+PORT=3001 NODE_ENV=production pm2 start node \
+  --name pizza-store \
+  --cwd "$STORE_STANDALONE_DIR" \
+  -- server.js --update-env
 
 # Настройте автозапуск при перезагрузке
 pm2 startup
@@ -392,11 +421,11 @@ After=network.target
 [Service]
 Type=simple
 User=www-data
-WorkingDirectory=/path/to/your/project/apps/pizza-store
+WorkingDirectory=/var/www/html/francesco-lucania-pizza
 Environment=NODE_ENV=production
 Environment=PORT=3001
 Environment=NEXT_PUBLIC_API_URL=http://localhost:3000/api
-ExecStart=/usr/bin/npm start
+ExecStart=/usr/bin/node /var/www/html/francesco-lucania-pizza/dist/apps/pizza-store/.next/standalone/apps/pizza-store/server.js
 Restart=always
 RestartSec=10
 
@@ -405,6 +434,7 @@ WantedBy=multi-user.target
 ```
 
 Затем:
+
 ```bash
 sudo systemctl daemon-reload
 sudo systemctl enable pizza-store
@@ -430,32 +460,36 @@ PORT=3001
 
 ```javascript
 module.exports = {
-  apps: [{
-    name: 'pizza-store',
-    script: 'npm',
-    args: 'start',
-    cwd: './apps/pizza-store',
-    env: {
-      NODE_ENV: 'production',
-      PORT: 3001,
-      NEXT_PUBLIC_API_URL: 'http://localhost:3000/api'
-    }
-  }]
+  apps: [
+    {
+      name: 'pizza-store',
+      script: 'npm',
+      args: 'start',
+      cwd: './apps/pizza-store',
+      env: {
+        NODE_ENV: 'production',
+        PORT: 3001,
+        NEXT_PUBLIC_API_URL: 'http://localhost:3000/api',
+      },
+    },
+  ],
 };
 ```
 
 ## Шаг 4: Проверка работы
 
 1. **Проверьте Next.js сервер:**
+
    ```bash
    curl http://localhost:3001
    ```
 
 2. **Проверьте логи:**
+
    ```bash
    # Логи PM2
    pm2 logs pizza-store
-   
+
    # Логи systemd
    sudo journalctl -u pizza-store -f
    ```
@@ -464,8 +498,12 @@ module.exports = {
 
 1. **Порт Next.js**: По умолчанию 3000, но рекомендуется использовать 3001, чтобы не конфликтовать с API
 2. **Директория сборки**: Результат сборки в `dist/apps/pizza-store/.next/`
-3. **Статика**: Next.js автоматически отдает статические файлы из `.next/static/`
-4. **Firewall**: Откройте порты 80 и 443, но НЕ открывайте порт 3001 наружу (только для nginx)
+3. **Standalone entrypoint**: `dist/apps/pizza-store/.next/standalone/apps/pizza-store/server.js`
+4. **Статика**: Для standalone убедитесь, что существуют:
+   - `dist/apps/pizza-store/.next/static/` (после сборки)
+   - `dist/apps/pizza-store/.next/standalone/apps/pizza-store/.next/static/` (скопируйте из `dist/apps/pizza-store/.next/static/`)
+   - `dist/apps/pizza-store/.next/standalone/apps/pizza-store/public/` (скопируйте из `apps/pizza-store/public/`)
+5. **Firewall**: Откройте порты 80 и 443, но НЕ открывайте порт 3001 наружу (только для nginx)
 
 ---
 
@@ -487,11 +525,13 @@ sudo cp nginx.conf.example /etc/nginx/sites-available/pizza
 ```
 
 Отредактируйте файл:
+
 ```bash
 sudo nano /etc/nginx/sites-available/pizza
 ```
 
 **Важные изменения:**
+
 - `server_name` - ваш домен
 - Пути к статическим файлам
 - Порты для проксирования
