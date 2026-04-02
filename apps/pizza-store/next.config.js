@@ -11,8 +11,6 @@ const nextConfig = {
   // See: https://nx.dev/recipes/next/next-config-setup
   nx: {},
   output: 'standalone',
-  // Output directory for Next.js build
-  distDir: '../../dist/apps/pizza-store/.next',
 };
 
 const plugins = [

@@ -353,24 +353,39 @@ Internet → Nginx (порт 80/443) → Next.js сервер (порт 3001)
 node --version
 npm --version
 
-# Установите зависимости проекта
-npm install --production
+# Установите зависимости проекта (для сборки нужны devDependencies)
+# Рекомендуется:
+npm ci
 ```
 
-### 1.2 Соберите приложение
+### 1.2 Публичные URL перед сборкой (обязательно в проде)
+
+Переменные **`NEXT_PUBLIC_*` подставляются в клиентский JS на этапе `next build`**. Если в `apps/pizza-store/.env` для разработки указаны `http://localhost:5000/...`, после сборки **в браузере пользователя** запросы уйдут на **localhost его компьютера**, а не на сервер: не загрузятся данные API и картинки из `/static/`, хотя HTML от nginx может открываться.
+
+**Перед `nx build pizza-store` на сервере** задайте реальные URL (через `export` или файл `apps/pizza-store/.env.production`, который Next подхватит при production-сборке):
 
 ```bash
-# Соберите Next.js приложение
-nx build pizza-store
-# или
-npm run build:pizza-store
+# Пример: один домен, nginx проксирует /api и /static на pizza-api
+export NEXT_PUBLIC_API_URL="https://francescolucania.com/api"
+export NEXT_PUBLIC_STATIC_URL="https://francescolucania.com/static/"
 ```
 
-Результат сборки будет в `dist/apps/pizza-store/.next/`
+Убедитесь, что nginx действительно проксирует **`/api`** и **`/static`** на ваш NestJS (порт API в вашей конфигурации может быть 3000 или 5000 — используйте тот, что реально слушает `pizza-api`).
 
-> Для запуска **только из `dist/`** используется `output: 'standalone'`.
-> В этом проекте entrypoint после сборки находится здесь:
-> `dist/apps/pizza-store/.next/standalone/apps/pizza-store/server.js`
+### 1.3 Соберите приложение
+
+```bash
+# Соберите Next.js приложение на сервере
+npx nx build pizza-store
+```
+
+Билд создаёт `apps/pizza-store/.next/`. Для **`output: 'standalone'`** рабочий процесс **сам переключает `cwd`** на `apps/pizza-store/.next/standalone/apps/pizza-store` и читает статику из **`.next/static` внутри этой папки**. Next **не копирует** туда чанки автоматически, поэтому таргет `nx build pizza-store` после `next build` **копирует** `.next/static` и `public` в standalone (см. `project.json`).
+
+Точка входа:
+
+`apps/pizza-store/.next/standalone/apps/pizza-store/server.js`
+
+Запускать **лучше с `cwd` = эта же папка** (там уже лежат и `server.js`, и `.next/static`, и `public`).
 
 ## Шаг 2: Настройка Node.js сервера
 
@@ -383,22 +398,18 @@ npm install -g pm2
 # Перейдите в репозиторий на сервере
 cd /var/www/html/francesco-lucania-pizza
 
-# (обязательно) соберите standalone билд
+# Соберите на сервере (см. раздел 1.2 — NEXT_PUBLIC_* до сборки)
 npx nx build pizza-store
 
-# Standalone entrypoint
-STORE_STANDALONE_DIR="dist/apps/pizza-store/.next/standalone/apps/pizza-store"
+STANDALONE_DIR="/var/www/html/francesco-lucania-pizza/apps/pizza-store/.next/standalone/apps/pizza-store"
+test -f "$STANDALONE_DIR/server.js" || { echo "Нет standalone — сборка не прошла"; exit 1; }
+test -d "$STANDALONE_DIR/.next/static/chunks" || { echo "Нет .next/static в standalone — проверьте project.json (post-build copy)"; exit 1; }
 
-# Важно: standalone сервер ожидает, что рядом будут .next/static и public
-mkdir -p "$STORE_STANDALONE_DIR/.next"
-cp -R dist/apps/pizza-store/.next/static "$STORE_STANDALONE_DIR/.next/" 2>/dev/null || true
-cp -R apps/pizza-store/public "$STORE_STANDALONE_DIR/public" 2>/dev/null || true
-
-# Запустите standalone сервер из dist
+pm2 delete pizza-store 2>/dev/null || true
 PORT=3001 NODE_ENV=production pm2 start node \
   --name pizza-store \
-  --cwd "$STORE_STANDALONE_DIR" \
-  -- server.js --update-env
+  --cwd "$STANDALONE_DIR" \
+  -- server.js
 
 # Настройте автозапуск при перезагрузке
 pm2 startup
@@ -421,11 +432,11 @@ After=network.target
 [Service]
 Type=simple
 User=www-data
-WorkingDirectory=/var/www/html/francesco-lucania-pizza
+WorkingDirectory=/var/www/html/francesco-lucania-pizza/apps/pizza-store/.next/standalone/apps/pizza-store
 Environment=NODE_ENV=production
 Environment=PORT=3001
 Environment=NEXT_PUBLIC_API_URL=http://localhost:3000/api
-ExecStart=/usr/bin/node /var/www/html/francesco-lucania-pizza/dist/apps/pizza-store/.next/standalone/apps/pizza-store/server.js
+ExecStart=/usr/bin/node server.js
 Restart=always
 RestartSec=10
 
@@ -497,12 +508,9 @@ module.exports = {
 ## Важные моменты
 
 1. **Порт Next.js**: По умолчанию 3000, но рекомендуется использовать 3001, чтобы не конфликтовать с API
-2. **Директория сборки**: Результат сборки в `dist/apps/pizza-store/.next/`
-3. **Standalone entrypoint**: `dist/apps/pizza-store/.next/standalone/apps/pizza-store/server.js`
-4. **Статика**: Для standalone убедитесь, что существуют:
-   - `dist/apps/pizza-store/.next/static/` (после сборки)
-   - `dist/apps/pizza-store/.next/standalone/apps/pizza-store/.next/static/` (скопируйте из `dist/apps/pizza-store/.next/static/`)
-   - `dist/apps/pizza-store/.next/standalone/apps/pizza-store/public/` (скопируйте из `apps/pizza-store/public/`)
+2. **Директория сборки**: `apps/pizza-store/.next/`
+3. **Запуск в проде**: каталог `apps/pizza-store/.next/standalone/apps/pizza-store/` (там после сборки должны быть `server.js`, `.next/static/`, `public/`)
+4. **Иначе будет 404 на `/_next/static`**: без копирования в standalone Next не находит чанки (см. автоматику в `project.json`)
 5. **Firewall**: Откройте порты 80 и 443, но НЕ открывайте порт 3001 наружу (только для nginx)
 
 ---
@@ -591,11 +599,23 @@ dist/
 │   ├── pizza-api/
 │   │   ├── main.js           # Скомпилированный API
 │   │   └── assets/
-│   └── pizza-store/
-│       └── .next/            # Next.js сборка
-│           ├── static/
-│           ├── server/
-│           └── ...
+│   └── (pizza-store собирается в ../apps/pizza-store/.next/)
+```
+
+Фронт магазина после сборки:
+
+```
+apps/pizza-store/
+├── public/                 # исходники; после build копируются в standalone
+└── .next/
+    ├── static/             # исходный output; после build копируется в standalone
+    └── standalone/
+        └── apps/
+            └── pizza-store/
+                ├── server.js
+                ├── public/          # копия для /img/...
+                └── .next/
+                    └── static/      # обязательно для /_next/static/...
 ```
 
 ---
@@ -663,7 +683,7 @@ pm2 logs pizza-api
 
 ```bash
 # Проверьте, что сборка прошла успешно
-ls -la dist/apps/pizza-store/.next
+ls -la apps/pizza-store/.next/standalone/apps/pizza-store/.next/static/chunks | head
 
 # Проверьте переменные окружения
 cat apps/pizza-store/.env.local

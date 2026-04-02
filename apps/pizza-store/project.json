@@ -9,11 +9,11 @@
     "build": {
       "executor": "nx:run-commands",
       "outputs": [
-        "{workspaceRoot}/dist/apps/pizza-store/.next/!(cache)/**/*",
-        "{workspaceRoot}/dist/apps/pizza-store/.next/!(cache)"
+        "{workspaceRoot}/apps/pizza-store/.next/!(cache)/**/*",
+        "{workspaceRoot}/apps/pizza-store/.next/!(cache)"
       ],
       "options": {
-        "command": "next build",
+        "command": "next build && rm -rf .next/standalone/apps/pizza-store/.next/static && cp -R .next/static .next/standalone/apps/pizza-store/.next/static && rm -rf .next/standalone/apps/pizza-store/public && cp -R public .next/standalone/apps/pizza-store/public",
         "cwd": "apps/pizza-store"
       },
       "dependsOn": ["^build"],
