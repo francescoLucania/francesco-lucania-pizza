@@ -5,6 +5,25 @@ import { fileURLToPath } from 'node:url';
 
 const appDir = join(dirname(fileURLToPath(import.meta.url)), '..');
 
+/** По умолчанию — как у Next 16 (часто Turbopack). Webpack в этом монорепо пока ломает часть *.module.scss в libs. */
+function nextBuildArgs() {
+  if (process.env.PIZZA_STORE_NEXT_BUILD_WEBPACK === '1') {
+    return 'next build --webpack';
+  }
+  if (process.env.PIZZA_STORE_NEXT_BUILD_TURBOPACK === '1') {
+    return 'next build --turbopack';
+  }
+  return 'next build';
+}
+
+function countChunkFiles(staticRoot) {
+  const chunksDir = join(staticRoot, 'chunks');
+  if (!existsSync(chunksDir)) {
+    return -1;
+  }
+  return readdirSync(chunksDir).filter((f) => f.endsWith('.js')).length;
+}
+
 function findAppsPizzaStoreServerJs(rootDir) {
   const stack = [rootDir];
   while (stack.length > 0) {
@@ -37,7 +56,7 @@ function findAppsPizzaStoreServerJs(rootDir) {
 }
 
 try {
-  execSync('npx next build', { cwd: appDir, stdio: 'inherit', env: process.env });
+  execSync(`npx ${nextBuildArgs()}`, { cwd: appDir, stdio: 'inherit', env: process.env });
 } catch {
   process.exit(1);
 }
@@ -74,4 +93,16 @@ mkdirSync(join(standaloneAppDir, '.next'), { recursive: true });
 cpSync(staticSrc, staticDest, { recursive: true });
 cpSync(publicSrc, publicDest, { recursive: true });
 
+const srcChunks = countChunkFiles(staticSrc);
+const destChunks = countChunkFiles(staticDest);
+if (srcChunks < 1 || destChunks !== srcChunks) {
+  console.error(
+    'pizza-store: copy check failed — .next/static/chunks: src=%s dest=%s (expected equal, >0)',
+    srcChunks,
+    destChunks,
+  );
+  process.exit(1);
+}
+
 console.log('pizza-store: standalone assets copied →', standaloneAppDir);
+console.log('pizza-store: verified', destChunks, 'chunk .js files under standalone .next/static/chunks');

@@ -21,139 +21,91 @@ Internet → Nginx (порт 80/443)
 
 # 1. Pizza Admin (Angular SSR)
 
-## Архитектура развертывания
+Админка в браузере: **`https://ваш-домен/admin/`**. В **production** в `apps/pizza-admin/project.json` задано **`baseHref: "/admin/"`**, чтобы бандлы шли с **`/admin/...`**, а не с корня (там Next.js).
+
+## Архитектура
 
 ```
-Internet → Nginx (порт 80/443) → Node.js сервер (порт 4000) → Angular SSR
-                ↓
-         Статические файлы (browser/)
+Internet → Nginx → http://127.0.0.1:4000/  (Express: static из dist/.../browser + SSR)
+Префикс /admin/ снаружи снимается: в nginx нужен proxy_pass …/4000/;
 ```
 
-## Шаг 1: Подготовка сервера
+Корень репозитория на сервере: **`/var/www/html/francesco-lucania-pizza`**.
 
-### 1.1 Установите зависимости на сервере
+## Шаг 1: Зависимости и сборка
 
 ```bash
-# Убедитесь, что установлены Node.js (v18+) и npm
-node --version
-npm --version
+cd /var/www/html/francesco-lucania-pizza
 
-# Установите зависимости проекта
-npm install --production
+# Для сборки нужны devDependencies — не используйте только --production
+npm ci
+
+npx nx build pizza-admin --configuration=production
+# или: npm run build:pizza-admin:prod
 ```
 
-### 1.2 Соберите приложение
+**API**: в `environment.prod.ts` для прода заданы **`apiUrl: '/api'`** и **`staticUrl: '/static'`** (тот же origin, nginx шлёт на Nest). При отдельном домене API измените файл и пересоберите.
+
+## Шаг 2: PM2
+
+Артефакт: **`dist/apps/pizza-admin/server/server.mjs`**.
 
 ```bash
-# На сервере или локально (затем загрузите dist/)
-npm run build:pizza-admin:prod
-```
+cd /var/www/html/francesco-lucania-pizza
 
-## Шаг 2: Настройка Node.js сервера
+ADMIN_SERVER="dist/apps/pizza-admin/server/server.mjs"
+test -f "$ADMIN_SERVER" || { echo "Нет server.mjs — сначала nx build pizza-admin"; exit 1; }
 
-### 2.1 Запуск через PM2 (рекомендуется)
-
-```bash
-# Установите PM2 глобально
-npm install -g pm2
-
-# Запустите приложение
-cd /path/to/your/project
-pm2 start dist/apps/pizza-admin/server/server.mjs --name pizza-admin
-
-# Настройте автозапуск при перезагрузке
-pm2 startup
+pm2 delete pizza-admin 2>/dev/null || true
+PORT=4000 NODE_ENV=production pm2 start "$ADMIN_SERVER" --name pizza-admin
 pm2 save
 
-# Проверьте статус
 pm2 status
-pm2 logs pizza-admin
+pm2 logs pizza-admin --lines 40
 ```
 
-### 2.2 Или через systemd service
+Перезапуск: **`pm2 restart pizza-admin`**.
 
-Создайте файл `/etc/systemd/system/pizza-admin.service`:
+Проверка локально (пути как после nginx, с префиксом `/admin/`):
+
+```bash
+curl -sS -o /dev/null -w "%{http_code}\n" http://127.0.0.1:4000/admin/
+```
+
+## Шаг 3: Nginx
+
+Обязательно **завершающий слэш** у upstream:
+
+```nginx
+location /admin/ {
+    proxy_pass http://127.0.0.1:4000/;
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+```
+
+Иначе Node получает **`/admin/...`**, а `express.static` отдаёт файлы от **`/`** — ломаются **main-\*.js** и чанки.
+
+Готовые примеры: **`nginx.default-server.example`**, **`nginx.conf.example`**.
+
+## Шаг 4: systemd (альтернатива PM2)
 
 ```ini
-[Unit]
-Description=Pizza Admin Angular SSR Server
-After=network.target
-
 [Service]
-Type=simple
-User=www-data
-WorkingDirectory=/path/to/your/project
+WorkingDirectory=/var/www/html/francesco-lucania-pizza
 Environment=NODE_ENV=production
 Environment=PORT=4000
-ExecStart=/usr/bin/node /path/to/your/project/dist/apps/pizza-admin/server/server.mjs
-Restart=always
-RestartSec=10
-
-[Install]
-WantedBy=multi-user.target
+ExecStart=/usr/bin/node /var/www/html/francesco-lucania-pizza/dist/apps/pizza-admin/server/server.mjs
 ```
 
-Затем:
+## Важно
 
-```bash
-sudo systemctl daemon-reload
-sudo systemctl enable pizza-admin
-sudo systemctl start pizza-admin
-sudo systemctl status pizza-admin
-```
-
-## Шаг 3: Переменные окружения
-
-Создайте файл `.env` или установите переменные окружения:
-
-```bash
-export NODE_ENV=production
-export PORT=4000
-export API_URL=https://your-api-domain.com/api
-```
-
-Или через PM2 ecosystem файл (`ecosystem.config.js`):
-
-```javascript
-module.exports = {
-  apps: [
-    {
-      name: 'pizza-admin',
-      script: './dist/apps/pizza-admin/server/server.mjs',
-      env: {
-        NODE_ENV: 'production',
-        PORT: 4000,
-        API_URL: 'http://localhost:3000/api',
-      },
-    },
-  ],
-};
-```
-
-## Шаг 4: Проверка работы
-
-1. **Проверьте Node.js сервер:**
-
-   ```bash
-   curl http://localhost:4000
-   ```
-
-2. **Проверьте логи:**
-
-   ```bash
-   # Логи PM2
-   pm2 logs pizza-admin
-
-   # Логи systemd
-   sudo journalctl -u pizza-admin -f
-   ```
-
-## Важные моменты
-
-1. **Путь в nginx `root`**: Указывайте на папку `browser/`, а не на всю `dist/apps/pizza-admin/`
-2. **Порт Node.js**: По умолчанию 4000, можно изменить через переменную `PORT`
-3. **Статика**: Nginx должен иметь права на чтение файлов в `browser/`
-4. **Firewall**: Откройте порты 80 и 443, но НЕ открывайте порт 4000 наружу (только для nginx)
+1. Статику **`browser/`** при SSR обычно **не** выкладывают отдельным `root` в nginx под тем же `/admin/` — проксируйте всё на **4000**, иначе пути разъезжаются с `baseHref`.
+2. Порт **4000** наружу не открывайте.
+3. После деплоя при странных чанках: инкогнито / сброс кэша HTML и **`pm2 restart pizza-admin`**.
 
 ---
 
@@ -429,6 +381,7 @@ npm ci
 
 - Раньше в цепочке команд в `project.json` при **любом** падении `next build` могло всплывать сообщение про отсутствие **`standalone/server.js`**, хотя причина была другая (в т.ч. не Node). Сейчас пост-этап — **`node scripts/post-build-standalone.mjs`** (см. `apps/pizza-store/scripts/`), он ругается на отсутствие `server.js` **только после успешного** `next build`.
 - Если в SSH **`node -v` ≥ 20.9**, а сборка из **cron, systemd, CI, другого пользователя** падает — проверьте там **`which node`** и **`node -v`**: часто подтягивается **другой** бинарник (старый `/usr/bin/node`, отсутствие nvm в неинтерактивной сессии и т.д.).
+- **`sudo npx nx build …`** при установке Node через **nvm** часто запускает **системный** Node из `/usr/bin/node` (например **18.x**), потому что у `sudo` бывает свой **`secure_path`** и другой `PATH`, чем у вашей оболочки. Отсюда ситуация: **`sudo npx …` → «нужен Node ≥ 20.9»**, а сразу после этого **`node -v` → v20** — это **два разных бинарника**. Проверка: **`which node`**, **`sudo which node`**, **`sudo node -v`**. Сборку делайте **без `sudo`** (от пользователя с нужным Node) либо явно: **`sudo env "PATH=$PATH" HOME="$HOME" npx nx build pizza-store`** — или обновите системный пакет `nodejs`, чтобы `/usr/bin/node` стал ≥ 20.9.
 
 На **Node 18** Next 16 при сборке обычно явно пишет о несовместимой версии Node — это не надо путать с отсутствием `standalone` от **другой** ошибки.
 
@@ -623,8 +576,26 @@ curl -sS -o /dev/null -w "chunk %{http_code}\n" "http://127.0.0.1:3001/_next/sta
 1. **Порт Next.js**: По умолчанию 3000, но рекомендуется использовать 3001, чтобы не конфликтовать с API
 2. **Директория сборки**: `apps/pizza-store/.next/`
 3. **Запуск в проде**: полный путь к `server.js` из `find …/standalone/…/apps/pizza-store/server.js`; в этой же папке после сборки должны быть `.next/static/` и `public/`
-4. **Иначе будет 404 на `/_next/static`**: без копирования в standalone Next не находит чанки (см. автоматику в `project.json`)
+4. **Иначе будет 404 на `/_next/static`**: без копирования в standalone Next не находит чанки (см. `apps/pizza-store/scripts/post-build-standalone.mjs`; в конце билда сверяется число `.js` в `standalone/.../.next/static/chunks`)
 5. **Firewall**: Откройте порты 80 и 443, но НЕ открывайте порт 3001 наружу (только для nginx)
+
+### Ошибка 500 (или «Failed to load chunk») на `/_next/static/chunks/*.js`
+
+Чаще всего это **несовпадение имён чанков** в HTML и файлов на диске после деплоя, а не «сломанный» nginx.
+
+1. **Кэш HTML** (браузер, Cloudflare и т.д.): старый документ ссылается на `ac79c811ff206104.js`, а после нового `nx build` этого файла уже нет — тот же домен отдаёт новую главную с другими чанками, но вы всё ещё смотрите **закэшированный** HTML. Очистите кэш для **страницы** (или режим инкогнито / Bypass на CDN).
+
+2. **Проверка на сервере** (имя файла из ошибки в консоли):
+
+   ```bash
+   SERVER_JS="$(find apps/pizza-store/.next/standalone -type f -path '*/apps/pizza-store/server.js' 2>/dev/null | head -n 1)"
+   ls "$(dirname "$SERVER_JS")/.next/static/chunks/ac79c811ff206104.js"
+   curl -sS -o /dev/null -w "%{http_code}\n" "http://127.0.0.1:3001/_next/static/chunks/ac79c811ff206104.js"
+   ```
+
+   Если `ls` — **нет файла**, а в «Исходном коде страницы» он есть — это кэш HTML или **PM2** смотрит на **другой** каталог `standalone`. Пересоберите с `npx nx build pizza-store --skip-nx-cache`, снова возьмите `SERVER_JS`, перезапустите PM2 этим путём.
+
+3. **Nginx**: для `/_next/` нужен префикс **`^~`** (см. `nginx.default-server.example`), чтобы regex по расширению не отдавал чанки с диска nginx.
 
 ---
 
@@ -745,7 +716,7 @@ sudo systemctl stop pizza-admin pizza-api pizza-store
 
 # 2. Обновите код и пересоберите
 git pull
-npm install
+npm ci
 npm run build:all:prod
 
 # 3. Запустите снова
@@ -770,11 +741,15 @@ pm2 restart pizza-admin
 ## Pizza Admin не запускается
 
 ```bash
-# Проверьте, что все зависимости установлены
-cd dist/apps/pizza-admin/server
-node server.mjs
+# Запуск вручную из корня репозитория (проверка без PM2)
+cd /var/www/html/francesco-lucania-pizza
+PORT=4000 node dist/apps/pizza-admin/server/server.mjs
+```
 
-# Проверьте логи
+В браузере админка — **`/admin/`**; локально: `curl -sS -o /dev/null -w "%{http_code}\n" http://127.0.0.1:4000/admin/`  
+Если **404** на `main-*.js` за nginx — чаще всего в `location /admin/` нет **`proxy_pass …/4000/`** (слэш в конце URL upstream), см. раздел Pizza Admin.
+
+```bash
 pm2 logs pizza-admin
 ```
 
@@ -809,7 +784,7 @@ pm2 logs pizza-store
 
 - Проверьте, что Node.js серверы запущены:
   ```bash
-  curl http://localhost:4000  # pizza-admin
+  curl -sS -o /dev/null -w "%{http_code}\n" http://127.0.0.1:4000/admin/  # pizza-admin
   curl http://localhost:3000/api  # pizza-api
   curl http://localhost:3001  # pizza-store
   ```

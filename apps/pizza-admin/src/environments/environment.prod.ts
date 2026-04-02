@@ -1,5 +1,6 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://api.yourdomain.com/api',
-  staticUrl: 'https://api.yourdomain.com/static',
+  /** Тот же origin, что у сайта (nginx → pizza-api). Замените при отдельном домене API. */
+  apiUrl: '/api',
+  staticUrl: '/static',
 };
