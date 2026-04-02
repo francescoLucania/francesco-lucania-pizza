@@ -79,13 +79,26 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const mode = configService.get<string>('MODE');
 
-  // В DEV режиме разрешаем все источники для CORS
+  // CORS: в DEV — любые origin; в PROD — только если задан CORS_ORIGIN (через запятую), иначе полагаемся на same-origin
   if (mode === 'DEV') {
     app.enableCors({
       origin: true,
       credentials: true,
     });
     Logger.log('🔓 CORS enabled for all origins (DEV mode)');
+  } else {
+    const corsOrigin = configService.get<string>('CORS_ORIGIN');
+    if (corsOrigin?.trim()) {
+      const origins = corsOrigin
+        .split(',')
+        .map((o) => o.trim())
+        .filter(Boolean);
+      app.enableCors({
+        origin: origins.length === 1 ? origins[0] : origins,
+        credentials: true,
+      });
+      Logger.log(`🔒 CORS (PROD): ${origins.join(', ')}`);
+    }
   }
 
   const globalPrefix = 'api';

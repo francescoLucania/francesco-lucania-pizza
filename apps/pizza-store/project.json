@@ -13,7 +13,7 @@
         "{workspaceRoot}/apps/pizza-store/.next/!(cache)"
       ],
       "options": {
-        "command": "next build && SERVER_JS=$(find .next/standalone -type f -path '*/apps/pizza-store/server.js' | head -n 1) && test -n \"$SERVER_JS\" || { echo 'pizza-store: standalone server.js not found after build'; exit 1; } && STANDALONE_APP_DIR=$(dirname \"$SERVER_JS\") && rm -rf \"$STANDALONE_APP_DIR/.next/static\" \"$STANDALONE_APP_DIR/public\" && mkdir -p \"$STANDALONE_APP_DIR/.next\" && cp -R .next/static \"$STANDALONE_APP_DIR/.next/static\" && cp -R public \"$STANDALONE_APP_DIR/public\"",
+        "command": "node scripts/post-build-standalone.mjs",
         "cwd": "apps/pizza-store"
       },
       "dependsOn": ["^build"],

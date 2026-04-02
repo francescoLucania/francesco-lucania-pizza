@@ -162,10 +162,12 @@ module.exports = {
 ## Архитектура развертывания
 
 ```
-Internet → Nginx (порт 80/443) → NestJS сервер (порт 3000) → MongoDB
+Internet → Nginx (порт 80/443) → NestJS сервер (порт из PORT, чаще 3000 или 5000) → MongoDB
                 ↓
          API endpoints (/api/*)
 ```
+
+Корень репозитория на сервере в примерах ниже: **`/var/www/html/francesco-lucania-pizza`**.
 
 ## Шаг 1: Подготовка сервера
 
@@ -176,8 +178,8 @@ Internet → Nginx (порт 80/443) → NestJS сервер (порт 3000) →
 node --version
 npm --version
 
-# Установите зависимости проекта
-npm install --production
+# Для сборки webpack нужны devDependencies — на сервере лучше:
+npm ci
 ```
 
 ### 1.2 Установите и настройте MongoDB
@@ -199,19 +201,48 @@ sudo systemctl status mongodb
 
 ```bash
 # Соберите API
-nx build pizza-api
-# или
-npm run build:all
+npx nx build pizza-api
 ```
+
+Артефакт: **`dist/apps/pizza-api/main.js`** (и `package.json` рядом для зависимостей при отдельном деплое).
+
+### 1.4 Файл `.env`
+
+`ConfigModule` в сборке читает **`dist/.env`** (путь считается от `dist/apps/pizza-api`). Удобно после каждой сборки скопировать рабочий файл:
+
+```bash
+cp apps/pizza-api/.env dist/.env
+```
+
+Либо задавайте переменные через окружение процесса (`pm2` / systemd) — они перекрывают значения из файла.
+
+В проде выставьте **`MODE=PROD`** (иначе включится широкий CORS как в DEV).
+
+Если фронт ходит в API **не строго с того же origin** (другая схема, `www`, поддомен) или включён **`credentials: 'include'`** и браузер ругается на CORS, добавьте в **`apps/pizza-api/.env`**:
+
+```bash
+CORS_ORIGIN=http://francescolucania.com,https://francescolucania.com,http://www.francescolucania.com,https://www.francescolucania.com
+```
+
+После правки `.env` перезапустите `pizza-api` (`pm2 restart pizza-api`).
 
 ## Шаг 2: Настройка Node.js сервера
 
 ### 2.1 Запуск через PM2 (рекомендуется)
 
 ```bash
-# Запустите приложение
-cd /path/to/your/project
-pm2 start dist/apps/pizza-api/main.js --name pizza-api
+cd /var/www/html/francesco-lucania-pizza
+
+npx nx build pizza-api
+cp apps/pizza-api/.env dist/.env
+
+# Подхватить переменные из apps/pizza-api/.env для процесса (порт MODE и т.д.)
+set -a
+. ./apps/pizza-api/.env
+set +a
+
+pm2 delete pizza-api 2>/dev/null || true
+pm2 start dist/apps/pizza-api/main.js --name pizza-api --cwd /var/www/html/francesco-lucania-pizza
 
 # Настройте автозапуск при перезагрузке
 pm2 startup
@@ -234,11 +265,11 @@ After=network.target mongodb.service
 [Service]
 Type=simple
 User=www-data
-WorkingDirectory=/path/to/your/project
+WorkingDirectory=/var/www/html/francesco-lucania-pizza
 Environment=NODE_ENV=production
 Environment=PORT=3000
 Environment=MODE=PROD
-ExecStart=/usr/bin/node /path/to/your/project/dist/apps/pizza-api/main.js
+ExecStart=/usr/bin/node /var/www/html/francesco-lucania-pizza/dist/apps/pizza-api/main.js
 Restart=always
 RestartSec=10
 
@@ -257,7 +288,7 @@ sudo systemctl status pizza-api
 
 ## Шаг 3: Переменные окружения
 
-Создайте файл `.env` в корне проекта:
+Создайте файл **`apps/pizza-api/.env`** (на сервере — только с реальными секретами). После сборки копируйте его в **`dist/.env`**, чтобы `ConfigModule` подхватил файл (см. выше), либо задайте те же переменные в окружении `pm2` / systemd.
 
 ```bash
 # Режим работы
@@ -308,10 +339,11 @@ module.exports = {
 
 ## Шаг 4: Проверка работы
 
-1. **Проверьте API сервер:**
+1. **Проверьте API сервер** (подставьте свой `PORT` из `.env`):
 
    ```bash
-   curl http://localhost:3000/api
+   curl "http://localhost:3000/api"
+   # или: curl "http://localhost:${PORT}/api"
    ```
 
 2. **Проверьте логи:**
@@ -324,13 +356,46 @@ module.exports = {
    sudo journalctl -u pizza-api -f
    ```
 
+## Полный чеклист: pizza-api на сервере
+
+Выполняйте из корня репозитория. Порт в `curl` должен совпадать с **`PORT`** в `apps/pizza-api/.env` (у вас может быть `5000`).
+
+```bash
+set -e
+ROOT="/var/www/html/francesco-lucania-pizza"
+cd "$ROOT"
+
+git pull
+npm ci
+
+# Сборка
+npx nx build pizza-api
+test -f dist/apps/pizza-api/main.js
+
+# Конфиг: копия для пути dist/.env + переменные в процессе
+cp apps/pizza-api/.env dist/.env
+set -a
+. ./apps/pizza-api/.env
+set +a
+
+pm2 delete pizza-api 2>/dev/null || true
+pm2 start dist/apps/pizza-api/main.js --name pizza-api --cwd "$ROOT"
+pm2 save
+
+# Проверка (подставьте свой PORT, например 3000 или 5000)
+curl -sS -o /dev/null -w "%{http_code}\n" "http://127.0.0.1:${PORT:-3000}/api"
+```
+
+**Nginx:** `proxy_pass` для `location /api/` должен указывать на тот же хост и порт, где слушает Nest (например `http://127.0.0.1:5000/api/` если `PORT=5000`). Пример в `nginx.conf.example` рассчитан на `3000` — при необходимости замените.
+
 ## Важные моменты
 
-1. **Порт API**: По умолчанию 3000, можно изменить через переменную `PORT`
-2. **Префикс API**: Все endpoints имеют префикс `/api`
-3. **MongoDB**: Убедитесь, что MongoDB запущен и доступен
-4. **CORS**: В режиме PROD CORS настроен строже, чем в DEV
-5. **Firewall**: Откройте порты 80 и 443, но НЕ открывайте порт 3000 наружу (только для nginx)
+1. **Порт API**: задаётся **`PORT`** в `.env`; nginx должен проксировать на тот же порт
+2. **Префикс API**: все HTTP-маршруты приложения под префиксом **`/api`**
+3. **MongoDB**: Убедитесь, что MongoDB запущен и строка подключения в `.env` актуальна
+4. **Статика**: корень проекта используется для папки **`static/`** (создаётся при старте при необходимости)
+5. **CORS / MODE**: в проде **`MODE=PROD`**
+6. **Firewall**: снаружи обычно открыты только 80/443; порт API — только для nginx
 
 ---
 
@@ -358,19 +423,29 @@ npm --version
 npm ci
 ```
 
+**Важно для `pizza-store`:** используется **Next.js 16** — для `next build` официально нужен **Node.js ≥ 20.9.0**. Если у вас уже **`node -v` вроде `v20.19.5`**, с версией интерактивной оболочки всё в порядке; тогда **не ориентируйтесь на старые советы «просто обнови Node»**.
+
+Частая путаница:
+
+- Раньше в цепочке команд в `project.json` при **любом** падении `next build` могло всплывать сообщение про отсутствие **`standalone/server.js`**, хотя причина была другая (в т.ч. не Node). Сейчас пост-этап — **`node scripts/post-build-standalone.mjs`** (см. `apps/pizza-store/scripts/`), он ругается на отсутствие `server.js` **только после успешного** `next build`.
+- Если в SSH **`node -v` ≥ 20.9**, а сборка из **cron, systemd, CI, другого пользователя** падает — проверьте там **`which node`** и **`node -v`**: часто подтягивается **другой** бинарник (старый `/usr/bin/node`, отсутствие nvm в неинтерактивной сессии и т.д.).
+
+На **Node 18** Next 16 при сборке обычно явно пишет о несовместимой версии Node — это не надо путать с отсутствием `standalone` от **другой** ошибки.
+
 ### 1.2 Публичные URL перед сборкой (обязательно в проде)
 
 Переменные **`NEXT_PUBLIC_*` подставляются в клиентский JS на этапе `next build`**. Если в `apps/pizza-store/.env` для разработки указаны `http://localhost:5000/...`, после сборки **в браузере пользователя** запросы уйдут на **localhost его компьютера**, а не на сервер: не загрузятся данные API и картинки из `/static/`, хотя HTML от nginx может открываться.
 
-**Перед `nx build pizza-store` на сервере** задайте реальные URL (через `export` или файл `apps/pizza-store/.env.production`, который Next подхватит при production-сборке):
+**Перед `nx build pizza-store` на сервере** задайте URL для клиента. Надёжнее всего **относительные пути** — одна и та же схема (http/https), что у страницы, без расхождений `http` vs `https`:
 
 ```bash
-# Пример: один домен, nginx проксирует /api и /static на pizza-api
-export NEXT_PUBLIC_API_URL="https://francescolucania.com/api"
-export NEXT_PUBLIC_STATIC_URL="https://francescolucania.com/static/"
+export NEXT_PUBLIC_API_URL="/api"
+export NEXT_PUBLIC_STATIC_URL="/static/"
 ```
 
-Убедитесь, что nginx действительно проксирует **`/api`** и **`/static`** на ваш NestJS (порт API в вашей конфигурации может быть 3000 или 5000 — используйте тот, что реально слушает `pizza-api`).
+Либо полные URL **с той же схемой**, что у сайта, например только `http://…` или только `https://…` + при необходимости **`CORS_ORIGIN`** в `.env` у `pizza-api` (см. раздел Pizza API).
+
+Убедитесь, что nginx проксирует **`/api`** и **`/static`** на ваш NestJS.
 
 ### 1.3 Соберите приложение
 
@@ -379,7 +454,7 @@ export NEXT_PUBLIC_STATIC_URL="https://francescolucania.com/static/"
 npx nx build pizza-store
 ```
 
-Билд создаёт `apps/pizza-store/.next/`. Для **`output: 'standalone'`** рабочий процесс **сам переключает `cwd`** на `apps/pizza-store/.next/standalone/apps/pizza-store` и читает статику из **`.next/static` внутри этой папки**. Next **не копирует** туда чанки автоматически, поэтому таргет `nx build pizza-store` после `next build` **копирует** `.next/static` и `public` в standalone (см. `project.json`).
+Билд создаёт `apps/pizza-store/.next/`. Для **`output: 'standalone'`** рабочий процесс **сам переключает `cwd`** на каталог с `server.js` под `.next/standalone/.../apps/pizza-store` и читает статику из **`.next/static` внутри этой папки**. Next **не копирует** туда чанки автоматически, поэтому таргет `nx build pizza-store` после успешного `next build` **копирует** `.next/static` и `public` в standalone (см. `apps/pizza-store/scripts/post-build-standalone.mjs` и `project.json`).
 
 Точка входа после сборки ищется так (у вас может быть вложенный сегмент, например `standalone/francesco-lucania-pizza/apps/pizza-store`):
 
