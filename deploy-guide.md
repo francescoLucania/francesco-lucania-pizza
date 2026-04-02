@@ -74,11 +74,19 @@ curl -sS -o /dev/null -w "%{http_code}\n" http://127.0.0.1:4000/admin/
 
 ## Шаг 3: Nginx
 
-Обязательно **завершающий слэш** у upstream:
+1. **`location ^~ /admin/`** — с **`^~`**, иначе **`location ~* \.(js|css|…)$`** забирает **`/admin/main-*.js`** → **404** с диска nginx.
+
+2. **`proxy_pass` без URI** — только **`http://127.0.0.1:4000`** (без **`/`** в конце). Тогда на Node приходит **`/admin/...`**, и Angular SSR (base href **`/admin/`**) находит маршруты. Вариант **`proxy_pass …4000/`** обрезает префикс → на приложение приходит **`/`** → SSR часто отдаёт **404**.
+
+3. Запрос **`/admin`** без слэша не попадает в **`location /admin/`**; добавьте редирект на **`/admin/`**, иначе запрос уйдёт в **`location /`** (Next.js).
 
 ```nginx
-location /admin/ {
-    proxy_pass http://127.0.0.1:4000/;
+location = /admin {
+    return 301 /admin/;
+}
+
+location ^~ /admin/ {
+    proxy_pass http://127.0.0.1:4000;
     proxy_http_version 1.1;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
@@ -87,7 +95,7 @@ location /admin/ {
 }
 ```
 
-Иначе Node получает **`/admin/...`**, а `express.static` отдаёт файлы от **`/`** — ломаются **main-\*.js** и чанки.
+В **`server.ts`**: статика под **`/admin`**; запрос **`/admin/`** внутри нормализуется в **`/admin`**, чтобы совпасть с маршрутом SSR **`/admin`** и не получить цикл **301**; без слэша **`/admin`** пусть редиректит **nginx**.
 
 Готовые примеры: **`nginx.default-server.example`**, **`nginx.conf.example`**.
 
@@ -747,7 +755,7 @@ PORT=4000 node dist/apps/pizza-admin/server/server.mjs
 ```
 
 В браузере админка — **`/admin/`**; локально: `curl -sS -o /dev/null -w "%{http_code}\n" http://127.0.0.1:4000/admin/`  
-Если **404** на `main-*.js` за nginx — чаще всего в `location /admin/` нет **`proxy_pass …/4000/`** (слэш в конце URL upstream), см. раздел Pizza Admin.
+Если **404** на `main-*.js`: **`location ^~ /admin/`** и **`proxy_pass http://127.0.0.1:4000`** без завершающего **`/`**. Если **404** на самой **`/admin/`**: тот же **`proxy_pass`** (без обрезки префикса), пересоберите админку после обновления **`server.ts`**, см. раздел Pizza Admin.
 
 ```bash
 pm2 logs pizza-admin

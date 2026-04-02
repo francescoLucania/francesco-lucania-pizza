@@ -11,31 +11,45 @@ import { fileURLToPath } from 'node:url';
 const serverDistFolder = dirname(fileURLToPath(import.meta.url));
 const browserDistFolder = resolve(serverDistFolder, '../browser');
 
+/** Совпадает с production baseHref в project.json; nginx должен проксировать /admin/* без обрезки префикса. */
+const adminPublicPath = '/admin';
+
 const app = express();
 const angularApp = new AngularNodeAppEngine();
 
 /**
- * Example Express Rest API endpoints can be defined here.
- * Uncomment and define endpoints as necessary.
- *
- * Example:
- * ```ts
- * app.get('/api/**', (req, res) => {
- *   // Handle API request
- * });
- * ```
+ * Манифест SSR содержит маршрут `/admin` без завершающего `/`; при запросе `/admin/` Angular
+ * отдаёт 301 на `/admin/` → цикл. Приводим только корень префикса к `/admin`.
+ * Редирект `/admin` → `/admin/` делайте в nginx (`location = /admin`).
  */
+app.use((req, _res, next) => {
+  const q = req.originalUrl.indexOf('?');
+  const pathOnly = q === -1 ? req.originalUrl : req.originalUrl.slice(0, q);
+  const query = q === -1 ? '' : req.originalUrl.slice(q);
+  if (pathOnly === `${adminPublicPath}/`) {
+    req.originalUrl = `${adminPublicPath}${query}`;
+    req.url = `${adminPublicPath}${query}`;
+  }
+  next();
+});
 
 /**
- * Serve static files from /browser
+ * Статика из /browser под /admin/*. Для путей без расширения (корень /admin/, SSR-маршруты)
+ * express.static не вызываем: иначе внутренний GET «/» даёт 301 Location /admin/ и цикл редиректов.
  */
-app.use(
-  express.static(browserDistFolder, {
-    maxAge: '1y',
-    index: false,
-    redirect: false,
-  }),
-);
+const adminStatic = express.static(browserDistFolder, {
+  maxAge: '1y',
+  index: false,
+  redirect: false,
+});
+app.use(adminPublicPath, (req, res, next) => {
+  const relative = req.path === '' ? '/' : req.path;
+  if (relative === '/' || !/\.[^/]+$/.test(relative)) {
+    next();
+    return;
+  }
+  adminStatic(req, res, next);
+});
 
 /**
  * Handle all other requests by rendering the Angular application.

@@ -89,11 +89,15 @@ server {
     
     # ============================================
     # Pizza Admin (Angular SSR на 4000)
-    # Сборка с baseHref /admin/ — слэш после порта: /admin/* → upstream /* (Express раздаёт browser/ + SSR).
-    # Не дублируйте раздачу browser/ из nginx тем же префиксом: иначе расходятся пути с прокси.
+    # ^~ обязателен: иначе location ~* \.(js|css|…)$ перехватывает /admin/main-*.js и отдаёт 404 с диска nginx.
+    # proxy_pass без пути: upstream получает /admin/... (SSR матчит маршруты с baseHref /admin/).
     # ============================================
-    location /admin/ {
-        proxy_pass http://localhost:4000/;
+    location = /admin {
+        return 301 /admin/;
+    }
+
+    location ^~ /admin/ {
+        proxy_pass http://localhost:4000;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
@@ -111,8 +115,8 @@ server {
     # Общие настройки для статических файлов
     # ============================================
     
-    # Общее правило по расширению: НЕ должно матчить /_next/* (см. ^~ /_next/ выше).
-    # Иначе чанки Next уходят в «файл с диска» и ломаются.
+    # Общее правило по расширению: не должно матчить /_next/* и /admin/* (см. ^~ выше).
+    # Иначе чанки Next и бандлы Angular ищутся в root nginx → 404.
     location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|webp|avif)$ {
         expires 1y;
         add_header Cache-Control "public, immutable";
