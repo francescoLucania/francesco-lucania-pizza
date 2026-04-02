@@ -381,11 +381,9 @@ npx nx build pizza-store
 
 Билд создаёт `apps/pizza-store/.next/`. Для **`output: 'standalone'`** рабочий процесс **сам переключает `cwd`** на `apps/pizza-store/.next/standalone/apps/pizza-store` и читает статику из **`.next/static` внутри этой папки**. Next **не копирует** туда чанки автоматически, поэтому таргет `nx build pizza-store` после `next build` **копирует** `.next/static` и `public` в standalone (см. `project.json`).
 
-Точка входа:
+Точка входа после сборки ищется так (у вас может быть вложенный сегмент, например `standalone/francesco-lucania-pizza/apps/pizza-store`):
 
-`apps/pizza-store/.next/standalone/apps/pizza-store/server.js`
-
-Запускать **лучше с `cwd` = эта же папка** (там уже лежат и `server.js`, и `.next/static`, и `public`).
+`find apps/pizza-store/.next/standalone -type f -path '*/apps/pizza-store/server.js'`
 
 ## Шаг 2: Настройка Node.js сервера
 
@@ -401,15 +399,12 @@ cd /var/www/html/francesco-lucania-pizza
 # Соберите на сервере (см. раздел 1.2 — NEXT_PUBLIC_* до сборки)
 npx nx build pizza-store
 
-STANDALONE_DIR="$(dirname "$(find /var/www/html/francesco-lucania-pizza/apps/pizza-store/.next/standalone -type f -path '*/apps/pizza-store/server.js' 2>/dev/null | head -n 1)")"
-test -f "$STANDALONE_DIR/server.js" || { echo "Нет standalone — сборка не прошла или другой путь; проверьте find …/server.js"; exit 1; }
-test -d "$STANDALONE_DIR/.next/static/chunks" || { echo "Нет .next/static в standalone — проверьте project.json (post-build copy)"; exit 1; }
+SERVER_JS="$(find /var/www/html/francesco-lucania-pizza/apps/pizza-store/.next/standalone -type f -path '*/apps/pizza-store/server.js' 2>/dev/null | head -n 1)"
+test -f "$SERVER_JS" || { echo "Нет server.js — сборка не прошла; выполните npx nx build pizza-store"; exit 1; }
+test -d "$(dirname "$SERVER_JS")/.next/static/chunks" || { echo "Нет .next/static в standalone — проверьте project.json (post-build copy)"; exit 1; }
 
 pm2 delete pizza-store 2>/dev/null || true
-PORT=3001 NODE_ENV=production pm2 start node \
-  --name pizza-store \
-  --cwd "$STANDALONE_DIR" \
-  -- server.js
+PORT=3001 NODE_ENV=production pm2 start "$SERVER_JS" --name pizza-store
 
 # Настройте автозапуск при перезагрузке
 pm2 startup
@@ -432,7 +427,8 @@ After=network.target
 [Service]
 Type=simple
 User=www-data
-WorkingDirectory=/var/www/html/francesco-lucania-pizza/apps/pizza-store/.next/standalone/apps/pizza-store
+# WorkingDirectory = каталог, где лежит server.js (путь может содержать francesco-lucania-pizza — проверьте find)
+WorkingDirectory=/var/www/html/francesco-lucania-pizza/apps/pizza-store/.next/standalone/francesco-lucania-pizza/apps/pizza-store
 Environment=NODE_ENV=production
 Environment=PORT=3001
 Environment=NEXT_PUBLIC_API_URL=http://localhost:3000/api
@@ -505,11 +501,53 @@ module.exports = {
    sudo journalctl -u pizza-store -f
    ```
 
+## Полный чеклист: pizza-store на сервере (`/var/www/html/francesco-lucania-pizza`)
+
+Копируйте блок целиком и выполняйте по порядку. Домен и URL замените на свои.
+
+```bash
+set -e
+ROOT="/var/www/html/francesco-lucania-pizza"
+cd "$ROOT"
+
+# 1) Код
+# Если мешает локальный next-env.d.ts:
+# git checkout -- apps/pizza-store/next-env.d.ts
+git pull
+
+# 2) Зависимости
+npm ci
+
+# 3) Публичные URL для клиентского бандла (до сборки!)
+export NEXT_PUBLIC_API_URL="https://francescolucania.com/api"
+export NEXT_PUBLIC_STATIC_URL="https://francescolucania.com/static/"
+
+# 4) Сборка (в project.json после next build копируются .next/static и public в standalone)
+npx nx build pizza-store
+
+# 5) Проверка артефактов
+SERVER_JS="$(find "$ROOT/apps/pizza-store/.next/standalone" -type f -path '*/apps/pizza-store/server.js' | head -n 1)"
+test -f "$SERVER_JS"
+test -d "$(dirname "$SERVER_JS")/.next/static/chunks"
+
+# 6) PM2 (полный путь к server.js — так надёжнее, чем node + cwd)
+pm2 delete pizza-store 2>/dev/null || true
+PORT=3001 NODE_ENV=production pm2 start "$SERVER_JS" --name pizza-store
+pm2 save
+
+# 7) Проверки
+curl -sS -o /dev/null -w "root %{http_code}\n" http://127.0.0.1:3001/
+CHUNK="$(ls "$(dirname "$SERVER_JS")/.next/static/chunks" | head -n 1)"
+curl -sS -o /dev/null -w "chunk %{http_code}\n" "http://127.0.0.1:3001/_next/static/chunks/$CHUNK"
+```
+
+Дальше: nginx проксирует `location /` на `http://127.0.0.1:3001` и маршруты `/api`, `/static` — на ваш `pizza-api` (см. `nginx.conf.example`).
+
 ## Важные моменты
 
 1. **Порт Next.js**: По умолчанию 3000, но рекомендуется использовать 3001, чтобы не конфликтовать с API
 2. **Директория сборки**: `apps/pizza-store/.next/`
-3. **Запуск в проде**: каталог `apps/pizza-store/.next/standalone/apps/pizza-store/` (там после сборки должны быть `server.js`, `.next/static/`, `public/`)
+3. **Запуск в проде**: полный путь к `server.js` из `find …/standalone/…/apps/pizza-store/server.js`; в этой же папке после сборки должны быть `.next/static/` и `public/`
 4. **Иначе будет 404 на `/_next/static`**: без копирования в standalone Next не находит чанки (см. автоматику в `project.json`)
 5. **Firewall**: Откройте порты 80 и 443, но НЕ открывайте порт 3001 наружу (только для nginx)
 
