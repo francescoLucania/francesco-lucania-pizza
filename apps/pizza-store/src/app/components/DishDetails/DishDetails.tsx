@@ -7,8 +7,7 @@ const staticBaseUrl =
   process.env.NEXT_PUBLIC_STATIC_URL ||
   (typeof window !== 'undefined'
     ? ''
-    : process.env.NEXT_PUBLIC_API_URL?.replace(/\/api\/?$/, '') ||
-      'http://localhost:5000');
+    : process.env.NEXT_PUBLIC_API_URL?.replace(/\/api\/?$/, '') || '');
 
 function getDishImageUrl(picture: string | undefined): string {
   if (!picture) {
