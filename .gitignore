@@ -46,6 +46,7 @@ Thumbs.db
 .env.local
 .env.*.local
 apps/pizza-api/.env
+apps/pizza-store/.env.production
 
 .angular
 

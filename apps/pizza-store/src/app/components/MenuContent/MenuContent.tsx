@@ -8,17 +8,17 @@ import type { Category } from '@francesco-lucania-pizza-models';
 import { PizzaReactProductCard } from '@francesco-lucania-pizza/react-ui';
 import styles from './MenuContent.module.scss';
 
-const staticBaseUrl =
-  process.env.NEXT_PUBLIC_STATIC_URL ||
-  (typeof window !== 'undefined'
-    ? ''
-    : process.env.NEXT_PUBLIC_API_URL?.replace(/\/api\/?$/, '') || '');
+const staticBaseUrl = process.env.NEXT_PUBLIC_STATIC_URL || '/static';
 
 function getDishImageUrl(picture: string | undefined): string {
+  const base = staticBaseUrl.replace(/\/+$/, '');
+  const normalizedPicture = (
+    picture || '/image/menu/dishes/unknown.jpg'
+  ).replace(/^\/+/, '');
   if (!picture) {
-    return `${staticBaseUrl}/image/menu/dishes/unknown.jpg`;
+    return `${base}/${normalizedPicture}`;
   }
-  return `${staticBaseUrl}/${picture}`;
+  return `${base}/${normalizedPicture}`;
 }
 
 function CategorySection({ category }: { category: Category }) {
