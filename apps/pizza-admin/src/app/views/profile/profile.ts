@@ -30,6 +30,15 @@ export class Profile implements OnInit {
   protected readonly avatarUploading = signal(false);
   protected readonly avatarError = signal<string | null>(null);
 
+  protected getProfileImageUrl(picture: string | undefined): string {
+    const base = this.staticEndpoint().replace(/\/+$/, '');
+    const normalizedPicture = (picture || '/image/menu/dishes/unknown.jpg').replace(
+      /^\/+/,
+      '',
+    );
+    return `${base}/${normalizedPicture}`;
+  }
+
   public ngOnInit(): void {
     this.userService.userData$
       .pipe(

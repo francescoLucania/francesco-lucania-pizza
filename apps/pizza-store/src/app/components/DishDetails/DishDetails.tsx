@@ -3,7 +3,11 @@
 import { useGetDishByIdQuery } from '../../../store/api/menuApi';
 import styles from './DishDetails.module.scss';
 
-const staticBaseUrl = process.env.NEXT_PUBLIC_STATIC_URL || '/static';
+const staticBaseUrl =
+  process.env.NEXT_PUBLIC_STATIC_URL ||
+  (process.env.NODE_ENV === 'development'
+    ? 'http://localhost:5000/static'
+    : '/static');
 
 function getDishImageUrl(picture: string | undefined): string {
   const base = staticBaseUrl.replace(/\/+$/, '');

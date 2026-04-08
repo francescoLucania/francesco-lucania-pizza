@@ -8,7 +8,11 @@ import type { Category } from '@francesco-lucania-pizza-models';
 import { PizzaReactProductCard } from '@francesco-lucania-pizza/react-ui';
 import styles from './MenuContent.module.scss';
 
-const staticBaseUrl = process.env.NEXT_PUBLIC_STATIC_URL || '/static';
+const staticBaseUrl =
+  process.env.NEXT_PUBLIC_STATIC_URL ||
+  (process.env.NODE_ENV === 'development'
+    ? 'http://localhost:5000/static'
+    : '/static');
 
 function getDishImageUrl(picture: string | undefined): string {
   const base = staticBaseUrl.replace(/\/+$/, '');

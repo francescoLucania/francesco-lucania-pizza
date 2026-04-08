@@ -7,6 +7,7 @@ const navigationItems: INavigateList[] = [
   { name: 'Главная', uri: '/' },
   { name: 'Меню', uri: '/menu' },
   { name: 'Заказать', uri: '/order' },
+  { name: 'Контакты', uri: '/contacts' },
 ];
 
 export function AppHeader() {

@@ -102,9 +102,11 @@ export class Menu implements OnInit {
   }
 
   protected getDishImageUrl(picture: string | undefined): string {
-    if (!picture) {
-      return `${this.staticUrl}/image/menu/dishes/unknown.jpg`;
-    }
-    return `${this.staticUrl}/${picture}`;
+    const base = this.staticUrl.replace(/\/+$/, '');
+    const normalizedPicture = (picture || '/image/menu/dishes/unknown.jpg').replace(
+      /^\/+/,
+      '',
+    );
+    return `${base}/${normalizedPicture}`;
   }
 }

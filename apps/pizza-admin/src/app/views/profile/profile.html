@@ -11,7 +11,7 @@
       <div class="profile__avatar-wrapper">
         <img
           class="profile__avatar-img"
-          [src]="staticEndpoint() + profileData.picture"
+          [src]="getProfileImageUrl(profileData.picture)"
           alt="Аватар пользователя"
         />
       </div>
