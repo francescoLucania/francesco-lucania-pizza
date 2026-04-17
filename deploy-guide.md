@@ -142,7 +142,31 @@ npm --version
 npm ci
 ```
 
-### 1.2 Установите и настройте MongoDB
+### 1.2 Подготовьте MongoDB (локально или в облаке)
+
+#### Вариант A (рекомендуется): облачная MongoDB Atlas
+
+1. Создайте кластер (M0 Shared достаточно для старта).
+2. Создайте пользователя БД (Database Access).
+3. Добавьте IP вашего сервера в Network Access.
+4. Скопируйте connection string формата `mongodb+srv://...`.
+
+Пример строки в `.env`:
+
+```bash
+DATABASE_URL="mongodb+srv://cluster0.xxxxx.mongodb.net/pizza-db?retryWrites=true&w=majority&appName=pizza"
+# Опционально, если логин/пароль храните отдельно:
+# DATABASE_LOGIN=your-db-user
+# DATABASE_PASS=your-db-password
+```
+
+Проверка соединения с сервера:
+
+```bash
+mongosh "$DATABASE_URL" --eval "db.adminCommand({ ping: 1 })"
+```
+
+#### Вариант B: локальная MongoDB на VPS
 
 ```bash
 # Установите MongoDB
@@ -257,8 +281,11 @@ MODE=PROD
 # Порт сервера
 PORT=3000
 
-# MongoDB
-MONGODB_URI=mongodb://localhost:27017/pizza-db
+# MongoDB (основная переменная)
+DATABASE_URL=mongodb://localhost:27017/pizza-db
+
+# Совместимость со старыми окружениями (опционально)
+# MONGODB_URI=mongodb://localhost:27017/pizza-db
 
 # JWT секреты
 JWT_ACCESS_SECRET=your-access-token-secret
@@ -289,7 +316,7 @@ module.exports = {
         NODE_ENV: 'production',
         PORT: 3000,
         MODE: 'PROD',
-        MONGODB_URI: 'mongodb://localhost:27017/pizza-db',
+        DATABASE_URL: 'mongodb://localhost:27017/pizza-db',
         // ... остальные переменные
       },
     },
@@ -764,9 +791,12 @@ pm2 logs pizza-admin
 ## Pizza API не запускается
 
 ```bash
-# Проверьте MongoDB
+# Проверьте MongoDB (локальная инсталляция)
 sudo systemctl status mongodb
 mongosh --eval "db.adminCommand('ping')"
+
+# Или проверьте облачный кластер
+mongosh "$DATABASE_URL" --eval "db.adminCommand({ ping: 1 })"
 
 # Проверьте переменные окружения
 cat .env

@@ -55,6 +55,7 @@ import { MenuModule } from './modules/menu/menu.module';
       useFactory: async (configService: ConfigService) => {
         const databaseUrl =
           configService.get<string>('DATABASE_URL')?.replace(/^"|"$/g, '') ||
+          configService.get<string>('MONGODB_URI')?.replace(/^"|"$/g, '') ||
           '';
         const databaseLogin =
           configService.get<string>('DATABASE_LOGIN')?.replace(/^"|"$/g, '') ||
@@ -63,13 +64,20 @@ import { MenuModule } from './modules/menu/menu.module';
           configService.get<string>('DATABASE_PASS')?.replace(/^"|"$/g, '') ||
           '';
 
-        // Формируем connection string с авторизацией
+        // Формируем connection string с авторизацией для mongodb:// и mongodb+srv://
         let connectionString = databaseUrl;
         if (databaseLogin && databasePass && !databaseUrl.includes('@')) {
-          const host = databaseUrl
-            .replace('mongodb://', '')
-            .replace(/\/.*$/, '');
-          connectionString = `mongodb://${databaseLogin}:${encodeURIComponent(databasePass)}@${host}`;
+          try {
+            const parsedUrl = new URL(databaseUrl);
+            parsedUrl.username = databaseLogin;
+            parsedUrl.password = databasePass;
+            connectionString = parsedUrl.toString();
+          } catch {
+            const host = databaseUrl
+              .replace(/^mongodb(\+srv)?:\/\//, '')
+              .replace(/\/.*$/, '');
+            connectionString = `mongodb://${databaseLogin}:${encodeURIComponent(databasePass)}@${host}`;
+          }
         }
 
         return {
