@@ -56,3 +56,5 @@ out
 
 # Static files
 static/
+
+.db-dumps/
