@@ -12,6 +12,11 @@
   background: #fff;
   text-align: center;
   transition: border-color var(--transitionBase);
+  will-change: border-color;
+
+  @media (prefers-color-scheme: dark) {
+    background: var(--bgColorMode) !important;
+  }
 
   &--link {
     position: relative;

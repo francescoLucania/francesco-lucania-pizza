@@ -9,6 +9,15 @@ $transitionSmall: 0.2s;
 $transitionBase: 0.4s;
 $transitionLarge: 0.8s;
 
+// Dark
+$borderRadiusSmallDark: $borderRadiusSmall;
+$borderRadiusBaseDark: $borderRadiusBase;
+$borderRadiusLargeDark: $borderRadiusLarge;
+
+$transitionSmallDark: $transitionSmall;
+$transitionBaseDark: $transitionBase;
+$transitionLargeDark: $transitionLarge;
+
 :root {
   --borderRadiusSmall: #{$borderRadiusSmall};
   --borderRadiusBase: #{$borderRadiusBase};
@@ -31,6 +40,18 @@ $lineHeightBase: 24px !default;
 
 $fontSizeLarge: 18px !default;
 $lineHeightLarge: 32px !default;
+
+// Dark
+$baseFontDark: $baseFont !default;
+
+$fontSizeSmallDark: $fontSizeSmall !default;
+$lineHeightSmallDark: $lineHeightSmall !default;
+
+$fontSizeBaseDark: $fontSizeBase !default;
+$lineHeightBaseDark: $lineHeightBase !default;
+
+$fontSizeLargeDark: $fontSizeLarge !default;
+$lineHeightLargeDark: $lineHeightLarge !default;
 
 :root {
   --baseFont: #{$baseFont};
@@ -102,46 +123,6 @@ $accessibilityColorDark: $accessibilityBorder !default;
   --colorError: #{$colorError};
 }
 
-html[data-theme='dark'] {
-  --colorBase: #{$colorBaseDark};
-  --colorLight: #{$colorLightDark};
-  --colorLighter: #{$colorLighterDark};
-  --colorLightest: #{$colorLightestDark};
-
-  --colorBrand: #{$colorBrandDark};
-  --colorSound: #{$colorSoundDark};
-  --colorSoundLight: #{$colorSoundLightDark};
-  --bgColor: #{$bgColorDark};
-  --bgColorMode: #{$bgColorModeDark};
-
-  --accessibilityBorder: #{$accessibilityBorderDark};
-  --accessibilityBackground: #{$accessibilityBackgroundDark};
-  --accessibilityColor: #{$accessibilityColorDark};
-
-  --colorError: #{$colorErrorDark};
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --colorBase: #{$colorBaseDark};
-    --colorLight: #{$colorLightDark};
-    --colorLighter: #{$colorLighterDark};
-    --colorLightest: #{$colorLightestDark};
-
-    --colorBrand: #{$colorBrandDark};
-    --colorSound: #{$colorSoundDark};
-    --colorSoundLight: #{$colorSoundLightDark};
-    --bgColor: #{$bgColorDark};
-    --bgColorMode: #{$bgColorModeDark};
-
-    --accessibilityBorder: #{$accessibilityBorderDark};
-    --accessibilityBackground: #{$accessibilityBackgroundDark};
-    --accessibilityColor: #{$accessibilityColorDark};
-
-    --colorError: #{$colorErrorDark};
-  }
-}
-
 // pizza-ui-input
 $inputBorderWidth: 1px;
 $inputBorderRadius: 0;
@@ -166,6 +147,31 @@ $inputPaddingRightLarge: 8px;
 $inputHeightSmall: auto;
 $inputHeightBase: auto;
 $inputHeightLarge: auto;
+
+// Dark
+$inputBorderWidthDark: $inputBorderWidth;
+$inputBorderRadiusDark: $inputBorderRadius;
+$inputBackgroundBaseDark: $bgColorDark;
+$inputColorBaseDark: $colorBaseDark;
+
+$inputPaddingTopSmallDark: $inputPaddingTopSmall;
+$inputPaddingBottomSmallDark: $inputPaddingBottomSmall;
+$inputPaddingLeftSmallDark: $inputPaddingLeftSmall;
+$inputPaddingRightSmallDark: $inputPaddingRightSmall;
+
+$inputPaddingTopBaseDark: $inputPaddingTopBase;
+$inputPaddingBottomBaseDark: $inputPaddingBottomBase;
+$inputPaddingLeftBaseDark: $inputPaddingLeftBase;
+$inputPaddingRightBaseDark: $inputPaddingRightBase;
+
+$inputPaddingTopLargeDark: $inputPaddingTopLarge;
+$inputPaddingBottomLargeDark: $inputPaddingBottomLarge;
+$inputPaddingLeftLargeDark: $inputPaddingLeftLarge;
+$inputPaddingRightLargeDark: $inputPaddingRightLarge;
+
+$inputHeightSmallDark: $inputHeightSmall;
+$inputHeightBaseDark: $inputHeightBase;
+$inputHeightLargeDark: $inputHeightLarge;
 
 :root {
   // pizza-ui-input
@@ -217,6 +223,28 @@ $buttonPaddingBottomLarge: 14px;
 $buttonPaddingLeftLarge: 30px;
 $buttonPaddingRightLarge: 30px;
 
+// Dark
+$buttonBorderWidthDark: $buttonBorderWidth;
+$buttonBorderRadiusDark: $buttonBorderRadius;
+$buttonBackgroundBaseDark: $colorBaseDark;
+$buttonFontWeightDark: $colorBaseDark;
+$buttonColorBaseDark: $colorBase;
+
+$buttonPaddingTopSmallDark: $buttonPaddingTopSmall;
+$buttonPaddingBottomSmallDark: $buttonPaddingBottomSmall;
+$buttonPaddingLeftSmallDark: $buttonPaddingLeftSmall;
+$buttonPaddingRightSmallDark: $buttonPaddingRightSmall;
+
+$buttonPaddingTopBaseDark: $buttonPaddingTopBase;
+$buttonPaddingBottomBaseDark: $buttonPaddingBottomBase;
+$buttonPaddingLeftBaseDark: $buttonPaddingLeftBase;
+$buttonPaddingRightBaseDark: $buttonPaddingRightBase;
+
+$buttonPaddingTopLargeDark: $buttonPaddingTopLarge;
+$buttonPaddingBottomLargeDark: $buttonPaddingBottomLarge;
+$buttonPaddingLeftLargeDark: $buttonPaddingLeftLarge;
+$buttonPaddingRightLargeDark: $buttonPaddingRightLarge;
+
 :root {
   --borderRadiusSmall: #{$borderRadiusSmall};
   --borderRadiusBase: #{$borderRadiusBase};
@@ -256,6 +284,12 @@ $navigateListColorHover: $colorBase;
 $navigateListFontWeight: 400;
 $navigateListTransition: $transitionSmall;
 
+// Dark
+$navigateListColorBaseDark: $colorBaseDark;
+$navigateListColorHoverDark: $colorBaseDark;
+$navigateListFontWeightDark: $navigateListFontWeight;
+$navigateListTransitionDark: $navigateListTransition;
+
 :root {
   --navigateListColorBase: #{$navigateListColorBase};
   --navigateListColorHover: #{$navigateListColorHover};
@@ -274,6 +308,18 @@ $modalBorder: 4px solid var(--colorBrand);
 $modalBoxShadow: 0 12px 32px rgba(11, 31, 51, 0.18);
 $modalBorderRadius: none;
 $modalBgColor: #fff;
+
+// Dark
+$modalPaddingSmDark: $modalPaddingSm;
+$modalBorderSmDark: $modalBorderSm;
+$modalBoxShadowSmDark: $modalBoxShadowSm;
+$modalBorderRadiusSmDark: $modalBorderRadiusSm;
+
+$modalPaddingDark: $modalPadding;
+$modalBorderDark: $modalBorder;
+$modalBoxShadowDark: 0 12px 32px rgba(0, 0, 0, 0.45);
+$modalBorderRadiusDark: $modalBorderRadius;
+$modalBgColorDark: $bgColorDark;
 
 :root {
   --modalPaddingSm: #{$modalPaddingSm};
@@ -297,6 +343,14 @@ $popoverBoxShadow: 0 12px 12px #0000001f;
 $popoverBorderRadius: 6px;
 $popoverBgColor: #fff;
 
+// Dark
+$popoverPaddingSmDark: $popoverPaddingSm;
+$popoverPaddingDark: $popoverPadding;
+$popoverBorderDark: 1px solid rgba(255, 255, 255, 0.1);
+$popoverBoxShadowDark: 0 12px 12px rgba(0, 0, 0, 0.5);
+$popoverBorderRadiusDark: $popoverBorderRadius;
+$popoverBgColorDark: $bgColorDark;
+
 :root {
   --popoverPaddingSm: #{$popoverPaddingSm};
 
@@ -305,4 +359,224 @@ $popoverBgColor: #fff;
   --popoverBorder: #{$popoverBorder};
   --popoverBorderRadius: #{$popoverBorderRadius};
   --popoverBgColor: #{$popoverBgColor};
+}
+
+html[data-theme='dark'] {
+  --borderRadiusSmall: #{$borderRadiusSmallDark};
+  --borderRadiusBase: #{$borderRadiusBaseDark};
+  --borderRadiusLarge: #{$borderRadiusLargeDark};
+
+  --transitionSmall: #{$transitionSmallDark};
+  --transitionBase: #{$transitionBaseDark};
+  --transitionLarge: #{$transitionLargeDark};
+
+  --baseFont: #{$baseFontDark};
+
+  --fontSizeSmall: #{$fontSizeSmallDark};
+  --lineHeightSmall: #{$lineHeightSmallDark};
+
+  --fontSizeBase: #{$fontSizeBaseDark};
+  --lineHeightBase: #{$lineHeightBaseDark};
+
+  --fontSizeLarge: #{$fontSizeLargeDark};
+  --lineHeightLarge: #{$lineHeightLargeDark};
+
+  --colorBase: #{$colorBaseDark};
+  --colorLight: #{$colorLightDark};
+  --colorLighter: #{$colorLighterDark};
+  --colorLightest: #{$colorLightestDark};
+
+  --colorBrand: #{$colorBrandDark};
+  --colorSound: #{$colorSoundDark};
+  --colorSoundLight: #{$colorSoundLightDark};
+  --bgColor: #{$bgColorDark};
+  --bgColorMode: #{$bgColorModeDark};
+
+  --accessibilityBorder: #{$accessibilityBorderDark};
+  --accessibilityBackground: #{$accessibilityBackgroundDark};
+  --accessibilityColor: #{$accessibilityColorDark};
+
+  --colorError: #{$colorErrorDark};
+
+  --inputBorderWidth: #{$inputBorderWidthDark};
+  --inputBorderRadius: #{$inputBorderRadiusDark};
+  --inputBackgroundBase: #{$inputBackgroundBaseDark};
+  --inputColorBase: #{$inputColorBaseDark};
+  --inputTransition: #{$transitionSmallDark};
+
+  --inputPaddingTopSmall: #{$inputPaddingTopSmallDark};
+  --inputPaddingBottomSmall: #{$inputPaddingBottomSmallDark};
+  --inputPaddingLeftSmall: #{$inputPaddingLeftSmallDark};
+  --inputPaddingRightSmall: #{$inputPaddingRightSmallDark};
+
+  --inputPaddingTopBase: #{$inputPaddingTopBaseDark};
+  --inputPaddingBottomBase: #{$inputPaddingBottomBaseDark};
+  --inputPaddingLeftBase: #{$inputPaddingLeftBaseDark};
+  --inputPaddingRightBase: #{$inputPaddingRightBaseDark};
+
+  --inputPaddingTopLarge: #{$inputPaddingTopLargeDark};
+  --inputPaddingBottomLarge: #{$inputPaddingBottomLargeDark};
+  --inputPaddingLeftLarge: #{$inputPaddingLeftLargeDark};
+  --inputPaddingRightLarge: #{$inputPaddingRightLargeDark};
+
+  --inputHeightSmall: #{$inputHeightSmallDark};
+  --inputHeightBase: #{$inputHeightBaseDark};
+  --inputHeightLarge: #{$inputHeightLargeDark};
+
+  --buttonBorderWidth: #{$buttonBorderWidthDark};
+  --buttonBorderRadius: #{$buttonBorderRadiusDark};
+  --buttonColotBase: #{$buttonColorBaseDark};
+  --buttonFontWeight: #{$buttonFontWeightDark};
+  --buttonBackgroundBase: #{$buttonBackgroundBaseDark};
+  --buttonTransition: #{$transitionSmallDark};
+
+  --buttonPaddingTopSmall: #{$buttonPaddingTopSmallDark};
+  --buttonPaddingBottomSmall: #{$buttonPaddingBottomSmallDark};
+  --buttonPaddingLeftSmall: #{$buttonPaddingLeftSmallDark};
+  --buttonPaddingRightSmall: #{$buttonPaddingRightSmallDark};
+
+  --buttonPaddingTopBase: #{$buttonPaddingTopBaseDark};
+  --buttonPaddingBottomBase: #{$buttonPaddingBottomBaseDark};
+  --buttonPaddingLeftBase: #{$buttonPaddingLeftBaseDark};
+  --buttonPaddingRightBase: #{$buttonPaddingRightBaseDark};
+
+  --buttonPaddingTopLarge: #{$buttonPaddingTopLargeDark};
+  --buttonPaddingBottomLarge: #{$buttonPaddingBottomLargeDark};
+  --buttonPaddingLeftLarge: #{$buttonPaddingLeftLargeDark};
+  --buttonPaddingRightLarge: #{$buttonPaddingRightLargeDark};
+
+  --navigateListColorBase: #{$navigateListColorBaseDark};
+  --navigateListColorHover: #{$navigateListColorHoverDark};
+  --navigateListFontWeight: #{$navigateListFontWeightDark};
+  --navigateListTransition: #{$navigateListTransitionDark};
+
+  --modalPaddingSm: #{$modalPaddingSmDark};
+  --modalBoxShadowSm: #{$modalBoxShadowSmDark};
+  --modalBorderSm: #{$modalBorderSmDark};
+  --modalBorderRadiusSm: #{$modalBorderRadiusSmDark};
+
+  --modalPadding: #{$modalPaddingDark};
+  --modalBoxShadow: #{$modalBoxShadowDark};
+  --modalBorder: #{$modalBorderDark};
+  --modalBorderRadius: #{$modalBorderRadiusDark};
+  --modalBgColor: #{$modalBgColorDark};
+
+  --popoverPaddingSm: #{$popoverPaddingSmDark};
+
+  --popoverPadding: #{$popoverPaddingDark};
+  --popoverBoxShadow: #{$popoverBoxShadowDark};
+  --popoverBorder: #{$popoverBorderDark};
+  --popoverBorderRadius: #{$popoverBorderRadiusDark};
+  --popoverBgColor: #{$popoverBgColorDark};
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --borderRadiusSmall: #{$borderRadiusSmallDark};
+    --borderRadiusBase: #{$borderRadiusBaseDark};
+    --borderRadiusLarge: #{$borderRadiusLargeDark};
+
+    --transitionSmall: #{$transitionSmallDark};
+    --transitionBase: #{$transitionBaseDark};
+    --transitionLarge: #{$transitionLargeDark};
+
+    --baseFont: #{$baseFontDark};
+
+    --fontSizeSmall: #{$fontSizeSmallDark};
+    --lineHeightSmall: #{$lineHeightSmallDark};
+
+    --fontSizeBase: #{$fontSizeBaseDark};
+    --lineHeightBase: #{$lineHeightBaseDark};
+
+    --fontSizeLarge: #{$fontSizeLargeDark};
+    --lineHeightLarge: #{$lineHeightLargeDark};
+
+    --colorBase: #{$colorBaseDark};
+    --colorLight: #{$colorLightDark};
+    --colorLighter: #{$colorLighterDark};
+    --colorLightest: #{$colorLightestDark};
+
+    --colorBrand: #{$colorBrandDark};
+    --colorSound: #{$colorSoundDark};
+    --colorSoundLight: #{$colorSoundLightDark};
+    --bgColor: #{$bgColorDark};
+    --bgColorMode: #{$bgColorModeDark};
+
+    --accessibilityBorder: #{$accessibilityBorderDark};
+    --accessibilityBackground: #{$accessibilityBackgroundDark};
+    --accessibilityColor: #{$accessibilityColorDark};
+
+    --colorError: #{$colorErrorDark};
+
+    --inputBorderWidth: #{$inputBorderWidthDark};
+    --inputBorderRadius: #{$inputBorderRadiusDark};
+    --inputBackgroundBase: #{$inputBackgroundBaseDark};
+    --inputColorBase: #{$inputColorBaseDark};
+    --inputTransition: #{$transitionSmallDark};
+
+    --inputPaddingTopSmall: #{$inputPaddingTopSmallDark};
+    --inputPaddingBottomSmall: #{$inputPaddingBottomSmallDark};
+    --inputPaddingLeftSmall: #{$inputPaddingLeftSmallDark};
+    --inputPaddingRightSmall: #{$inputPaddingRightSmallDark};
+
+    --inputPaddingTopBase: #{$inputPaddingTopBaseDark};
+    --inputPaddingBottomBase: #{$inputPaddingBottomBaseDark};
+    --inputPaddingLeftBase: #{$inputPaddingLeftBaseDark};
+    --inputPaddingRightBase: #{$inputPaddingRightBaseDark};
+
+    --inputPaddingTopLarge: #{$inputPaddingTopLargeDark};
+    --inputPaddingBottomLarge: #{$inputPaddingBottomLargeDark};
+    --inputPaddingLeftLarge: #{$inputPaddingLeftLargeDark};
+    --inputPaddingRightLarge: #{$inputPaddingRightLargeDark};
+
+    --inputHeightSmall: #{$inputHeightSmallDark};
+    --inputHeightBase: #{$inputHeightBaseDark};
+    --inputHeightLarge: #{$inputHeightLargeDark};
+
+    --buttonBorderWidth: #{$buttonBorderWidthDark};
+    --buttonBorderRadius: #{$buttonBorderRadiusDark};
+    --buttonColotBase: #{$buttonColorBaseDark};
+    --buttonFontWeight: #{$buttonFontWeightDark};
+    --buttonBackgroundBase: #{$buttonBackgroundBaseDark};
+    --buttonTransition: #{$transitionSmallDark};
+
+    --buttonPaddingTopSmall: #{$buttonPaddingTopSmallDark};
+    --buttonPaddingBottomSmall: #{$buttonPaddingBottomSmallDark};
+    --buttonPaddingLeftSmall: #{$buttonPaddingLeftSmallDark};
+    --buttonPaddingRightSmall: #{$buttonPaddingRightSmallDark};
+
+    --buttonPaddingTopBase: #{$buttonPaddingTopBaseDark};
+    --buttonPaddingBottomBase: #{$buttonPaddingBottomBaseDark};
+    --buttonPaddingLeftBase: #{$buttonPaddingLeftBaseDark};
+    --buttonPaddingRightBase: #{$buttonPaddingRightBaseDark};
+
+    --buttonPaddingTopLarge: #{$buttonPaddingTopLargeDark};
+    --buttonPaddingBottomLarge: #{$buttonPaddingBottomLargeDark};
+    --buttonPaddingLeftLarge: #{$buttonPaddingLeftLargeDark};
+    --buttonPaddingRightLarge: #{$buttonPaddingRightLargeDark};
+
+    --navigateListColorBase: #{$navigateListColorBaseDark};
+    --navigateListColorHover: #{$navigateListColorHoverDark};
+    --navigateListFontWeight: #{$navigateListFontWeightDark};
+    --navigateListTransition: #{$navigateListTransitionDark};
+
+    --modalPaddingSm: #{$modalPaddingSmDark};
+    --modalBoxShadowSm: #{$modalBoxShadowSmDark};
+    --modalBorderSm: #{$modalBorderSmDark};
+    --modalBorderRadiusSm: #{$modalBorderRadiusSmDark};
+
+    --modalPadding: #{$modalPaddingDark};
+    --modalBoxShadow: #{$modalBoxShadowDark};
+    --modalBorder: #{$modalBorderDark};
+    --modalBorderRadius: #{$modalBorderRadiusDark};
+    --modalBgColor: #{$modalBgColorDark};
+
+    --popoverPaddingSm: #{$popoverPaddingSmDark};
+
+    --popoverPadding: #{$popoverPaddingDark};
+    --popoverBoxShadow: #{$popoverBoxShadowDark};
+    --popoverBorder: #{$popoverBorderDark};
+    --popoverBorderRadius: #{$popoverBorderRadiusDark};
+    --popoverBgColor: #{$popoverBgColorDark};
+  }
 }
