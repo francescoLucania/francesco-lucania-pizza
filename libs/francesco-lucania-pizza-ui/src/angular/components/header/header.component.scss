@@ -1,6 +1,4 @@
-@use '../../../../assets/styles/theme-provider/theme_provider' as theme;
-@use '../../../../assets/styles/theme-provider/base-styles/typography/typography'
-  as typography;
+@use '../../../../assets/styles/theme-provider/core/mixins/media/media' as media;
 @use '../../../../assets/styles/theme-provider/common/accessibility/mixins/actions'
   as actions;
 
@@ -51,20 +49,16 @@
     padding: 16px 0;
     transition: all 0.6s;
 
-    @include theme.mq(md) {
+    @include media.mq(md) {
       padding: 16px 0;
     }
 
-    @include theme.mq(lg) {
+    @include media.mq(lg) {
       padding: 32px 0;
     }
 
     .site-header--scroll-mod & {
-      @include theme.mq(lg) {
-        padding: 16px 0;
-      }
-
-      @include theme.mq(lg) {
+      @include media.mq(lg) {
         padding: 16px 0;
       }
     }
@@ -75,7 +69,7 @@
     height: 48px;
     transition: all 0.6s;
 
-    @include theme.mq(md) {
+    @include media.mq(md) {
       width: 64px;
       height: 64px;
     }
@@ -117,7 +111,7 @@
   }
 
   &__navigate {
-    @include theme.mq(sm) {
+    @include media.mq(sm) {
       display: none;
     }
   }
@@ -126,22 +120,23 @@
     list-style: none;
     counter-reset: item;
 
-    @include theme.mq(md) {
+    @include media.mq(md) {
       display: flex;
     }
   }
 
   &__navigate-list-item {
-    @include typography.text-base-large();
+    font-size: var(--fontSizeLarge);
+    line-height: var(--lineHeightLarge);
 
     display: flex;
 
     &:not(:first-child) {
-      @include theme.mq(sm) {
+      @include media.mq(sm) {
         margin-top: 16px;
       }
 
-      @include theme.mq(md) {
+      @include media.mq(md) {
         margin-left: 24px;
       }
     }
@@ -170,7 +165,7 @@
 
         span::after {
           width: 100%;
-          background-color: theme.$colorLightest;
+          background-color: var(--colorLightest);
         }
       }
 
@@ -185,7 +180,7 @@
           transform: translateY(-50%);
           width: 0;
           height: 3px;
-          background-color: theme.$colorBrand;
+          background-color: var(--colorBrand);
           transition: all 0.2s;
           content: '';
         }
@@ -216,7 +211,7 @@
     }
   }
 
-  @include theme.mq(md) {
+  @include media.mq(md) {
     display: none;
   }
 
@@ -280,7 +275,7 @@
   opacity: 0;
   transition: opacity 0.6s;
 
-  @include theme.mq(md) {
+  @include media.mq(md) {
     display: none;
   }
 
@@ -308,7 +303,7 @@
   background: var(--bgColor);
   transition: all 0.6s;
 
-  @include theme.mq(md) {
+  @include media.mq(md) {
     display: none !important;
   }
 

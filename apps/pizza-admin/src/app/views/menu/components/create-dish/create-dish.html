@@ -24,7 +24,6 @@
             [formField]="dishForm.name"
             type="text"
             id="name"
-            name="name"
             placeholder="Введите название блюда"
             [size]="'large'"
             (blurEvent)="markFieldTouched('name')"
@@ -46,7 +45,6 @@
             [formField]="dishForm.fullName"
             type="text"
             id="fullName"
-            name="fullName"
             placeholder="Введите полное название блюда"
             [size]="'large'"
             (blurEvent)="markFieldTouched('fullName')"
@@ -66,7 +64,6 @@
             [formField]="dishForm.description"
             type="text"
             id="description"
-            name="description"
             placeholder="Введите описание блюда"
             [size]="'large'"
             (blurEvent)="markFieldTouched('description')"
@@ -88,7 +85,6 @@
             [formField]="dishForm.ingredients"
             type="text"
             id="ingredients"
-            name="ingredients"
             placeholder="Введите список ингредиентов"
             [size]="'large'"
             (blurEvent)="markFieldTouched('ingredients')"
@@ -108,7 +104,6 @@
             [formField]="dishForm.recipe"
             type="text"
             id="recipe"
-            name="recipe"
             placeholder="Введите рецепт приготовления"
             [size]="'large'"
             (blurEvent)="markFieldTouched('recipe')"
@@ -123,8 +118,8 @@
         <!-- Picture -->
         <div class="mt-16">
           <label for="picture" class="create-dish__label"
-            >Изображение блюда
-            {{ isEditMode() ? '(оставьте пустым, чтобы не менять)' : '' }}</label
+            >Изображение блюда {{ isEditMode() ? '(оставьте пустым, чтобы не
+            менять)' : '' }}</label
           >
           <input
             class="create-dish__file-input mt-4"

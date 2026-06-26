@@ -1,23 +1,20 @@
-@use 'libs/francesco-lucania-pizza-ui/assets/styles/theme-provider/theme_provider'
-  as theme;
+@use 'libs/francesco-lucania-pizza-ui/assets/styles/theme-provider/core/mixins/media/media'
+  as media;
 
 .categories {
   max-width: 1200px;
   margin: 0 auto;
 
-  &__title {
-  }
-
   &__header {
     margin-bottom: 24px;
 
-    @include theme.mq(md) {
+    @include media.mq(md) {
       display: flex;
       justify-content: space-between;
     }
 
     > * {
-      @include theme.mq(sm) {
+      @include media.mq(sm) {
         &:not(:first-child) {
           display: block;
           margin-top: 24px;
@@ -55,7 +52,6 @@
 
   &__actions {
     display: flex;
-    justify-content: flex-start;
     align-items: center;
     gap: 8px;
   }
@@ -161,7 +157,8 @@
     color: var(--colorTextSecondary);
   }
 
-  &__card-dishes {
+  &__card-dishes,
+  &__selected-dishes {
     margin-top: 16px;
     padding-top: 16px;
     border-top: 1px solid var(--colorBorder);
@@ -206,12 +203,6 @@
       border-color: var(--colorPrimary);
       box-shadow: 0 0 0 2px var(--colorPrimaryLight);
     }
-  }
-
-  &__selected-dishes {
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px solid var(--colorBorder);
   }
 
   &__selected-dishes-list {
