@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   HttpException,
   HttpStatus,
   Query,
@@ -16,6 +17,8 @@ import {
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 import { UserService } from './user.service';
 import { ValidationPipe } from '../../pipes/validation/validation';
 import { UserDto } from './dto/user-public.dto';
@@ -156,6 +159,35 @@ export class UserController {
   public async getUserData(@Req() request, @Response() response) {
     const token = request?.headers.authorization?.split(' ')?.[1];
     const userData = await this.userService.getUserData(token);
+    response.send(userData);
+  }
+
+  @UseGuards(AuthGuard)
+  @UsePipes(ValidationPipe)
+  @Put('/update')
+  public async updateUserData(
+    @Req() request,
+    @Body() dto: UpdateUserDto,
+    @Response() response,
+  ) {
+    const token = request?.headers.authorization?.split(' ')?.[1];
+    const normalizedDto = dto.phone
+      ? { ...dto, phone: normalizePhone(dto.phone) }
+      : dto;
+    const userData = await this.userService.updateUserData(token, normalizedDto);
+    response.send(userData);
+  }
+
+  @UseGuards(AuthGuard)
+  @UsePipes(ValidationPipe)
+  @Put('/updatePassword')
+  public async updatePassword(
+    @Req() request,
+    @Body() dto: UpdatePasswordDto,
+    @Response() response,
+  ) {
+    const token = request?.headers.authorization?.split(' ')?.[1];
+    const userData = await this.userService.updatePassword(token, dto);
     response.send(userData);
   }
 

@@ -12,6 +12,7 @@
 
   &__avatar-block {
     display: flex;
+    justify-content: center;
     align-items: center;
     gap: 16px;
     flex-wrap: wrap;
@@ -51,5 +52,19 @@
   &__grid {
     display: grid;
     gap: 12px;
+  }
+
+  &__form {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  &__form-title {
+    margin: 0 0 24px;
+    text-align: center;
+  }
+
+  &__success {
+    color: var(--colorBrand);
   }
 }

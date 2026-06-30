@@ -5,6 +5,7 @@ import {
   RegistrationBody,
   CreateResponse,
   LoginBody,
+  UpdateUserBody,
   UserProfile,
 } from '@francesco-lucania-pizza-models';
 import { UserDataService } from './user-data.service';
@@ -68,6 +69,14 @@ export class AuthService {
         file,
         fieldName: 'avatar',
       },
+    );
+  }
+
+  public updateUser(userData: UpdateUserBody): Observable<UserProfile> {
+    return this.apiService.put<UserProfile>('user/update', userData).pipe(
+      tap((data) => {
+        this.userService.setUserData(data);
+      }),
     );
   }
 

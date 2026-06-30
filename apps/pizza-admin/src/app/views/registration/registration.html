@@ -1,10 +1,21 @@
 <section class="section">
   <div class="container">
-    <div class="registration-form-container">
+    <form class="registration-form-container" (ngSubmit)="send()">
+      <h1 class="registration__title heading-h1">Регистрация</h1>
       <pizza-admin-registration-form
-        (formSubmit)="onFormSubmit($event)"
+        [registrationForm]="registrationForm"
+        [submitted]="submitted()"
         [serverError]="serverError()"
-      ></pizza-admin-registration-form>
-    </div>
+      />
+      <div class="registration__actions mt-24">
+        <pizza-lib-button
+          [buttonType]="'submit'"
+          [label]="isLoading() ? 'Регистрируем...' : 'Зарегистрироваться'"
+          [theme]="'brand'"
+          [disabled]="!registrationForm().valid() || isLoading()"
+          [fullWidth]="true"
+        />
+      </div>
+    </form>
   </div>
 </section>

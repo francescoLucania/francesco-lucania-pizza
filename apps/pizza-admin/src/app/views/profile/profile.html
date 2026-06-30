@@ -7,71 +7,122 @@
     } @else if (errorText()) {
     <p class="mt-16 color-error">{{ errorText() }}</p>
     } @else { @if (profile(); as profileData) {
-    <div class="mt-24 profile__avatar-block">
-      <div class="profile__avatar-wrapper">
-        <img
-          class="profile__avatar-img"
-          [src]="getProfileImageUrl(profileData.picture)"
-          alt="Аватар пользователя"
+
+    @if (successText(); as successMessage) {
+    <div class="text-base-small profile__success mt-16">{{ successMessage }}</div>
+    }
+
+      @if (!isEditing()) {
+        <div class="mt-24 profile__avatar-block">
+          <div class="profile__avatar-wrapper">
+            <img
+              class="profile__avatar-img"
+              [src]="getProfileImageUrl(profileData.picture)"
+              alt="Аватар пользователя"
+            />
+          </div>
+          <div class="profile__avatar-controls">
+            <label class="profile__avatar-upload">
+              <span class="text-base-small">Сменить аватар</span>
+              <input
+                type="file"
+                accept="image/*"
+                (change)="onAvatarChange($event)"
+              />
+            </label>
+            @if (avatarUploading()) {
+              <div class="text-base-small mt-4">Загружаем...</div>
+            } @if (avatarError(); as aErr) {
+            <div class="text-base-small color-error mt-4">{{ aErr }}</div>
+          }
+          </div>
+        </div>
+
+        <div class="mt-24 text-center">
+          <div class="mt-16">
+            <span class="text-base-small color-secondary mt-16">Email:</span>
+            {{ profileData.email }}
+          </div>
+          <div class="mt-16">
+            <span class="text-base-small color-secondary">Телефон:</span>
+            {{ profileData.phone }}
+          </div>
+          <div class="mt-16">
+            <span class="text-base-small color-secondary">Имя:</span>
+            {{ profileData.name }}
+          </div>
+          <div class="mt-16">
+            <span class="text-base-small color-secondary">Полное имя:</span>
+            {{ profileData.fullName }}
+          </div>
+          <div class="mt-16">
+            <span class="text-base-small color-secondary">Пол:</span>
+            {{ getGenderLabel(profileData.gender) }}
+          </div>
+          <div class="mt-16">
+            <span class="text-base-small color-secondary">Дата рождения:</span>
+            {{ profileData.dateIssue }}
+          </div>
+          <div class="mt-16">
+            <span class="text-base-small color-secondary">Создан:</span>
+            {{ profileData.created }}
+          </div>
+          <div class="mt-16">
+            <span class="text-base-small color-secondary">Последняя активность:</span>
+            {{ profileData.lastActivity }}
+          </div>
+        </div>
+      }
+
+
+    @if (isEditing()) {
+    <form class="profile__form mt-24" (ngSubmit)="sendProfileUpdate()">
+
+      @if (formServerError() === 'UPDATE_FAILED') {
+      <div class="text-base-small color-error mb-16">
+        Не удалось обновить данные. Попробуйте ещё раз.
+      </div>
+      }
+
+      <pizza-admin-registration-form
+        mode="update"
+        [registrationForm]="updateForm"
+        [submitted]="formSubmitted()"
+        [serverError]="formServerError()"
+      />
+
+      <div class="form-actions-grid mt-24">
+        <pizza-lib-button
+          [buttonType]="'submit'"
+          [label]="formSubmitting() ? 'Сохраняем...' : 'Сохранить изменения'"
+          [theme]="'brand'"
+          [fullWidth]="true"
+          [disabled]="formSubmitting() || !updateForm.phone().valid() || !updateForm.name().valid() || !updateForm.fullName().valid()"
+        />
+        <pizza-lib-button
+          [buttonType]="'button'"
+          [label]="'Отмена'"
+          [theme]="'secondary'"
+          [fullWidth]="true"
+          (click)="cancelEditing()"
         />
       </div>
-      <div class="profile__avatar-controls">
-        <label class="profile__avatar-upload">
-          <span class="text-base-small">Сменить аватар</span>
-          <input
-            type="file"
-            accept="image/*"
-            (change)="onAvatarChange($event)"
-          />
-        </label>
-        @if (avatarUploading()) {
-        <div class="text-base-small mt-4">Загружаем...</div>
-        } @if (avatarError(); as aErr) {
-        <div class="text-base-small color-error mt-4">{{ aErr }}</div>
-        }
-      </div>
-    </div>
+    </form>
+    }
 
-    <div class="mt-24 profile__grid">
-      <div>
-        <span class="text-base-small color-secondary">Email:</span> {{
-        profileData.email }}
-      </div>
-      <div>
-        <span class="text-base-small color-secondary">Телефон:</span> {{
-        profileData.phone }}
-      </div>
-      <div>
-        <span class="text-base-small color-secondary">Имя:</span> {{
-        profileData.name }}
-      </div>
-      <div>
-        <span class="text-base-small color-secondary">Полное имя:</span> {{
-        profileData.fullName }}
-      </div>
-      <div>
-        <span class="text-base-small color-secondary">Пол:</span> {{
-        profileData.gender }}
-      </div>
-      <div>
-        <span class="text-base-small color-secondary">Дата выдачи:</span> {{
-        profileData.dateIssue }}
-      </div>
-      <div>
-        <span class="text-base-small color-secondary">Создан:</span> {{
-        profileData.created }}
-      </div>
-      <div>
-        <span class="text-base-small color-secondary"
-          >Последняя активность:</span
-        >
-        {{ profileData.lastActivity }}
-      </div>
-    </div>
-
-    <div class="profile__actions mt-24">
+    <div class="form-actions-grid mt-24">
+      @if (!isEditing()) {
       <pizza-lib-button
         [buttonType]="'button'"
+        [fullWidth]="true"
+        [label]="'Редактировать данные'"
+        [theme]="'brand'"
+        (click)="startEditing()"
+      />
+      }
+      <pizza-lib-button
+        [buttonType]="'button'"
+        [fullWidth]="true"
         [label]="'Выйти'"
         [theme]="'secondary'"
         (click)="logout()"

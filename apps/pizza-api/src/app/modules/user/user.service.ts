@@ -4,6 +4,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './schemas/user.schema';
 import { FileService, FileType } from '../../services/file/file.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 import { MailService } from '../../services/mail/mail.service';
 import bcrypt from 'bcryptjs';
 import { TokenService, TokenType } from './services/token/token.service';
@@ -144,9 +146,68 @@ export class UserService {
   }
 
   public async getUserData(token: string) {
-    return this.buildUserProfileData(
-      await this.getUserByToken('ACCESS_TOKEN', token),
-    );
+    const user = await this.getUserByToken('ACCESS_TOKEN', token);
+    if (!user) {
+      throw new UnauthorizedException('BAD_TOKEN');
+    }
+
+    return this.buildUserProfileData(user);
+  }
+
+  public async updateUserData(
+    token: string,
+    dto: UpdateUserDto,
+  ): Promise<UserProfile> {
+    const user = await this.getUserByToken('ACCESS_TOKEN', token);
+    if (!user) {
+      throw new UnauthorizedException('BAD_TOKEN');
+    }
+
+    if (dto.phone) {
+      const normalizedPhone = normalizePhone(dto.phone);
+      if (normalizedPhone !== user.phone) {
+        const existingUser = await this.searchUserInModel({
+          phone: normalizedPhone,
+        });
+        if (existingUser) {
+          throw new ValidationException('BUSY_PHONE');
+        }
+        user.phone = normalizedPhone;
+      }
+    }
+
+    if (dto.name) {
+      user.name = dto.name;
+    }
+
+    if (dto.fullName) {
+      user.fullName = dto.fullName;
+    }
+
+    user.lastActivity = new Date().toISOString();
+    await user.save();
+
+    return this.buildUserProfileData(user);
+  }
+
+  public async updatePassword(
+    token: string,
+    dto: UpdatePasswordDto,
+  ): Promise<UserProfile> {
+    const user = await this.getUserByToken('ACCESS_TOKEN', token);
+    if (!user) {
+      throw new UnauthorizedException('BAD_TOKEN');
+    }
+
+    if (!(await this.loginPasswordEquals(user, dto.oldPassword))) {
+      throw new ValidationException('BAD_PASSWORD');
+    }
+
+    user.password = await bcrypt.hash(dto.newPassword, 3);
+    user.lastActivity = new Date().toISOString();
+    await user.save();
+
+    return this.buildUserProfileData(user);
   }
 
   public buildUserProfileData(user: UserDocument): UserProfile {

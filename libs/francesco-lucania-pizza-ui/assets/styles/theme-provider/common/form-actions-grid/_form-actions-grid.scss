@@ -1,0 +1,11 @@
+@use '../../core/mixins/mixins' as mixins;
+
+.form-actions-grid {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+
+  @include mixins.mq(sm) {
+    flex-direction: column;
+  }
+}

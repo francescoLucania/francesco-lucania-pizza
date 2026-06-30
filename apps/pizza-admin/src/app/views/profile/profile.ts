@@ -1,24 +1,37 @@
-import {Component, DestroyRef, inject, OnInit, signal} from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonComponent } from '@francesco-lucania-pizza/angular-ui';
 import { AuthService } from '../../services/auth/auth.service';
 import { AuthSessionService } from '../../services/auth/auth-session.service';
-import { UserProfile } from '@francesco-lucania-pizza-models';
-import { ApiService } from '../../services/api/api.service';
+import {
+  Gender,
+  RegistrationBody,
+  UpdateUserBody,
+  UserProfile,
+} from '@francesco-lucania-pizza-models';
 import { environment } from '../../../environments';
-import {UserDataService} from "../../services/auth";
-import {filter} from "rxjs/operators";
+import { UserDataService } from '../../services/auth';
+import { filter } from 'rxjs/operators';
+import { RegistrationForm } from '../../components/registration-form/registration-form';
+import { extractServerErrorCode } from '../../utils/extract-server-error-code';
+import { normalizePhone } from '@francesco-lucania-pizza/utils';
+import {
+  createEmptyRegistrationModel,
+  createProfileUpdateFormFields,
+  formatPhoneForInput,
+  isProfileUpdateFormValid,
+} from '../../components/registration-form/registration-form.utils';
 
 @Component({
   selector: 'pizza-admin-profile',
-  imports: [ButtonComponent],
+  imports: [ButtonComponent, RegistrationForm],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
 })
 export class Profile implements OnInit {
   private readonly authService = inject(AuthService);
-  private readonly userService = inject(UserDataService);
+  private readonly userDataService = inject(UserDataService);
   private readonly session = inject(AuthSessionService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
@@ -29,6 +42,17 @@ export class Profile implements OnInit {
   protected readonly errorText = signal<string | null>(null);
   protected readonly avatarUploading = signal(false);
   protected readonly avatarError = signal<string | null>(null);
+  protected readonly isEditing = signal(false);
+  protected readonly formSubmitting = signal(false);
+  protected readonly formServerError = signal<string | null>(null);
+  protected readonly successText = signal<string | null>(null);
+  protected readonly formSubmitted = signal(false);
+  protected readonly updateFormModel = signal<RegistrationBody>(
+    createEmptyRegistrationModel(),
+  );
+  protected readonly updateForm = createProfileUpdateFormFields(
+    this.updateFormModel,
+  );
 
   protected getProfileImageUrl(picture: string | undefined): string {
     const base = this.staticEndpoint().replace(/\/+$/, '');
@@ -39,11 +63,15 @@ export class Profile implements OnInit {
     return `${base}/${normalizedPicture}`;
   }
 
+  protected getGenderLabel(gender: Gender): string {
+    return gender === 'female' ? 'Женский' : 'Мужской';
+  }
+
   public ngOnInit(): void {
-    this.userService.userData$
+    this.userDataService.userData$
       .pipe(
-        filter(data => Boolean(data)),
-        takeUntilDestroyed(this.destroyRef)
+        filter((data) => Boolean(data)),
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
         next: (data) => {
@@ -59,6 +87,48 @@ export class Profile implements OnInit {
       });
   }
 
+  protected startEditing(): void {
+    const data = this.profile();
+    if (!data) {
+      return;
+    }
+
+    this.updateFormModel.set({
+      email: data.email,
+      phone: formatPhoneForInput(data.phone),
+      name: data.name,
+      fullName: data.fullName,
+      gender: data.gender,
+      dateIssue: data.dateIssue,
+      password: '',
+    });
+    this.formSubmitted.set(false);
+    this.formServerError.set(null);
+    this.successText.set(null);
+    this.isEditing.set(true);
+  }
+
+  protected cancelEditing(): void {
+    this.isEditing.set(false);
+    this.formServerError.set(null);
+    this.formSubmitted.set(false);
+  }
+
+  protected sendProfileUpdate(): void {
+    this.formSubmitted.set(true);
+
+    if (!isProfileUpdateFormValid(this.updateForm)) {
+      return;
+    }
+
+    const { phone, name, fullName } = this.updateFormModel();
+    this.onProfileUpdate({
+      phone: normalizePhone(phone),
+      name,
+      fullName,
+    });
+  }
+
   protected logout(): void {
     this.authService
       .logout()
@@ -69,7 +139,6 @@ export class Profile implements OnInit {
           void this.router.navigateByUrl('/');
         },
         error: () => {
-          // Даже если запрос не удался, очищаем локальную сессию
           this.session.logout();
           void this.router.navigateByUrl('/');
         },
@@ -93,12 +162,45 @@ export class Profile implements OnInit {
         next: (res) => {
           this.avatarUploading.set(false);
           this.profile.update((p) => (p ? { ...p, picture: res.picture } : p));
+          this.userDataService.setUserData({
+            ...this.profile()!,
+            picture: res.picture,
+          });
         },
         error: () => {
           this.avatarUploading.set(false);
           this.avatarError.set(
             'Не удалось загрузить аватар. Попробуйте ещё раз.',
           );
+        },
+      });
+  }
+
+  private onProfileUpdate(formData: UpdateUserBody): void {
+    this.formServerError.set(null);
+    this.successText.set(null);
+    this.formSubmitting.set(true);
+
+    this.authService
+      .updateUser(formData)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (updatedProfile) => {
+          this.formSubmitting.set(false);
+          this.profile.set(updatedProfile);
+          this.isEditing.set(false);
+          this.formSubmitted.set(false);
+          this.successText.set('Данные профиля успешно обновлены.');
+        },
+        error: (error: unknown) => {
+          this.formSubmitting.set(false);
+          const code = extractServerErrorCode(error);
+          if (code) {
+            this.formServerError.set(code);
+            return;
+          }
+
+          this.formServerError.set('UPDATE_FAILED');
         },
       });
   }

@@ -1,17 +1,24 @@
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { RegistrationForm } from './components/registration-form/registration-form';
+import { ButtonComponent } from '@francesco-lucania-pizza/angular-ui';
+import { RegistrationForm } from '../../components/registration-form/registration-form';
 import { AuthService } from '../../services/auth/auth.service';
 import {
   RegistrationBody,
   CreateResponse,
 } from '@francesco-lucania-pizza-models';
-import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { extractServerErrorCode } from '../../utils/extract-server-error-code';
+import { normalizePhone } from '@francesco-lucania-pizza/utils';
+import {
+  createEmptyRegistrationModel,
+  createRegistrationFormFields,
+  isRegistrationFormValid,
+} from '../../components/registration-form/registration-form.utils';
 
 @Component({
   selector: 'pizza-admin-registration',
-  imports: [RegistrationForm],
+  imports: [RegistrationForm, ButtonComponent],
   templateUrl: './registration.html',
   styleUrl: './registration.scss',
 })
@@ -21,44 +28,50 @@ export class Registration {
   private readonly router = inject(Router);
 
   protected readonly serverError = signal<string | null>(null);
+  protected readonly submitted = signal(false);
+  protected readonly isLoading = signal(false);
+  protected readonly registrationModel = signal<RegistrationBody>(
+    createEmptyRegistrationModel(),
+  );
+  protected readonly registrationForm = createRegistrationFormFields(
+    this.registrationModel,
+  );
 
-  protected onFormSubmit(registrationData: RegistrationBody): void {
+  protected send(): void {
+    this.submitted.set(true);
+
+    if (!isRegistrationFormValid(this.registrationForm)) {
+      return;
+    }
+
+    this.isLoading.set(true);
+    const formValue = this.registrationModel();
+    const registrationData: RegistrationBody = {
+      ...formValue,
+      phone: normalizePhone(formValue.phone),
+    };
+
+    this.onFormSubmit(registrationData);
+  }
+
+  private onFormSubmit(registrationData: RegistrationBody): void {
     this.serverError.set(null);
     this.authService
       .register(registrationData)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response: CreateResponse) => {
+          this.isLoading.set(false);
           // eslint-disable-next-line no-console
           console.log('Регистрация успешна:', response);
           void this.router.navigateByUrl('/activate');
         },
         error: (error: unknown) => {
+          this.isLoading.set(false);
           // eslint-disable-next-line no-console
           console.error('Ошибка регистрации:', error);
-          const code = this.extractServerErrorCode(error);
-          this.serverError.set(code);
+          this.serverError.set(extractServerErrorCode(error));
         },
       });
-  }
-
-  private extractServerErrorCode(error: unknown): string | null {
-    if (error instanceof HttpErrorResponse) {
-      // Nest ValidationException sends raw string like 'BUSY_PHONE'
-      const err = error.error as any;
-      if (typeof err === 'string') {
-        return err;
-      }
-      if (err && typeof err.message === 'string') {
-        return err.message;
-      }
-      if (err && typeof err.messages === 'string') {
-        return err.messages;
-      }
-      if (err && typeof err.error === 'string') {
-        return err.error;
-      }
-    }
-    return null;
   }
 }
