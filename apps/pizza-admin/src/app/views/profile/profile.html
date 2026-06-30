@@ -12,7 +12,7 @@
     <div class="text-base-small profile__success mt-16">{{ successMessage }}</div>
     }
 
-      @if (!isEditing()) {
+      @if (!isEditing() && !isChangingPassword()) {
         <div class="mt-24 profile__avatar-block">
           <div class="profile__avatar-wrapper">
             <img
@@ -61,22 +61,59 @@
           </div>
           <div class="mt-16">
             <span class="text-base-small color-secondary">Дата рождения:</span>
-            {{ profileData.dateIssue }}
+            {{ profileData.dateIssue | dateReadable }}
           </div>
           <div class="mt-16">
             <span class="text-base-small color-secondary">Создан:</span>
-            {{ profileData.created }}
+            {{ profileData.created | dateReadable:'datetime' }}
           </div>
           <div class="mt-16">
             <span class="text-base-small color-secondary">Последняя активность:</span>
-            {{ profileData.lastActivity }}
+            {{ profileData.lastActivity | dateReadable:'datetime' }}
           </div>
         </div>
       }
 
 
+    @if (isChangingPassword()) {
+    <form class="profile__form mt-24">
+      <h2 class="profile__form-title heading-h2">Смена пароля</h2>
+
+      @if (passwordFormServerError() === 'UPDATE_PASSWORD_FAILED') {
+      <div class="text-base-small color-error mb-16">
+        Не удалось сменить пароль. Попробуйте ещё раз.
+      </div>
+      }
+
+      <pizza-admin-change-password-form
+        [changePasswordForm]="passwordForm"
+        [formModel]="passwordFormModel"
+        [submitted]="passwordFormSubmitted()"
+        [serverError]="passwordFormServerError()"
+      />
+
+      <div class="form-actions-grid mt-24">
+        <pizza-lib-button
+          [buttonType]="'button'"
+          [label]="passwordFormSubmitting() ? 'Сохраняем...' : 'Сменить пароль'"
+          [theme]="'brand'"
+          [fullWidth]="true"
+          [disabled]="passwordFormSubmitting()"
+          (click)="sendPasswordUpdate()"
+        />
+        <pizza-lib-button
+          [buttonType]="'button'"
+          [label]="'Отмена'"
+          [theme]="'secondary'"
+          [fullWidth]="true"
+          (click)="cancelChangingPassword()"
+        />
+      </div>
+    </form>
+    }
+
     @if (isEditing()) {
-    <form class="profile__form mt-24" (ngSubmit)="sendProfileUpdate()">
+    <form class="profile__form mt-24">
 
       @if (formServerError() === 'UPDATE_FAILED') {
       <div class="text-base-small color-error mb-16">
@@ -93,11 +130,12 @@
 
       <div class="form-actions-grid mt-24">
         <pizza-lib-button
-          [buttonType]="'submit'"
+          [buttonType]="'button'"
           [label]="formSubmitting() ? 'Сохраняем...' : 'Сохранить изменения'"
           [theme]="'brand'"
           [fullWidth]="true"
           [disabled]="formSubmitting() || !updateForm.phone().valid() || !updateForm.name().valid() || !updateForm.fullName().valid()"
+          (click)="sendProfileUpdate()"
         />
         <pizza-lib-button
           [buttonType]="'button'"
@@ -111,13 +149,20 @@
     }
 
     <div class="form-actions-grid mt-24">
-      @if (!isEditing()) {
+      @if (!isEditing() && !isChangingPassword()) {
       <pizza-lib-button
         [buttonType]="'button'"
         [fullWidth]="true"
         [label]="'Редактировать данные'"
         [theme]="'brand'"
         (click)="startEditing()"
+      />
+      <pizza-lib-button
+        [buttonType]="'button'"
+        [fullWidth]="true"
+        [label]="'Сменить пароль'"
+        [theme]="'secondary'"
+        (click)="startChangingPassword()"
       />
       }
       <pizza-lib-button

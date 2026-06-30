@@ -7,6 +7,7 @@ import { AuthSessionService } from '../../services/auth/auth-session.service';
 import {
   Gender,
   RegistrationBody,
+  UpdatePasswordBody,
   UpdateUserBody,
   UserProfile,
 } from '@francesco-lucania-pizza-models';
@@ -22,10 +23,17 @@ import {
   formatPhoneForInput,
   isProfileUpdateFormValid,
 } from '../../components/registration-form/registration-form.utils';
+import { DateReadablePipe } from '../../pipes/date-readable.pipe';
+import { ChangePasswordForm } from '../../components/change-password-form/change-password-form';
+import {
+  createChangePasswordFormFields,
+  createEmptyChangePasswordModel,
+  isChangePasswordFormValid,
+} from '../../components/change-password-form/change-password-form.utils';
 
 @Component({
   selector: 'pizza-admin-profile',
-  imports: [ButtonComponent, RegistrationForm],
+  imports: [ButtonComponent, RegistrationForm, ChangePasswordForm, DateReadablePipe],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
 })
@@ -43,15 +51,23 @@ export class Profile implements OnInit {
   protected readonly avatarUploading = signal(false);
   protected readonly avatarError = signal<string | null>(null);
   protected readonly isEditing = signal(false);
+  protected readonly isChangingPassword = signal(false);
   protected readonly formSubmitting = signal(false);
   protected readonly formServerError = signal<string | null>(null);
+  protected readonly passwordFormSubmitting = signal(false);
+  protected readonly passwordFormServerError = signal<string | null>(null);
   protected readonly successText = signal<string | null>(null);
   protected readonly formSubmitted = signal(false);
+  protected readonly passwordFormSubmitted = signal(false);
   protected readonly updateFormModel = signal<RegistrationBody>(
     createEmptyRegistrationModel(),
   );
   protected readonly updateForm = createProfileUpdateFormFields(
     this.updateFormModel,
+  );
+  protected readonly passwordFormModel = signal(createEmptyChangePasswordModel());
+  protected readonly passwordForm = createChangePasswordFormFields(
+    this.passwordFormModel,
   );
 
   protected getProfileImageUrl(picture: string | undefined): string {
@@ -93,6 +109,10 @@ export class Profile implements OnInit {
       return;
     }
 
+    this.isChangingPassword.set(false);
+    this.passwordFormServerError.set(null);
+    this.passwordFormSubmitted.set(false);
+
     this.updateFormModel.set({
       email: data.email,
       phone: formatPhoneForInput(data.phone),
@@ -112,6 +132,34 @@ export class Profile implements OnInit {
     this.isEditing.set(false);
     this.formServerError.set(null);
     this.formSubmitted.set(false);
+  }
+
+  protected startChangingPassword(): void {
+    this.isEditing.set(false);
+    this.formServerError.set(null);
+    this.formSubmitted.set(false);
+    this.passwordFormModel.set(createEmptyChangePasswordModel());
+    this.passwordFormServerError.set(null);
+    this.passwordFormSubmitted.set(false);
+    this.successText.set(null);
+    this.isChangingPassword.set(true);
+  }
+
+  protected cancelChangingPassword(): void {
+    this.isChangingPassword.set(false);
+    this.passwordFormServerError.set(null);
+    this.passwordFormSubmitted.set(false);
+  }
+
+  protected sendPasswordUpdate(): void {
+    this.passwordFormSubmitted.set(true);
+
+    if (!isChangePasswordFormValid(this.passwordForm, this.passwordFormModel())) {
+      return;
+    }
+
+    const { oldPassword, newPassword } = this.passwordFormModel();
+    this.onPasswordUpdate({ oldPassword, newPassword });
   }
 
   protected sendProfileUpdate(): void {
@@ -201,6 +249,36 @@ export class Profile implements OnInit {
           }
 
           this.formServerError.set('UPDATE_FAILED');
+        },
+      });
+  }
+
+  private onPasswordUpdate(body: UpdatePasswordBody): void {
+    this.passwordFormServerError.set(null);
+    this.successText.set(null);
+    this.passwordFormSubmitting.set(true);
+
+    this.authService
+      .updatePassword(body)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (updatedProfile) => {
+          this.passwordFormSubmitting.set(false);
+          this.profile.set(updatedProfile);
+          this.isChangingPassword.set(false);
+          this.passwordFormSubmitted.set(false);
+          this.passwordFormModel.set(createEmptyChangePasswordModel());
+          this.successText.set('Пароль успешно изменён.');
+        },
+        error: (error: unknown) => {
+          this.passwordFormSubmitting.set(false);
+          const code = extractServerErrorCode(error);
+          if (code) {
+            this.passwordFormServerError.set(code);
+            return;
+          }
+
+          this.passwordFormServerError.set('UPDATE_PASSWORD_FAILED');
         },
       });
   }
